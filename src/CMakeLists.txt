@@ -50,6 +50,8 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.79 REQUIRED COMPONENTS thread)
 message(STATUS "Boost version: ${Boost_VERSION}")
 
+#Curl library
+find_package(CURL REQUIRED)
 
 #declare the target
 add_executable(${EXECUTABLE_NAME}
@@ -64,7 +66,7 @@ message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
 message(STATUS "Using linking flags: ${LINKER_FLAGS}")
 
 target_compile_options(${EXECUTABLE_NAME} PUBLIC ${COMPILE_FLAGS})
-target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} glog)
+target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} glog CURL::libcurl)
 
 #### Unit tests
 if(buildUT)

@@ -1,12 +1,17 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND=noninteractive
 
+RUN apt-get clean
 RUN apt-get update
 RUN apt-get -y dist-upgrade
 
 RUN apt-get install -y build-essential
 RUN apt-get install -y make cmake g++ gdb
 RUN apt-get install -y autoconf libtool pkg-config git wget
+
+# TODO: Download specific versions:
+RUN apt-get install -y libcurl4-openssl-dev
+RUN apt-get install nlohmann-json3-dev
 
 RUN cd /home && wget http://downloads.sourceforge.net/project/boost/boost/1.79.0/boost_1_79_0.tar.gz \
   && tar xfz boost_1_79_0.tar.gz \
@@ -30,7 +35,7 @@ RUN mkdir -p gtest \
   && make \
   && make install
 
-# TODO: Refactor to download specific versions:
+# TODO: Download specific versions:
 RUN apt-get install -y clang
 RUN apt-get install -y clang-format
 RUN apt-get install -y clang-tidy

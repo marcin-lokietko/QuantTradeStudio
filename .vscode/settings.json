@@ -2,7 +2,8 @@
     "cmake.sourceDirectory": "${workspaceFolder}/src",
     "cmake.configureOnOpen": false,
     "files.associations": {
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "iostream": "cpp"
     },
     "editor.formatOnSave": true,
     "clang-format.executable": "clang-format",
