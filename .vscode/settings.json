@@ -1,0 +1,13 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/src",
+    "cmake.configureOnOpen": false,
+    "files.associations": {
+        "filesystem": "cpp"
+    },
+    "editor.formatOnSave": true,
+    "clang-format.executable": "clang-format",
+    "clang-format.style": "file",
+    "clang-format.fallbackStyle": "Google",
+    "clang-format.assumeFilename": "${workspaceFolder}/scripts/.clang-format",
+    "C_Cpp.default.cppStandard": "gnu++20"
+}

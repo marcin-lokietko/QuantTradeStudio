@@ -1,0 +1,101 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build debug",
+            "type": "shell",
+            "command": "scripts/build.sh",
+            "args": [
+                "debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build debug without unit tests",
+            "type": "shell",
+            "command": "scripts/build.sh",
+            "args": [
+                "debug",
+                "skipUT"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "Build production",
+            "type": "shell",
+            "command": "scripts/build.sh",
+            "args": [
+                "production"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            // Address sanitizer (leak detection disabled)
+            // E.g. try using after free:
+            // char *s = (char*)malloc(100); free(s); strcpy(s, "Hello world!");
+            "label": "Build sanitizer",
+            "type": "shell",
+            "command": "scripts/build.sh",
+            "args": [
+                "sanitizer"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "Build profiler",
+            "type": "shell",
+            "command": "scripts/build.sh",
+            "args": [
+                "profiler"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "Launch profiler",
+            "type": "shell",
+            "command": "scripts/run_profiler.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+            },
+            "dependsOn": [
+                "Build profiler"
+            ]
+        },
+        {
+            // Finding memory leaks
+            // E.g. try allocating memory without freeing it later
+            // char* str [[maybe_unused]] = (char*)malloc(5 * sizeof(char));
+            "label": "Launch valgrind",
+            "type": "shell",
+            "command": "scripts/run_valgrind.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+            },
+            "dependsOn": [
+                "Build debug"
+            ]
+        },
+        {
+            "label": "Clean all",
+            "type": "shell",
+            "command": "scripts/clean_all.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+            }
+        }
+    ]
+}
