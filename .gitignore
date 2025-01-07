@@ -1,2 +1,5 @@
 /build
 /logs
+
+/keys/apiKey.txt
+/keys/secretKey.txt

@@ -12,6 +12,7 @@ RUN apt-get install -y autoconf libtool pkg-config git wget
 # TODO: Download specific versions:
 RUN apt-get install -y libcurl4-openssl-dev
 RUN apt-get install nlohmann-json3-dev
+RUN apt-get install libssl-dev
 
 RUN cd /home && wget http://downloads.sourceforge.net/project/boost/boost/1.79.0/boost_1_79_0.tar.gz \
   && tar xfz boost_1_79_0.tar.gz \

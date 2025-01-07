@@ -1,8 +1,14 @@
 #include <curl/curl.h>
 #include <glog/logging.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
+#include <openssl/sha.h>
 
 #include <filesystem>
+#include <fstream>
 #include <nlohmann/json.hpp>
+
+const std::string binanceTestnetBaseUrl = "https://testnet.binance.vision";
 
 void setupLogger(const char* programName, const char* logDir) {
   std::filesystem::create_directory(logDir);
@@ -71,6 +77,57 @@ std::string runHttpGet(const std::string& url) {
   return response;
 }
 
+std::string runHttpGetWithHeader(const std::string& url, const std::string& header) {
+  CURL* curl = curl_easy_init();
+  std::string response;
+
+  if (curl) {
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, header.c_str());
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    curl_slist_free_all(headers);
+  }
+  return response;
+}
+
+std::string generateSignature(const std::string& data, const std::string& secretKey) {
+  unsigned char* digest;
+  digest = HMAC(EVP_sha256(), secretKey.c_str(), secretKey.size(), reinterpret_cast<const unsigned char*>(data.c_str()),
+                data.size(), nullptr, nullptr);
+
+  std::ostringstream result;
+  for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+    result << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(digest[i]);
+  }
+  return result.str();
+}
+
+std::string getSecretKey(const std::string& keysDir) {
+  std::ifstream stream(keysDir + "/secretKey.txt");
+  std::string key;
+  stream >> key;
+  return key;
+}
+std::string getApiKey(const std::string& keysDir) {
+  std::ifstream stream(keysDir + "/apiKey.txt");
+  std::string key;
+  stream >> key;
+  return key;
+}
+
+std::string getAccountUrl(const std::string& keysPath) {
+  const std::string timestamp = "timestamp=" + std::to_string(time(nullptr) * 1000);
+  std::string signature = generateSignature(timestamp, getSecretKey(keysPath));
+  std::string signedQuery = timestamp + "&signature=" + signature;
+  return binanceTestnetBaseUrl + "/api/v3/account?" + signedQuery;
+}
+
 int main(int, char* argv[]) {
   setupLogger(argv[0], argv[1]);
 
@@ -80,11 +137,14 @@ int main(int, char* argv[]) {
   printBinancePrice(symbol);
 
   // Test connectivity with Binance testnet
-  const std::string binanceTestnetBaseUrl = "https://testnet.binance.vision";
   const std::string timeUrl = binanceTestnetBaseUrl + "/api/v3/time";
   const std::string timeResponse = runHttpGet(timeUrl);
-
   LOG(INFO) << "Binance testnet GET /api/v3/time response: " << timeResponse;
+
+  // Print Binance testnet account details
+  const auto accountUrl = getAccountUrl(argv[2]);
+  std::string accountResponse = runHttpGetWithHeader(accountUrl, "X-MBX-APIKEY: " + getApiKey(argv[2]));
+  LOG(INFO) << "Binance testnet GET /api/v3/account response: " << accountResponse;
 
   LOG(INFO) << "########## Ending AlgoTrader";
 }

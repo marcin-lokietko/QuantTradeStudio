@@ -53,6 +53,9 @@ message(STATUS "Boost version: ${Boost_VERSION}")
 #Curl library
 find_package(CURL REQUIRED)
 
+#Openssl library
+find_package(OpenSSL REQUIRED)
+
 #declare the target
 add_executable(${EXECUTABLE_NAME}
     ${PROJECT_SOURCE_DIR}/main.cpp
@@ -66,7 +69,7 @@ message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
 message(STATUS "Using linking flags: ${LINKER_FLAGS}")
 
 target_compile_options(${EXECUTABLE_NAME} PUBLIC ${COMPILE_FLAGS})
-target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} glog CURL::libcurl)
+target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} glog CURL::libcurl OpenSSL::SSL OpenSSL::Crypto)
 
 #### Unit tests
 if(buildUT)
