@@ -1,9 +1,7 @@
 add_library(StockMarketService STATIC
-    BinanceService.cpp
+    Binance/BinanceService.cpp
+    Binance/Encryption.cpp
 )
-
-#Curl library
-find_package(CURL REQUIRED)
 
 #Openssl library
 find_package(OpenSSL REQUIRED)

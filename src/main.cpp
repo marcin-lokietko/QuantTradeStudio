@@ -5,7 +5,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "StockMarketService/BinanceService.h"
+#include "StockMarketService/Binance/BinanceService.h"
 
 void setupLogger(const char* programName, const char* logDir) {
   std::filesystem::create_directory(logDir);
@@ -23,9 +23,9 @@ int main(int, char* argv[]) {
   LOG(INFO) << "########## Starting AlgoTrader";
 
   std::unique_ptr<StockMarketService::IStockMarketService> stockMarketService =
-      std::make_unique<StockMarketService::BinanceService>(argv[2]);
+      std::make_unique<StockMarketService::Binance::BinanceService>(argv[2]);
 
-  LOG(INFO) << "Binance testnet GET /api/v3/time response: " << stockMarketService->getServerTime();
+  LOG(INFO) << "Binance testnet server time: " << stockMarketService->getServerTime();
 
   const std::string symbol = "BTCUSDT";
   LOG(INFO) << "Current price of " << symbol << ": " << stockMarketService->getPrice(symbol);
@@ -44,7 +44,7 @@ int main(int, char* argv[]) {
   file << accountJson.dump(4);
 
   // Make Binance testnet order
-  stockMarketService->makeOrder();
+  stockMarketService->makeOrder("BTCUSDT", "0.0001", "100000.00");
 
   LOG(INFO) << "########## Ending AlgoTrader";
 }
