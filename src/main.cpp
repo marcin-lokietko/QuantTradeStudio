@@ -171,6 +171,15 @@ int main(int, char* argv[]) {
   const std::string symbol = "BTCUSDT";
   printBinancePrice(symbol);
 
+  // Fetch klines
+  const std::string interval = "1h";
+  const std::string klinesUrl =
+      binanceTestnetBaseUrl + "/api/v3/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
+  const std::string klinesResponse = runHttpGet(klinesUrl);
+  const auto klinesJson = nlohmann::json::parse(klinesResponse);
+  std::ofstream fileKlines(std::string(argv[1]) + "/klines.txt");
+  fileKlines << klinesJson.dump(4);
+
   // Print Binance testnet account details
   const auto accountUrl = getAccountUrl(argv[2]);
   std::string accountResponse = runHttpGetWithHeader(accountUrl, "X-MBX-APIKEY: " + getApiKey(argv[2]));
