@@ -20,46 +20,33 @@ size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
   return contentSizeBytes;
 }
 
-std::string runHttpGet(const std::string& url) {
-  CURL* curl = curl_easy_init();
-  std::string response;
-
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, NULL);
-    const auto res = curl_easy_perform(curl);
-
-    if (res != CURLE_OK) {
-      LOG(ERROR) << "Failed, error: " << curl_easy_strerror(res);
-    }
-
-    curl_easy_cleanup(curl);
-  }
-  return response;
-}
-
-std::string runHttpGetWithHeader(const std::string& url, const std::string& header) {
+std::string runHttpGet(const std::string& url, const std::string& header) {
   CURL* curl = curl_easy_init();
   std::string response;
 
   if (curl) {
     struct curl_slist* headers = nullptr;
-    headers = curl_slist_append(headers, header.c_str());
+    if (header.size() > 0) {
+      headers = curl_slist_append(headers, header.c_str());
+    }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_perform(curl);
+    const auto res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK) {
+      LOG(ERROR) << "HTTP GET failed, error: " << curl_easy_strerror(res);
+    }
+
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
   return response;
 }
 
-std::string runHttpPostWithHeader(const std::string& url, const std::string& header) {
+std::string runHttpPost(const std::string& url, const std::string& header) {
   CURL* curl = curl_easy_init();
   std::string response;
 
@@ -121,12 +108,12 @@ std::string getOrderUrl(const std::string& secretKey, const std::string& querySt
 
 std::string BinanceService::getServerTime() {
   const std::string timeUrl = binanceTestnetBaseUrl + "/api/v3/time";
-  return runHttpGet(timeUrl);
+  return runHttpGet(timeUrl, "");
 }
 
 std::string BinanceService::getPrice(const std::string& symbol) {
   std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbol=" + symbol;
-  const auto response = runHttpGet(url);
+  const auto response = runHttpGet(url, "");
 
   const auto jsonResponse = nlohmann::json::parse(response);
   if (jsonResponse.contains("price")) {
@@ -140,12 +127,12 @@ std::string BinanceService::getPrice(const std::string& symbol) {
 std::string BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
   const std::string klinesUrl =
       binanceTestnetBaseUrl + "/api/v3/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
-  return runHttpGet(klinesUrl);
+  return runHttpGet(klinesUrl, "");
 }
 
 std::string BinanceService::getAccountData() {
   const auto accountUrl = getAccountUrl(getSecretKey(keysPath));
-  return runHttpGetWithHeader(accountUrl, "X-MBX-APIKEY: " + getApiKey(keysPath));
+  return runHttpGet(accountUrl, "X-MBX-APIKEY: " + getApiKey(keysPath));
 }
 
 void BinanceService::makeOrder() {
@@ -153,7 +140,7 @@ void BinanceService::makeOrder() {
       "symbol=BTCUSDT&side=BUY&type=LIMIT&timeInForce=GTC&quantity=0.0001&price=100000.00&recvWindow=5000&timestamp=" +
       std::to_string(time(nullptr) * 1000);
   const auto orderUrl = getOrderUrl(getSecretKey(keysPath), queryString);
-  const auto response = runHttpPostWithHeader(orderUrl, "X-MBX-APIKEY: " + getApiKey(keysPath));
+  const auto response = runHttpPost(orderUrl, "X-MBX-APIKEY: " + getApiKey(keysPath));
 
   LOG(INFO) << "Order complete, response: " << response;
 }

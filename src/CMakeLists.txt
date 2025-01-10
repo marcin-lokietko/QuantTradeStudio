@@ -56,11 +56,12 @@ find_package(CURL REQUIRED)
 #Openssl library
 find_package(OpenSSL REQUIRED)
 
+#Add components
+add_subdirectory(StockMarketService)
+
 #declare the target
 add_executable(${EXECUTABLE_NAME}
     ${PROJECT_SOURCE_DIR}/main.cpp
-
-    ${PROJECT_SOURCE_DIR}/StockMarketService/BinanceService.cpp
 )
 
 #include directories
@@ -71,7 +72,13 @@ message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
 message(STATUS "Using linking flags: ${LINKER_FLAGS}")
 
 target_compile_options(${EXECUTABLE_NAME} PUBLIC ${COMPILE_FLAGS})
-target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} glog CURL::libcurl OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} 
+    glog
+    CURL::libcurl
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    StockMarketService
+)
 
 #### Unit tests
 if(buildUT)
