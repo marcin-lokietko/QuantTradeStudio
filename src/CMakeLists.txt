@@ -59,6 +59,8 @@ find_package(OpenSSL REQUIRED)
 #declare the target
 add_executable(${EXECUTABLE_NAME}
     ${PROJECT_SOURCE_DIR}/main.cpp
+
+    ${PROJECT_SOURCE_DIR}/StockMarketService/BinanceService.cpp
 )
 
 #include directories
