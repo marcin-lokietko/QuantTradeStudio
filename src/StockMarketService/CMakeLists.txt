@@ -9,11 +9,12 @@ find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 # include directories
-target_include_directories(StockMarketService PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(StockMarketService PRIVATE ${PROJECT_SOURCE_DIR})
 
 target_link_libraries(StockMarketService
     glog
     CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
+    Http
 )

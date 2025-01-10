@@ -58,6 +58,7 @@ find_package(OpenSSL REQUIRED)
 
 #Add components
 add_subdirectory(StockMarketService)
+add_subdirectory(Http)
 
 #declare the target
 add_executable(${EXECUTABLE_NAME}
@@ -65,7 +66,7 @@ add_executable(${EXECUTABLE_NAME}
 )
 
 #include directories
-target_include_directories(${EXECUTABLE_NAME} PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
 
 #compile and link
 message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
