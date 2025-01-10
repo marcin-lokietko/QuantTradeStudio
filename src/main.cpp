@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 const std::string binanceTestnetBaseUrl = "https://testnet.binance.vision";
+const std::string binanceRealBaseUrl = "https://api.binance.com";
 
 void setupLogger(const char* programName, const char* logDir) {
   std::filesystem::create_directory(logDir);
@@ -28,7 +29,7 @@ size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 
 std::string getBinancePrice(const std::string& symbol) {
   std::string receivedData;
-  std::string url = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol;
+  std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbol=" + symbol;
 
   curl_global_init(CURL_GLOBAL_DEFAULT);
   const auto curl = curl_easy_init();
@@ -96,6 +97,28 @@ std::string runHttpGetWithHeader(const std::string& url, const std::string& head
   return response;
 }
 
+std::string runHttpPostWithHeader(const std::string& url, const std::string& header) {
+  CURL* curl = curl_easy_init();
+  std::string response;
+
+  const std::string postFields = "";
+
+  if (curl) {
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, header.c_str());
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postFields.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    curl_slist_free_all(headers);
+  }
+  return response;
+}
+
 std::string generateSignature(const std::string& data, const std::string& secretKey) {
   unsigned char* digest;
   digest = HMAC(EVP_sha256(), secretKey.c_str(), secretKey.size(), reinterpret_cast<const unsigned char*>(data.c_str()),
@@ -123,9 +146,15 @@ std::string getApiKey(const std::string& keysDir) {
 
 std::string getAccountUrl(const std::string& keysPath) {
   const std::string timestamp = "timestamp=" + std::to_string(time(nullptr) * 1000);
-  std::string signature = generateSignature(timestamp, getSecretKey(keysPath));
-  std::string signedQuery = timestamp + "&signature=" + signature;
+  const std::string signature = generateSignature(timestamp, getSecretKey(keysPath));
+  const std::string signedQuery = timestamp + "&signature=" + signature;
   return binanceTestnetBaseUrl + "/api/v3/account?" + signedQuery;
+}
+
+std::string getOrderUrl(const std::string& keysPath, const std::string& queryString) {
+  const std::string signature = generateSignature(queryString, getSecretKey(keysPath));
+  const std::string signedQuery = queryString + "&signature=" + signature;
+  return binanceTestnetBaseUrl + "/api/v3/order?" + signedQuery;
 }
 
 int main(int, char* argv[]) {
@@ -133,18 +162,32 @@ int main(int, char* argv[]) {
 
   LOG(INFO) << "########## Starting AlgoTrader";
 
-  const std::string symbol = "BTCUSDT";
-  printBinancePrice(symbol);
-
   // Test connectivity with Binance testnet
   const std::string timeUrl = binanceTestnetBaseUrl + "/api/v3/time";
   const std::string timeResponse = runHttpGet(timeUrl);
   LOG(INFO) << "Binance testnet GET /api/v3/time response: " << timeResponse;
 
+  // Print price
+  const std::string symbol = "BTCUSDT";
+  printBinancePrice(symbol);
+
   // Print Binance testnet account details
   const auto accountUrl = getAccountUrl(argv[2]);
   std::string accountResponse = runHttpGetWithHeader(accountUrl, "X-MBX-APIKEY: " + getApiKey(argv[2]));
-  LOG(INFO) << "Binance testnet GET /api/v3/account response: " << accountResponse;
+  LOG(INFO) << "Binance testnet GET /api/v3/account response received and saved to text file";
+  const auto accountJson = nlohmann::json::parse(accountResponse);
+  std::ofstream file(std::string(argv[1]) + "/account.txt");
+  file << accountJson.dump(4);
+
+  // Make Binance testnet order
+  const std::string queryString =
+      "symbol=BTCUSDT&side=BUY&type=LIMIT&timeInForce=GTC&quantity=0.0001&price=100000.00&recvWindow=5000&timestamp=" +
+      std::to_string(time(nullptr) * 1000);
+  const auto orderUrl = getOrderUrl(argv[2], queryString);
+  std::string orderResponse = runHttpPostWithHeader(orderUrl, "X-MBX-APIKEY: " + getApiKey(argv[2]));
+  const auto orderJson = nlohmann::json::parse(orderResponse);
+  std::ofstream fileOrder(std::string(argv[1]) + "/order.txt");
+  fileOrder << orderJson.dump(4);
 
   LOG(INFO) << "########## Ending AlgoTrader";
 }
