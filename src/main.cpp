@@ -32,10 +32,8 @@ int main(int, char* argv[]) {
 
   // Fetch klines
   const std::string interval = "1h";
-  const std::string klinesResponse = stockMarketService->getKlines(symbol, interval);
-  const auto klinesJson = nlohmann::json::parse(klinesResponse);
-  std::ofstream fileKlines(std::string(argv[1]) + "/klines.txt");
-  fileKlines << klinesJson.dump(4);
+  const auto klines = stockMarketService->getKlines(symbol, interval);
+  (void)klines;
 
   // Print Binance testnet account details
   std::string accountResponse = stockMarketService->getAccountData();

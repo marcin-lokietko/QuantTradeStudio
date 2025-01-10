@@ -30,10 +30,22 @@ std::string BinanceService::getPrice(const std::string& symbol) {
   return "";
 }
 
-std::string BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
+StockMarketService::KlineSequence BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
   const std::string klinesUrl =
       binanceTestnetBaseUrl + "/api/v3/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
-  return Http::Http().get(klinesUrl, "");
+  const auto klinesString = Http::Http().get(klinesUrl, "");
+  const auto klinesJson = nlohmann::json::parse(klinesString);
+
+  StockMarketService::KlineSequence sequence;
+  sequence.reserve(klinesJson.size());
+
+  for (const auto& kline : klinesJson) {
+    std::string closePrice = kline[4].get<std::string>();
+    uint64_t closeTime = kline[6].get<uint64_t>();
+    sequence.push_back({.closeTime = closeTime, .closePrice = closePrice});
+  }
+
+  return sequence;
 }
 
 std::string BinanceService::getAccountData() {
