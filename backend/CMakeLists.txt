@@ -12,7 +12,7 @@ set(CMAKE_CXX_COMPILER "/bin/g++")
 
 
 #set compilation flags
-set(EXECUTABLE_NAME "cppSandbox")
+set(EXECUTABLE_NAME "AlgoTrader")
 set(BASIC_COMPILE_FLAGS "-Wall;-Wextra;-Werror;-pthread;-lboost_system;-lrt;-lm;-ldl")
 
 set(PROD_COMPILE_FLAGS ";-O3")

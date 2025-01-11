@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "${workspaceFolder}/src",
+    "cmake.sourceDirectory": "${workspaceFolder}/backend",
     "cmake.configureOnOpen": false,
     "files.associations": {
         "filesystem": "cpp",
@@ -73,7 +73,10 @@
         "valarray": "cpp",
         "variant": "cpp",
         "fstream": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "bitset": "cpp",
+        "unordered_set": "cpp",
+        "regex": "cpp"
     },
     "editor.formatOnSave": true,
     "clang-format.executable": "clang-format",

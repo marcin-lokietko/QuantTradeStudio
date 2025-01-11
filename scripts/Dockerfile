@@ -41,3 +41,8 @@ RUN apt-get install -y clang
 RUN apt-get install -y clang-format
 RUN apt-get install -y clang-tidy
 RUN apt-get install -y valgrind
+
+RUN apt install -y nodejs
+RUN apt install -y npm
+RUN npm install -g @angular/cli@19.0.7
+RUN apt-get install -y curl nginx autotools-dev
