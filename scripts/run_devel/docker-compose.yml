@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  frontend:
+    image: algo-trader-frontend
+    restart: always
+    volumes:
+      - ../../frontend:/algo-trader/frontend
+    ports:
+      - '4200:4200'
+    working_dir: /algo-trader/frontend
+    command: bash -c "npm install && ng serve --host 0.0.0.0"
+  backend:
+    image: algo-trader-backend
+    restart: always
+    volumes:
+      - ../../backend:/algo-trader/backend
+      - ../../build:/algo-trader/build
+      - ../../logs:/algo-trader/logs
+      - ../../keys:/algo-trader/keys
+    ports:
+      - "5000:5000"
+    working_dir: /
+    command: bash -c "/algo-trader/build/debug/AlgoTrader /algo-trader/logs /algo-trader/keys"

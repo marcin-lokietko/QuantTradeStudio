@@ -13,7 +13,8 @@ set(CMAKE_CXX_COMPILER "/bin/g++")
 
 #set compilation flags
 set(EXECUTABLE_NAME "AlgoTrader")
-set(BASIC_COMPILE_FLAGS "-Wall;-Wextra;-Werror;-pthread;-lboost_system;-lrt;-lm;-ldl")
+# set(BASIC_COMPILE_FLAGS "-Wall;-Wextra;-Werror;-pthread;-lboost_system;-lrt;-lm;-ldl")
+set(BASIC_COMPILE_FLAGS "-Wall;-Wextra;-Werror;-pthread;-lrt;-lm;-ldl")
 
 set(PROD_COMPILE_FLAGS ";-O3")
 set(SANITIZER_COMPILE_FLAGS ";-ggdb;-O0;-fsanitize=address,undefined")
@@ -43,12 +44,12 @@ message(STATUS "Configured sources directory: ${PROJECT_SOURCE_DIR}")
 message(STATUS "Configured binary output directory: ${CMAKE_CURRENT_BINARY_DIR}")
 
 
-#Boost libraries
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.79 REQUIRED COMPONENTS thread)
-message(STATUS "Boost version: ${Boost_VERSION}")
+# #Boost libraries
+# set(Boost_USE_STATIC_LIBS OFF)
+# set(Boost_USE_MULTITHREADED ON)
+# set(Boost_USE_STATIC_RUNTIME OFF)
+# find_package(Boost 1.79 REQUIRED COMPONENTS thread)
+# message(STATUS "Boost version: ${Boost_VERSION}")
 
 #Curl library
 find_package(CURL REQUIRED)

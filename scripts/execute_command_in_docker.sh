@@ -14,5 +14,5 @@ docker run \
     -p 4200:4200 \
     -p 5000:5000 \
     -p 8080:8080 \
-    -it algo-trader \
-    bash -c "$1"
+    -it algo-trader-$1 \
+    bash -c "$2"
