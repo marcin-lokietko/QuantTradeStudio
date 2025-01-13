@@ -57,8 +57,9 @@ find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 #Add components
-add_subdirectory(StockMarketService)
+add_subdirectory(GuiService)
 add_subdirectory(Http)
+add_subdirectory(StockMarketService)
 
 #declare the target
 add_executable(${EXECUTABLE_NAME}
@@ -78,6 +79,8 @@ target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS}
     CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
+    GuiService
+    Http
     StockMarketService
 )
 

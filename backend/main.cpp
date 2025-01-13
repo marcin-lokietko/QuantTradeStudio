@@ -5,6 +5,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
+#include "GuiService/ServiceFactory.hpp"
 #include "StockMarketService/Binance/BinanceService.h"
 
 void setupLogger(const char* programName, const char* logDir) {
@@ -43,6 +44,9 @@ int main(int, char* argv[]) {
 
   // Make Binance testnet order
   stockMarketService->makeOrder("BTCUSDT", "0.0001", "100000.00");
+
+  auto guiService = GuiService::ServiceFactory().makeGuiService();
+  guiService->start();
 
   LOG(INFO) << "########## Ending AlgoTrader";
 }

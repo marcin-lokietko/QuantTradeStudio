@@ -46,3 +46,9 @@ RUN apt install -y nodejs
 RUN apt install -y npm
 RUN npm install -g @angular/cli@19.0.7
 RUN apt-get install -y curl nginx autotools-dev
+
+RUN apt-get install -y libasio-dev
+RUN mkdir -p crow \
+  && cd crow \
+  && wget https://github.com/CrowCpp/Crow/releases/download/v1.2.0/Crow-1.2.0-Linux.deb \
+  && dpkg -i Crow-1.2.0-Linux.deb
