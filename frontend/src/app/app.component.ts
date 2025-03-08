@@ -16,7 +16,7 @@ export class AppComponent {
   }
 
   getData(): void {
-    fetch('http://0.0.0.0:5000/hello')
+    fetch('http://localhost:5000/hello')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

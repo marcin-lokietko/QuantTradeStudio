@@ -1,8 +1,14 @@
 version: '3'
 
+networks:
+  algo-trader-network:
+    driver: bridge
+
 services:
   frontend:
     image: algo-trader-frontend
+    networks:
+      - algo-trader-network
     restart: always
     volumes:
       - ../../frontend:/algo-trader/frontend
@@ -12,6 +18,8 @@ services:
     command: bash -c "npm install && ng serve --host 0.0.0.0"
   backend:
     image: algo-trader-backend
+    networks:
+      - algo-trader-network
     restart: always
     volumes:
       - ../../backend:/algo-trader/backend

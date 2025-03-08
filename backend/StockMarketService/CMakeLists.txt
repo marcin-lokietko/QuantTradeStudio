@@ -8,8 +8,9 @@ find_package(OpenSSL REQUIRED)
 
 # include directories
 target_include_directories(StockMarketService PRIVATE ${PROJECT_SOURCE_DIR})
+target_compile_options(StockMarketService PUBLIC ${COMPILE_FLAGS})
 
-target_link_libraries(StockMarketService
+target_link_libraries(StockMarketService ${LINKER_FLAGS}
     glog
     CURL::libcurl
     OpenSSL::SSL
