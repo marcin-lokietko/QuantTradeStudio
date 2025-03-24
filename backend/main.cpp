@@ -36,16 +36,10 @@ int main(int, char* argv[]) {
   const auto klines = stockMarketService->getKlines(symbol, interval);
   (void)klines;
 
-  // Print Binance testnet account details
-  std::string accountResponse = stockMarketService->getAccountData();
-  const auto accountJson = nlohmann::json::parse(accountResponse);
-  std::ofstream file(std::string(argv[1]) + "/account.txt");
-  file << accountJson.dump(4);
-
   // Make Binance testnet order
   stockMarketService->makeOrder("BTCUSDT", "0.0001", "100000.00");
 
-  auto guiService = GuiService::ServiceFactory().makeGuiService();
+  auto guiService = GuiService::ServiceFactory().makeGuiService(*stockMarketService.get());
   guiService->start();
 
   LOG(INFO) << "########## Ending AlgoTrader";

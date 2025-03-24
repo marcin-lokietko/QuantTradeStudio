@@ -48,7 +48,7 @@ StockMarketService::KlineSequence BinanceService::getKlines(const std::string& s
   return sequence;
 }
 
-std::string BinanceService::getAccountData() {
+std::string BinanceService::getAccountData() const {
   const auto accountUrl = getAccountUrl();
   return Http::Http().get(accountUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
 }
@@ -62,14 +62,14 @@ void BinanceService::makeOrder(const std::string& symbol, const std::string& qua
   LOG(INFO) << "Order complete, response: " << response;
 }
 
-std::string BinanceService::getAccountUrl() {
+std::string BinanceService::getAccountUrl() const {
   const std::string timestamp = "timestamp=" + getTimeSinceEpoch();
   const std::string signature = encryption.generateSignature(timestamp);
   const std::string signedQuery = timestamp + "&signature=" + signature;
   return binanceTestnetBaseUrl + "/api/v3/account?" + signedQuery;
 }
 
-std::string BinanceService::getOrderUrl(const std::string& queryString) {
+std::string BinanceService::getOrderUrl(const std::string& queryString) const {
   const std::string signature = encryption.generateSignature(queryString);
   const std::string signedQuery = queryString + "&signature=" + signature;
   return binanceTestnetBaseUrl + "/api/v3/order?" + signedQuery;

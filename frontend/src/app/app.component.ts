@@ -1,15 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, MatButtonModule, MatMenuModule, MatIconModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'algo-trader-gui';
-  public message = "";
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.getData();
@@ -25,11 +30,14 @@ export class AppComponent {
         //return response.json();
       })
       .then(data => {
-        this.message = data;
-        console.log('API Response:', this.message);
+        console.log('API Response:', data);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
+  }
+
+  navigateToWallet(): void {
+    this.router.navigate(['/account/wallet']);
   }
 }

@@ -8,7 +8,7 @@ in command line
 
 ## Building backend using VS code
 1. Connect to backend Docker container using .devcontainer/devcontainer.json configuration
-2. Execute task "Build debug" defined in .vscode/tasks.json
+2. Execute task "Build debug" defined in .vscode/tasks.json (this is the default build, so you can just click Ctrl + Shift + b)
 
 # Launching
 ## Run in development mode
@@ -20,7 +20,7 @@ in command line
 
 ## Run in development mode using VS code for backend debugging
 1. Connect to backend Docker container using .devcontainer/devcontainer.json configuration
-2. Execute "Launch main debug" debug config defined in .vscode/launch.json
+2. Execute "Launch main debug" debug config defined in .vscode/launch.json (this is the default task, so you can just click F5)
 3. Execute
 ```
 ./scripts/run_frontend_in_docker.sh

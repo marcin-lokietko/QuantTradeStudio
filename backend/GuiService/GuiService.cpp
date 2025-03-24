@@ -1,5 +1,7 @@
 #include <glog/logging.h>
 
+#include <nlohmann/json.hpp>
+
 #include "GuiService.hpp"
 #include "crow.h"
 
@@ -11,6 +13,17 @@ void GuiService::start() {
   CROW_ROUTE(app, "/hello")
   ([]() {
     crow::response res("Hello world from backend");
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Content-Type", "application/json");
+    return res;
+  });
+
+  CROW_ROUTE(app, "/wallet")
+  ([&stockMarketService_ = stockMarketService_]() {
+    const std::string accountResponse = stockMarketService_.getAccountData();
+    const auto accountJson = nlohmann::json::parse(accountResponse);
+    crow::response res(accountJson.dump());
+
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;
