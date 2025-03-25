@@ -39,7 +39,7 @@ int main(int, char* argv[]) {
   // Make Binance testnet order
   stockMarketService->makeOrder("BTCUSDT", "0.0001", "100000.00");
 
-  auto guiService = GuiService::ServiceFactory().makeGuiService(*stockMarketService.get());
+  auto guiService = GuiService::ServiceFactory().makeGuiService(*stockMarketService.get(), argv[1]);
   guiService->start();
 
   LOG(INFO) << "########## Ending AlgoTrader";

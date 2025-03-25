@@ -1,12 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+
+export interface Balance {
+  asset: string;
+  free: string;
+  locked: string;
+}
 
 @Component({
   selector: 'app-wallet-page',
+  imports: [MatTableModule, MatSortModule, MatIconModule],
   templateUrl: './wallet-page.component.html',
   styleUrls: ['./wallet-page.component.scss']
 })
 export class WalletPage {
-  public wallet = '';
+  public balances: Balance[] = [];
+  public displayedColumns: string[] = ['asset', 'free'];
+
+  dataSource = new MatTableDataSource(this.balances);
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
     this.getData();
@@ -21,12 +36,17 @@ export class WalletPage {
         return response.json();
       })
       .then(data => {
-        this.wallet = JSON.stringify(data);
-        console.log('API Response:', data);
+        try {
+          this.balances = data.balances as Balance[];
+          this.dataSource = new MatTableDataSource(this.balances);
+          this.dataSource.sort = this.sort;
+        } catch (error) {
+          console.error("Invalid wallet content:", error);
+        }
+        console.log('API Response:', JSON.stringify(data.balances));
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
   }
 }
-

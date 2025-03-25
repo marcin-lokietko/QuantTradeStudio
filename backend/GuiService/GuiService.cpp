@@ -19,11 +19,14 @@ void GuiService::start() {
   });
 
   CROW_ROUTE(app, "/wallet")
-  ([&stockMarketService_ = stockMarketService_]() {
+  ([&stockMarketService_ = stockMarketService_, &logsCatalog_ = logsCatalog_]() {
     const std::string accountResponse = stockMarketService_.getAccountData();
     const auto accountJson = nlohmann::json::parse(accountResponse);
-    crow::response res(accountJson.dump());
 
+    std::ofstream file(logsCatalog_ + "/wallet.txt");
+    file << accountJson.dump(4);
+
+    crow::response res(accountJson.dump());
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;
