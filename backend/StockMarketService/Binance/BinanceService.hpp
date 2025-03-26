@@ -1,7 +1,7 @@
 #pragma once
 
-#include "StockMarketService/Binance/Encryption.h"
-#include "StockMarketService/IStockMarketService.h"
+#include "StockMarketService/Binance/Encryption.hpp"
+#include "StockMarketService/IStockMarketService.hpp"
 
 namespace StockMarketService::Binance {
 

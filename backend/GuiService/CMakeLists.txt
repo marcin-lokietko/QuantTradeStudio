@@ -1,6 +1,5 @@
 add_library(GuiService STATIC
-    GuiService.cpp
-    ServiceFactory.cpp
+    HttpGuiService.cpp
 )
 
 #search for headers in root project directory

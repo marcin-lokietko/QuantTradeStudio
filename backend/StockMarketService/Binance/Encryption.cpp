@@ -1,13 +1,13 @@
 #include <glog/logging.h>
-#include <openssl/evp.h>
-#include <openssl/hmac.h>
-#include <openssl/sha.h>
 
 #include <fstream>
 #include <iomanip>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
+#include <openssl/sha.h>
 #include <sstream>
 
-#include "Encryption.h"
+#include "Encryption.hpp"
 
 namespace StockMarketService::Binance {
 std::string Encryption::generateSignature(const std::string& data) const {

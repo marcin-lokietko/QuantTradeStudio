@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IAccount.h"
-#include "StockMarketService/IStockMarketService.h"
+#include "IAccount.hpp"
+#include "StockMarketService/IStockMarketService.hpp"
 
 namespace Account {
 

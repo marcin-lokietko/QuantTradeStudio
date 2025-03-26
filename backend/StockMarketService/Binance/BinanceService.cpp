@@ -3,8 +3,8 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-#include "BinanceService.h"
-#include "Http/Http.h"
+#include "BinanceService.hpp"
+#include "Http/Http.hpp"
 
 namespace StockMarketService::Binance {
 

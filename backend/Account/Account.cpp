@@ -2,8 +2,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "Account.h"
-#include "Wallet.h"
+#include "Account.hpp"
+#include "Wallet.hpp"
 
 namespace Account {
 

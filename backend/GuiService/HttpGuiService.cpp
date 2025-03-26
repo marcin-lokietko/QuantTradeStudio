@@ -2,8 +2,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "Account/Wallet.h"
-#include "GuiService.hpp"
+#include "Account/Wallet.hpp"
+#include "HttpGuiService.hpp"
 #include "crow.h"
 
 namespace GuiService {
@@ -13,7 +13,7 @@ void to_json(nlohmann::json& j, const Account::WalletItem& walletItem) {
       {"asset", walletItem.asset}, {"amountFree", walletItem.amountFree}, {"usdtValue", walletItem.usdtValue}};
 }
 
-void GuiService::start() {
+void HttpGuiService::start() {
   crow::SimpleApp app;
 
   CROW_ROUTE(app, "/hello")

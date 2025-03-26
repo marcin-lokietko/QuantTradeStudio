@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "KlineSequence.h"
-#include "Prices.h"
+#include "KlineSequence.hpp"
+#include "Prices.hpp"
 
 namespace StockMarketService {
 

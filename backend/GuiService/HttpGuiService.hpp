@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Account/IAccount.h"
+#include "Account/IAccount.hpp"
 #include "IGuiService.hpp"
 
 namespace GuiService {
 
-class GuiService : public IGuiService {
+class HttpGuiService : public IGuiService {
  public:
-  GuiService(const Account::IAccount& account) : account_(account){};
+  HttpGuiService(const Account::IAccount& account) : account_(account){};
 
   void start() override;
 

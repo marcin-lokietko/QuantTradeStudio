@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Wallet.h"
+#include "Wallet.hpp"
 
 namespace Account {
 
