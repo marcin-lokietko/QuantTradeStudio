@@ -8,9 +8,15 @@
         </ng-container>
 
         <!-- column 2: free -->
-        <ng-container matColumnDef="free">
+        <ng-container matColumnDef="amountFree">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Free</th>
-            <td mat-cell *matCellDef="let element">{{ element.free }}</td>
+            <td mat-cell *matCellDef="let element">{{ element.amountFree }}</td>
+        </ng-container>
+
+        <!-- column 2: usdt value -->
+        <ng-container matColumnDef="usdtValue">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>USDT value</th>
+            <td mat-cell *matCellDef="let element">{{ element.usdtValue }}</td>
         </ng-container>
 
         <!-- first row -->

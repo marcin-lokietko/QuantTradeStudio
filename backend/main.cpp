@@ -5,6 +5,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
+#include "Account/Account.h"
 #include "GuiService/ServiceFactory.hpp"
 #include "StockMarketService/Binance/BinanceService.h"
 
@@ -26,20 +27,9 @@ int main(int, char* argv[]) {
   std::unique_ptr<StockMarketService::IStockMarketService> stockMarketService =
       std::make_unique<StockMarketService::Binance::BinanceService>(argv[2]);
 
-  LOG(INFO) << "Binance testnet server time: " << stockMarketService->getServerTime();
+  std::unique_ptr<Account::IAccount> account = std::make_unique<Account::Account>(*stockMarketService.get());
 
-  const std::string symbol = "BTCUSDT";
-  LOG(INFO) << "Current price of " << symbol << ": " << stockMarketService->getPrice(symbol);
-
-  // Fetch klines
-  const std::string interval = "1h";
-  const auto klines = stockMarketService->getKlines(symbol, interval);
-  (void)klines;
-
-  // Make Binance testnet order
-  stockMarketService->makeOrder("BTCUSDT", "0.0001", "100000.00");
-
-  auto guiService = GuiService::ServiceFactory().makeGuiService(*stockMarketService.get(), argv[1]);
+  auto guiService = GuiService::ServiceFactory().makeGuiService(*account.get());
   guiService->start();
 
   LOG(INFO) << "########## Ending AlgoTrader";

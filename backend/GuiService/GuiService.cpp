@@ -2,10 +2,16 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../Account/Wallet.h"
 #include "GuiService.hpp"
 #include "crow.h"
 
 namespace GuiService {
+
+void to_json(nlohmann::json& j, const Account::WalletItem& walletItem) {
+  j = nlohmann::json{
+      {"asset", walletItem.asset}, {"amountFree", walletItem.amountFree}, {"usdtValue", walletItem.usdtValue}};
+}
 
 void GuiService::start() {
   crow::SimpleApp app;
@@ -19,14 +25,17 @@ void GuiService::start() {
   });
 
   CROW_ROUTE(app, "/wallet")
-  ([&stockMarketService_ = stockMarketService_, &logsCatalog_ = logsCatalog_]() {
-    const std::string accountResponse = stockMarketService_.getAccountData();
-    const auto accountJson = nlohmann::json::parse(accountResponse);
+  ([&account_ = account_]() {
+    const auto wallet = account_.getWallet();
+    nlohmann::json walletJson = nlohmann::json::array();
+    for (const auto& walletItem : wallet) {
+      nlohmann::json walletItemJson;
+      to_json(walletItemJson, walletItem);
+      walletJson.push_back(walletItemJson);
+    }
 
-    std::ofstream file(logsCatalog_ + "/wallet.txt");
-    file << accountJson.dump(4);
-
-    crow::response res(accountJson.dump());
+    // TODO merge wallet with prices and send it to frontend
+    crow::response res(walletJson.dump());
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;

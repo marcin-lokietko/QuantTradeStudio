@@ -1,20 +1,18 @@
 #pragma once
 
-#include "../StockMarketService/IStockMarketService.h"
+#include "../Account/IAccount.h"
 #include "IGuiService.hpp"
 
 namespace GuiService {
 
 class GuiService : public IGuiService {
  public:
-  GuiService(const StockMarketService::IStockMarketService& stockMarketService, const std::string& logsCatalog)
-      : stockMarketService_(stockMarketService), logsCatalog_(logsCatalog){};
+  GuiService(const Account::IAccount& account) : account_(account){};
 
   void start() override;
 
  private:
-  const StockMarketService::IStockMarketService& stockMarketService_;
-  const std::string logsCatalog_;
+  const Account::IAccount& account_;
 };
 
 }  // namespace GuiService

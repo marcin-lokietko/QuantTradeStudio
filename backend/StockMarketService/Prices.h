@@ -6,11 +6,11 @@
 
 namespace StockMarketService {
 
-struct Kline {
-  uint64_t closeTime{};
-  std::string closePrice{};
+struct SinglePrice {
+  std::string symbol{};
+  std::string price{};
 };
 
-using KlineSequence = std::vector<Kline>;
+using Prices = std::vector<SinglePrice>;
 
 }  // namespace StockMarketService

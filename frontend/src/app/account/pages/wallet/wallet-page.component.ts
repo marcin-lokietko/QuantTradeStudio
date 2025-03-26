@@ -6,8 +6,8 @@ import { MatTableDataSource } from '@angular/material/table';
 
 export interface Balance {
   asset: string;
-  free: string;
-  locked: string;
+  amountFree: string;
+  usdtValue: string;
 }
 
 @Component({
@@ -18,7 +18,7 @@ export interface Balance {
 })
 export class WalletPage {
   public balances: Balance[] = [];
-  public displayedColumns: string[] = ['asset', 'free'];
+  public displayedColumns: string[] = ['asset', 'amountFree', 'usdtValue'];
 
   dataSource = new MatTableDataSource(this.balances);
   @ViewChild(MatSort) sort!: MatSort;
@@ -37,7 +37,7 @@ export class WalletPage {
       })
       .then(data => {
         try {
-          this.balances = data.balances as Balance[];
+          this.balances = data as Balance[];
           this.dataSource = new MatTableDataSource(this.balances);
           this.dataSource.sort = this.sort;
         } catch (error) {

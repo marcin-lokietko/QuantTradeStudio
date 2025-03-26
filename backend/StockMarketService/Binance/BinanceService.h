@@ -11,7 +11,9 @@ class BinanceService : public IStockMarketService {
 
   std::string getServerTime() override;
 
-  std::string getPrice(const std::string& symbol) override;
+  std::string getPrice(const std::string& tradingPairSymbol) override;
+
+  Prices getPrices(const std::vector<std::string>& tradingPairSymbols) const override;
 
   KlineSequence getKlines(const std::string& symbol, const std::string& interval) override;
 

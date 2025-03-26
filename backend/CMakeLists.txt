@@ -58,6 +58,7 @@ find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 #Add components
+add_subdirectory(Account)
 add_subdirectory(GuiService)
 add_subdirectory(Http)
 add_subdirectory(StockMarketService)
@@ -80,6 +81,7 @@ target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS}
     CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
+    Account
     GuiService
     Http
     StockMarketService

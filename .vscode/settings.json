@@ -76,7 +76,13 @@
         "shared_mutex": "cpp",
         "bitset": "cpp",
         "unordered_set": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "csignal": "cpp",
+        "complex": "cpp",
+        "coroutine": "cpp",
+        "list": "cpp",
+        "future": "cpp",
+        "typeindex": "cpp"
     },
     "editor.formatOnSave": true,
     "clang-format.executable": "clang-format",

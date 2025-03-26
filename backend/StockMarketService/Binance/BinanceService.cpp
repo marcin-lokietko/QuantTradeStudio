@@ -17,8 +17,8 @@ std::string BinanceService::getServerTime() {
   return Http::Http().get(timeUrl, "");
 }
 
-std::string BinanceService::getPrice(const std::string& symbol) {
-  std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbol=" + symbol;
+std::string BinanceService::getPrice(const std::string& tradingPairSymbol) {
+  std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbol=" + tradingPairSymbol;
   const auto response = Http::Http().get(url, "");
 
   const auto jsonResponse = nlohmann::json::parse(response);
@@ -30,6 +30,34 @@ std::string BinanceService::getPrice(const std::string& symbol) {
   return "";
 }
 
+Prices BinanceService::getPrices(const std::vector<std::string>& tradingPairSymbols) const {
+  std::string symbolsString = "[";
+  for (const auto& singleSymbol : tradingPairSymbols) {
+    if (symbolsString.back() != '[') {
+      symbolsString += ",";
+    }
+    symbolsString += '"';
+    symbolsString += singleSymbol;
+    symbolsString += '"';
+  }
+  symbolsString += "]";
+  const std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbols=" + symbolsString;
+  const auto response = Http::Http().get(url, "");
+
+  const auto jsonResponse = nlohmann::json::parse(response);
+
+  Prices prices;
+  prices.reserve(jsonResponse.size());
+
+  for (const auto& singlePrice : jsonResponse) {
+    std::string symbol = singlePrice.at("symbol").get<std::string>();
+    std::string price = singlePrice.at("price").get<std::string>();
+    prices.push_back({.symbol = symbol, .price = price});
+  }
+  return prices;
+}
+
+// e.g. symbol="BTCUSDT", interval="1h"
 StockMarketService::KlineSequence BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
   const std::string klinesUrl =
       binanceTestnetBaseUrl + "/api/v3/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
@@ -53,6 +81,7 @@ std::string BinanceService::getAccountData() const {
   return Http::Http().get(accountUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
 }
 
+// e.g. symbol="BTCUSDT", quantity="0.0001", price="100000.00"
 void BinanceService::makeOrder(const std::string& symbol, const std::string& quantity, const std::string& price) {
   const std::string queryString = "symbol=" + symbol + "&side=BUY&type=LIMIT&timeInForce=GTC&quantity=" + quantity +
                                   "&price=" + price + "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
