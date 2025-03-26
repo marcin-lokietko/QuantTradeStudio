@@ -6,8 +6,9 @@ add_library(StockMarketService STATIC
 #Openssl library
 find_package(OpenSSL REQUIRED)
 
-# include directories
+#search for headers in root project directory
 target_include_directories(StockMarketService PRIVATE ${PROJECT_SOURCE_DIR})
+
 target_compile_options(StockMarketService PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(StockMarketService ${LINKER_FLAGS}

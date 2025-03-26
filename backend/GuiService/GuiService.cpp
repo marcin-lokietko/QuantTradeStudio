@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "../Account/Wallet.h"
+#include "Account/Wallet.h"
 #include "GuiService.hpp"
 #include "crow.h"
 

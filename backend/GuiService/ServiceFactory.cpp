@@ -1,6 +1,6 @@
 #include <string>
 
-#include "../Account/IAccount.h"
+#include "Account/IAccount.h"
 #include "GuiService.hpp"
 #include "ServiceFactory.hpp"
 

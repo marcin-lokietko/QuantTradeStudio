@@ -68,7 +68,7 @@ add_executable(${EXECUTABLE_NAME}
     ${PROJECT_SOURCE_DIR}/main.cpp
 )
 
-#include directories
+#include directories for headers
 target_include_directories(${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
 
 #compile and link

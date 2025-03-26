@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Account/IAccount.h"
+#include "Account/IAccount.h"
 #include "IGuiService.hpp"
 
 namespace GuiService {

@@ -3,8 +3,9 @@ add_library(GuiService STATIC
     ServiceFactory.cpp
 )
 
-# include directories
-target_include_directories(GuiService PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+#search for headers in root project directory
+target_include_directories(GuiService PRIVATE ${PROJECT_SOURCE_DIR})
+
 target_compile_options(GuiService PUBLIC ${COMPILE_FLAGS})
 
 #Crow library
