@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Account/IAccount.hpp"
-#include "IGuiService.hpp"
+#include "GuiService/IGuiService.hpp"
 
-namespace GuiService {
+namespace GuiService::HttpGuiService {
 
 class HttpGuiService : public IGuiService {
  public:
@@ -15,4 +15,4 @@ class HttpGuiService : public IGuiService {
   const Account::IAccount& account_;
 };
 
-}  // namespace GuiService
+}  // namespace GuiService::HttpGuiService

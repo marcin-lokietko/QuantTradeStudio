@@ -1,6 +1,8 @@
 #include <glog/logging.h>
 
+#include <algorithm>
 #include <nlohmann/json.hpp>
+#include <ranges>
 
 #include "Account.hpp"
 #include "Wallet.hpp"
@@ -8,30 +10,28 @@
 namespace Account {
 
 Wallet Account::getWallet() const {
-  const std::string accountResponse = stockMarketService_.getAccountData();
-  const auto accountJson = nlohmann::json::parse(accountResponse);
+  const auto marketWallet = stockMarketService_.getWallet();
 
-  std::vector<std::string> symbols;
-  for (const auto& singleBalance : accountJson.at("balances")) {
-    symbols.push_back(singleBalance.at("asset").get<std::string>() + "USDT");
-  }
+  Wallet domainWallet;
+  const auto domainWalletView = std::views::transform(marketWallet, [](const auto& elem) {
+    return WalletItem{.asset = elem.asset, .amountFree = elem.amountFree, .usdtValue = "1.1"};
+  });
+  std::ranges::copy(domainWalletView, std::back_inserter(domainWallet));
 
-  // TODO - check if trading pair available using GET /api/v3/exchangeInfo - of so, fetch its price
+  return domainWallet;
+
+  // TODO 1: check if trading pair available using GET /api/v3/exchangeInfo - of so, fetch its price
+  // TODO 2: merge wallet with prices (separate component Market?) and send it to frontend
+  // std::vector<std::string> symbols;
+  // for (const auto& singleBalance : accountJson.at("balances")) {
+  //   symbols.push_back(singleBalance.at("asset").get<std::string>() + "USDT");
+  // }
   // const auto prices = stockMarketService_.getPrices(symbols);
   // std::map<std::string, std::string> symbolToPriceMap;
   // for (const auto& singlePrice : prices) {
   //   symbolToPriceMap[singlePrice.symbol] = singlePrice.price;
   // }
-
-  Wallet wallet;
-  for (const auto& singleBalance : accountJson.at("balances")) {
-    std::string asset = singleBalance.at("asset").get<std::string>();
-    std::string amountFree = singleBalance.at("free").get<std::string>();
-    // double usdtValueDouble = std::stod(amountFree) * std::stod(symbolToPriceMap.at(asset));
-    double usdtValueDouble = 1.23;
-    wallet.push_back({.asset = asset, .amountFree = amountFree, .usdtValue = std::to_string(usdtValueDouble)});
-  }
-  return wallet;
+  // double usdtValueDouble = std::stod(amountFree) * std::stod(symbolToPriceMap.at(asset));
 }
 
 }  // namespace Account

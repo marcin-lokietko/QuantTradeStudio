@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Account/Account.hpp"
-#include "GuiService/HttpGuiService.hpp"
+#include "GuiService/HttpGuiService/HttpGuiService.hpp"
 #include "StockMarketService/Binance/BinanceService.hpp"
 
 void setupLogger(const char* programName, const char* logDir) {
@@ -29,7 +29,8 @@ int main(int, char* argv[]) {
 
   std::unique_ptr<Account::IAccount> account = std::make_unique<Account::Account>(*stockMarketService.get());
 
-  std::unique_ptr<GuiService::IGuiService> guiService = std::make_unique<GuiService::HttpGuiService>(*account.get());
+  std::unique_ptr<GuiService::IGuiService> guiService =
+      std::make_unique<GuiService::HttpGuiService::HttpGuiService>(*account.get());
   guiService->start();
 
   LOG(INFO) << "########## Ending AlgoTrader";

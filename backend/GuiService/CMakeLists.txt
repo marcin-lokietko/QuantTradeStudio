@@ -1,5 +1,6 @@
 add_library(GuiService STATIC
-    HttpGuiService.cpp
+  HttpGuiService/Conversion/Wallet.cpp
+  HttpGuiService/HttpGuiService.cpp
 )
 
 #search for headers in root project directory
@@ -14,6 +15,6 @@ set_target_properties(Crow::Crow PROPERTIES
 )
 
 target_link_libraries(GuiService ${LINKER_FLAGS}
-    Crow::Crow
-    glog
+  Crow::Crow
+  glog
 )

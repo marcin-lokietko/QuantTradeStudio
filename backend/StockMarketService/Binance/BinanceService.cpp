@@ -5,6 +5,7 @@
 
 #include "BinanceService.hpp"
 #include "Http/Http.hpp"
+#include "StockMarketService/Binance/Conversion/Wallet.hpp"
 
 namespace StockMarketService::Binance {
 
@@ -76,9 +77,14 @@ StockMarketService::KlineSequence BinanceService::getKlines(const std::string& s
   return sequence;
 }
 
-std::string BinanceService::getAccountData() const {
+Wallet BinanceService::getWallet() const {
   const auto accountUrl = getAccountUrl();
-  return Http::Http().get(accountUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
+  const auto accountString = Http::Http().get(accountUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
+  const auto accountJson = nlohmann::json::parse(accountString);
+
+  Wallet wallet;
+  StockMarketService::Binance::Conversion::fromJson(accountJson.at("balances"), wallet);
+  return wallet;
 }
 
 // e.g. symbol="BTCUSDT", quantity="0.0001", price="100000.00"

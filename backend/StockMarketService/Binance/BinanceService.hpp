@@ -17,7 +17,7 @@ class BinanceService : public IStockMarketService {
 
   KlineSequence getKlines(const std::string& symbol, const std::string& interval) override;
 
-  std::string getAccountData() const override;
+  Wallet getWallet() const override;
 
   void makeOrder(const std::string& symbol, const std::string& quantity, const std::string& price) override;
 
