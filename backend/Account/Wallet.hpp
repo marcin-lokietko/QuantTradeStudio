@@ -4,12 +4,18 @@
 #include <string>
 #include <vector>
 
+#include "Utils/StrongType.hpp"
+
 namespace Account {
 
+DEFINE_STRONG_TYPE(Asset, std::string);
+DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
+DEFINE_STRONG_TYPE(ValueInUsdt, std::string);
+
 struct WalletItem {
-  std::string asset{};
-  std::string amountFree{};
-  std::string usdtValue{};
+  Asset asset{};
+  FreeAssetAmount amountFree{};
+  ValueInUsdt usdtValue{};
 };
 
 using Wallet = std::vector<WalletItem>;

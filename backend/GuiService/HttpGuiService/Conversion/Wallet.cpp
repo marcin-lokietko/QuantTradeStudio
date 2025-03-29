@@ -5,8 +5,9 @@ namespace GuiService::HttpGuiService::Conversion {
 namespace {
 nlohmann::json toJson(const ::Account::WalletItem& walletItem) {
   nlohmann::json j;
-  j = nlohmann::json{
-      {"asset", walletItem.asset}, {"amountFree", walletItem.amountFree}, {"usdtValue", walletItem.usdtValue}};
+  j = nlohmann::json{{"asset", walletItem.asset.val_},
+                     {"amountFree", walletItem.amountFree.val_},
+                     {"usdtValue", walletItem.usdtValue.val_}};
   return j;
 }
 }  // namespace

@@ -14,7 +14,9 @@ Wallet Account::getWallet() const {
 
   Wallet domainWallet;
   const auto domainWalletView = std::views::transform(marketWallet, [](const auto& elem) {
-    return WalletItem{.asset = elem.asset, .amountFree = elem.amountFree, .usdtValue = "1.1"};
+    return WalletItem{.asset = Asset{elem.asset.val_},
+                      .amountFree = FreeAssetAmount{elem.amountFree.val_},
+                      .usdtValue = ValueInUsdt{"1.1"}};
   });
   std::ranges::copy(domainWalletView, std::back_inserter(domainWallet));
 
