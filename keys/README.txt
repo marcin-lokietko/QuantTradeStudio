@@ -1,1 +1,0 @@
-This catalog must contain apiKey.txt and secretKey.txt generated on https://testnet.binance.vision/

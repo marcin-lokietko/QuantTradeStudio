@@ -1,3 +1,8 @@
+# Keys setup
+## Binance testnet
+Create apiKey.txt and secretKey.txt containing keys generated on https://testnet.binance.vision/
+Then copy those txt files into catalog.
+
 # Development
 ## Building Docker images
 Execute
