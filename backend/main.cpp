@@ -7,7 +7,7 @@
 
 #include "Account/Account.hpp"
 #include "GuiService/HttpGuiService/HttpGuiService.hpp"
-#include "StockMarketService/Binance/BinanceService.hpp"
+#include "MarketService/Binance/BinanceService.hpp"
 
 void setupLogger(const char* programName, const char* logDir) {
   std::filesystem::create_directory(logDir);
@@ -24,10 +24,10 @@ int main(int, char* argv[]) {
 
   LOG(INFO) << "########## Starting AlgoTrader";
 
-  std::unique_ptr<StockMarketService::IStockMarketService> stockMarketService =
-      std::make_unique<StockMarketService::Binance::BinanceService>(argv[2]);
+  std::unique_ptr<MarketService::IMarketService> marketService =
+      std::make_unique<MarketService::Binance::BinanceService>(argv[2]);
 
-  std::unique_ptr<Account::IAccount> account = std::make_unique<Account::Account>(*stockMarketService.get());
+  std::unique_ptr<Account::IAccount> account = std::make_unique<Account::Account>(*marketService.get());
 
   std::unique_ptr<GuiService::IGuiService> guiService =
       std::make_unique<GuiService::HttpGuiService::HttpGuiService>(*account.get());

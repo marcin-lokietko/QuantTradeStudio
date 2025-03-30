@@ -1,4 +1,4 @@
-add_library(StockMarketService STATIC
+add_library(MarketService STATIC
     Binance/BinanceService.cpp
     Binance/Conversion/Wallet.cpp
     Binance/Conversion/Prices.cpp
@@ -9,11 +9,11 @@ add_library(StockMarketService STATIC
 find_package(OpenSSL REQUIRED)
 
 #search for headers in root project directory
-target_include_directories(StockMarketService PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(MarketService PRIVATE ${PROJECT_SOURCE_DIR})
 
-target_compile_options(StockMarketService PUBLIC ${COMPILE_FLAGS})
+target_compile_options(MarketService PUBLIC ${COMPILE_FLAGS})
 
-target_link_libraries(StockMarketService ${LINKER_FLAGS}
+target_link_libraries(MarketService ${LINKER_FLAGS}
     glog
     CURL::libcurl
     OpenSSL::SSL

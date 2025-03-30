@@ -1,6 +1,6 @@
 #pragma once
 
-namespace StockMarketService {
+namespace MarketService {
 
 enum class MarketId
 {
@@ -8,4 +8,4 @@ enum class MarketId
   Binance = 1
 };
 
-}  // namespace StockMarketService
+}  // namespace MarketService

@@ -6,11 +6,11 @@
 #include "Prices.hpp"
 #include "Wallet.hpp"
 
-namespace StockMarketService {
+namespace MarketService {
 
-class IStockMarketService {
+class IMarketService {
  public:
-  virtual ~IStockMarketService() = default;
+  virtual ~IMarketService() = default;
   virtual std::string getServerTime() = 0;
   virtual std::string getPrice(const std::string& symbol) = 0;
   virtual Prices getPrices(const std::vector<std::string>& symbols) const = 0;
@@ -19,4 +19,4 @@ class IStockMarketService {
   virtual void makeOrder(const std::string& symbol, const std::string& quantity, const std::string& price) = 0;
 };
 
-}  // namespace StockMarketService
+}  // namespace MarketService

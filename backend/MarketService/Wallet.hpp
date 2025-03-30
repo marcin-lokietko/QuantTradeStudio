@@ -7,7 +7,7 @@
 #include "MarketId.hpp"
 #include "Utils/StrongType.hpp"
 
-namespace StockMarketService {
+namespace MarketService {
 
 DEFINE_STRONG_TYPE(Asset, std::string);
 DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
@@ -20,4 +20,4 @@ struct WalletItem {
 
 using Wallet = std::vector<WalletItem>;
 
-}  // namespace StockMarketService
+}  // namespace MarketService

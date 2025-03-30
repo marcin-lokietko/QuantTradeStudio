@@ -1,19 +1,18 @@
 #pragma once
 
 #include "IAccount.hpp"
-#include "StockMarketService/IStockMarketService.hpp"
+#include "MarketService/IMarketService.hpp"
 
 namespace Account {
 
 class Account : public IAccount {
  public:
-  Account(const StockMarketService::IStockMarketService& stockMarketService)
-      : stockMarketService_(stockMarketService) {}
+  Account(const MarketService::IMarketService& marketService) : marketService_(marketService) {}
 
   Wallet getWallet() const override;
 
  private:
-  const StockMarketService::IStockMarketService& stockMarketService_;
+  const MarketService::IMarketService& marketService_;
 };
 
 }  // namespace Account

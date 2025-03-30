@@ -1,8 +1,8 @@
 #include "Prices.hpp"
 
-namespace StockMarketService::Binance::Conversion {
+namespace MarketService::Binance::Conversion {
 
-void fromJson(const nlohmann::json& j, StockMarketService::Prices& prices) {
+void fromJson(const nlohmann::json& j, MarketService::Prices& prices) {
   prices.clear();
   prices.reserve(j.size());
 
@@ -13,4 +13,4 @@ void fromJson(const nlohmann::json& j, StockMarketService::Prices& prices) {
   }
 }
 
-}  // namespace StockMarketService::Binance::Conversion
+}  // namespace MarketService::Binance::Conversion

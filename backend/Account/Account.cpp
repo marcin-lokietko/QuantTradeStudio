@@ -10,7 +10,7 @@
 namespace Account {
 
 Wallet Account::getWallet() const {
-  const auto marketWallet = stockMarketService_.getWallet();
+  const auto marketWallet = marketService_.getWallet();
 
   Wallet domainWallet;
   const auto domainWalletView = std::views::transform(marketWallet, [](const auto& elem) {
@@ -28,7 +28,7 @@ Wallet Account::getWallet() const {
   // for (const auto& singleBalance : accountJson.at("balances")) {
   //   symbols.push_back(singleBalance.at("asset").get<std::string>() + "USDT");
   // }
-  // const auto prices = stockMarketService_.getPrices(symbols);
+  // const auto prices = marketService_.getPrices(symbols);
   // std::map<std::string, std::string> symbolToPriceMap;
   // for (const auto& singlePrice : prices) {
   //   symbolToPriceMap[singlePrice.symbol] = singlePrice.price;

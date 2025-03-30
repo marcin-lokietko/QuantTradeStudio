@@ -1,15 +1,15 @@
 #include <glog/logging.h>
-
-#include <fstream>
-#include <iomanip>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
+
+#include <fstream>
+#include <iomanip>
 #include <sstream>
 
 #include "Encryption.hpp"
 
-namespace StockMarketService::Binance {
+namespace MarketService::Binance {
 std::string Encryption::generateSignature(const std::string& data) const {
   const auto secretKey = getSecretKey();
   unsigned char* digest;
@@ -37,4 +37,4 @@ std::string Encryption::getSecretKey() const {
   return key;
 }
 
-}  // namespace StockMarketService::Binance
+}  // namespace MarketService::Binance

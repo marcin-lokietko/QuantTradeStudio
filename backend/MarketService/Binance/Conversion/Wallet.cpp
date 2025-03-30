@@ -1,8 +1,8 @@
 #include "Wallet.hpp"
 
-namespace StockMarketService::Binance::Conversion {
+namespace MarketService::Binance::Conversion {
 
-void fromJson(const nlohmann::json& j, StockMarketService::Wallet& wallet) {
+void fromJson(const nlohmann::json& j, MarketService::Wallet& wallet) {
   wallet.clear();
   for (const auto& item : j) {
     std::string asset = item.at("asset").get<std::string>();
@@ -11,4 +11,4 @@ void fromJson(const nlohmann::json& j, StockMarketService::Wallet& wallet) {
   }
 }
 
-}  // namespace StockMarketService::Binance::Conversion
+}  // namespace MarketService::Binance::Conversion

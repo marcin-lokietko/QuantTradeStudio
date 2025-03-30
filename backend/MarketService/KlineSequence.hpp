@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace StockMarketService {
+namespace MarketService {
 
 struct Kline {
   uint64_t closeTime{};
@@ -13,4 +13,4 @@ struct Kline {
 
 using KlineSequence = std::vector<Kline>;
 
-}  // namespace StockMarketService
+}  // namespace MarketService

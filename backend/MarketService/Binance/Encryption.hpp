@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace StockMarketService::Binance {
+namespace MarketService::Binance {
 
 class Encryption {
  public:
@@ -16,4 +16,4 @@ class Encryption {
   const std::string keysDir;
 };
 
-}  // namespace StockMarketService::Binance
+}  // namespace MarketService::Binance

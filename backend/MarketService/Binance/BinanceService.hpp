@@ -1,11 +1,11 @@
 #pragma once
 
-#include "StockMarketService/Binance/Encryption.hpp"
-#include "StockMarketService/IStockMarketService.hpp"
+#include "MarketService/Binance/Encryption.hpp"
+#include "MarketService/IMarketService.hpp"
 
-namespace StockMarketService::Binance {
+namespace MarketService::Binance {
 
-class BinanceService : public IStockMarketService {
+class BinanceService : public IMarketService {
  public:
   BinanceService(std::string keysDir) : encryption(std::move(keysDir)){};
 
@@ -32,4 +32,4 @@ class BinanceService : public IStockMarketService {
   const std::string binanceRealBaseUrl = "https://api.binance.com";
 };
 
-}  // namespace StockMarketService::Binance
+}  // namespace MarketService::Binance

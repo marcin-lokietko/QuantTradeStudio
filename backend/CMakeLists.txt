@@ -61,7 +61,7 @@ find_package(OpenSSL REQUIRED)
 add_subdirectory(Account)
 add_subdirectory(GuiService)
 add_subdirectory(Http)
-add_subdirectory(StockMarketService)
+add_subdirectory(MarketService)
 
 #declare the target
 add_executable(${EXECUTABLE_NAME}
@@ -84,7 +84,7 @@ target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS}
     Account
     GuiService
     Http
-    StockMarketService
+    MarketService
 )
 
 #### Unit tests

@@ -5,10 +5,10 @@
 
 #include "BinanceService.hpp"
 #include "Http/Http.hpp"
-#include "StockMarketService/Binance/Conversion/Prices.hpp"
-#include "StockMarketService/Binance/Conversion/Wallet.hpp"
+#include "MarketService/Binance/Conversion/Prices.hpp"
+#include "MarketService/Binance/Conversion/Wallet.hpp"
 
-namespace StockMarketService::Binance {
+namespace MarketService::Binance {
 
 namespace {
 std::string getTimeSinceEpoch() { return std::to_string(time(nullptr) * 1000); }
@@ -52,13 +52,13 @@ Prices BinanceService::getPrices(const std::vector<std::string>& tradingPairSymb
 }
 
 // e.g. symbol="BTCUSDT", interval="1h"
-StockMarketService::KlineSequence BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
+MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
   const std::string klinesUrl =
       binanceTestnetBaseUrl + "/api/v3/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
   const auto klinesString = Http::Http().get(klinesUrl, "");
   const auto klinesJson = nlohmann::json::parse(klinesString);
 
-  StockMarketService::KlineSequence sequence;
+  MarketService::KlineSequence sequence;
   sequence.reserve(klinesJson.size());
 
   for (const auto& kline : klinesJson) {
@@ -76,7 +76,7 @@ Wallet BinanceService::getWallet() const {
   const auto accountJson = nlohmann::json::parse(accountString);
 
   Wallet wallet;
-  StockMarketService::Binance::Conversion::fromJson(accountJson.at("balances"), wallet);
+  MarketService::Binance::Conversion::fromJson(accountJson.at("balances"), wallet);
   return wallet;
 }
 
@@ -103,4 +103,4 @@ std::string BinanceService::getOrderUrl(const std::string& queryString) const {
   return binanceTestnetBaseUrl + "/api/v3/order?" + signedQuery;
 }
 
-}  // namespace StockMarketService::Binance
+}  // namespace MarketService::Binance
