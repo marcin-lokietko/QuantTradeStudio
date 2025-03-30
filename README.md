@@ -1,3 +1,5 @@
+# General description
+
 # Keys setup
 ## Binance testnet
 Create apiKey.txt and secretKey.txt containing keys generated on https://testnet.binance.vision/
@@ -33,3 +35,9 @@ in command line
 in command line.
 
 Now you can use gdb debugger while running backend connected to frontend.
+
+# Documentation
+* doc/Architecture.md - high-level architecture description
+* doc/ArchitectureLog.md - design changes done during the development
+
+# Further development plans

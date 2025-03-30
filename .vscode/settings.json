@@ -89,5 +89,10 @@
     "clang-format.style": "file",
     "clang-format.fallbackStyle": "Google",
     "clang-format.assumeFilename": "${workspaceFolder}/scripts/.clang-format",
-    "C_Cpp.default.cppStandard": "gnu++20"
+    "C_Cpp.default.cppStandard": "gnu++20",
+    "cSpell.words": [
+        "Glog",
+        "Lokietko",
+        "Marcin"
+    ]
 }
