@@ -5,6 +5,7 @@
 
 #include "BinanceService.hpp"
 #include "Http/Http.hpp"
+#include "StockMarketService/Binance/Conversion/Prices.hpp"
 #include "StockMarketService/Binance/Conversion/Wallet.hpp"
 
 namespace StockMarketService::Binance {
@@ -45,16 +46,8 @@ Prices BinanceService::getPrices(const std::vector<std::string>& tradingPairSymb
   const std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbols=" + symbolsString;
   const auto response = Http::Http().get(url, "");
 
-  const auto jsonResponse = nlohmann::json::parse(response);
-
   Prices prices;
-  prices.reserve(jsonResponse.size());
-
-  for (const auto& singlePrice : jsonResponse) {
-    std::string symbol = singlePrice.at("symbol").get<std::string>();
-    std::string price = singlePrice.at("price").get<std::string>();
-    prices.push_back({.symbol = symbol, .price = price});
-  }
+  Conversion::fromJson(nlohmann::json::parse(response), prices);
   return prices;
 }
 

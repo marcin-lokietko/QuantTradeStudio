@@ -1,6 +1,7 @@
 add_library(StockMarketService STATIC
     Binance/BinanceService.cpp
     Binance/Conversion/Wallet.cpp
+    Binance/Conversion/Prices.cpp
     Binance/Encryption.cpp
 )
 

@@ -7,6 +7,10 @@ struct StrongType {
 };
 
 /*
+Usage:
+DEFINE_STRONG_TYPE(Asset, std::string);
+
+----------------------------------------
 Note that for e.g.
 namespace A {
   DEFINE_STRONG_TYPE(Asset, std::string);

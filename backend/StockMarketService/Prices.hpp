@@ -4,11 +4,16 @@
 #include <string>
 #include <vector>
 
+#include "Utils/StrongType.hpp"
+
 namespace StockMarketService {
 
+DEFINE_STRONG_TYPE(AssetPair, std::string);
+DEFINE_STRONG_TYPE(Price, std::string);
+
 struct SinglePrice {
-  std::string symbol{};
-  std::string price{};
+  AssetPair assetPair{};
+  Price price{};
 };
 
 using Prices = std::vector<SinglePrice>;
