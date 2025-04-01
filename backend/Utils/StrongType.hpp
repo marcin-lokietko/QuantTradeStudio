@@ -4,6 +4,10 @@
 template <typename T, typename UniqueTag>
 struct StrongType {
   T val_;
+
+  bool operator<(const StrongType<T, UniqueTag>& other) const { return val_ < other.val_; }
+  bool operator==(const StrongType<T, UniqueTag>& other) const = default;
+  bool operator!=(const StrongType<T, UniqueTag>& other) const = default;
 };
 
 /*

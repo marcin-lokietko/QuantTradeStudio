@@ -32,14 +32,14 @@ std::string BinanceService::getPrice(const std::string& tradingPairSymbol) {
   return "";
 }
 
-Prices BinanceService::getPrices(const std::vector<std::string>& tradingPairSymbols) const {
+Prices BinanceService::getPrices(const std::vector<MarketService::TradingPairSymbol>& tradingPairSymbols) const {
   std::string symbolsString = "[";
   for (const auto& singleSymbol : tradingPairSymbols) {
     if (symbolsString.back() != '[') {
       symbolsString += ",";
     }
     symbolsString += '"';
-    symbolsString += singleSymbol;
+    symbolsString += singleSymbol.val_;
     symbolsString += '"';
   }
   symbolsString += "]";
@@ -88,6 +88,13 @@ void BinanceService::makeOrder(const std::string& symbol, const std::string& qua
   const auto response = Http::Http().post(orderUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
 
   LOG(INFO) << "Order complete, response: " << response;
+}
+
+TradingPairs BinanceService::getTradingPairs(const AssetSymbol& quoteAsset) const {
+  (void)quoteAsset;
+
+  return {{TradingPairSymbol{"BTCUSDT"}, AssetSymbol{"BTC"}, AssetSymbol{"USDT"}}};
+  // TODO - /api/v3/exchangeInfo
 }
 
 std::string BinanceService::getAccountUrl() const {

@@ -13,13 +13,15 @@ class BinanceService : public IMarketService {
 
   std::string getPrice(const std::string& tradingPairSymbol) override;
 
-  Prices getPrices(const std::vector<std::string>& tradingPairSymbols) const override;
+  Prices getPrices(const std::vector<MarketService::TradingPairSymbol>& tradingPairSymbols) const override;
 
   KlineSequence getKlines(const std::string& symbol, const std::string& interval) override;
 
   Assets getAssets() const override;
 
   void makeOrder(const std::string& symbol, const std::string& quantity, const std::string& price) override;
+
+  TradingPairs getTradingPairs(const AssetSymbol& quoteAsset) const override;
 
  private:
   std::string getAccountUrl() const;

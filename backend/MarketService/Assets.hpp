@@ -4,12 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "AssetSymbol.hpp"
 #include "MarketId.hpp"
 #include "Utils/StrongType.hpp"
 
 namespace MarketService {
 
-DEFINE_STRONG_TYPE(AssetSymbol, std::string);
 DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
 
 struct SingleAsset {
