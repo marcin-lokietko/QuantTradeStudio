@@ -4,20 +4,20 @@
 #include <string>
 #include <vector>
 
-#include "MarketId.hpp"
 #include "Utils/StrongType.hpp"
 
-namespace MarketService {
+namespace ApiGateway {
 
 DEFINE_STRONG_TYPE(Asset, std::string);
 DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
+DEFINE_STRONG_TYPE(ValueInUsdt, std::string);
 
 struct WalletItem {
   Asset asset{};
   FreeAssetAmount freeAmount{};
-  MarketId marketId{MarketId::Unknown};
+  ValueInUsdt usdtValue{};
 };
 
 using Wallet = std::vector<WalletItem>;
 
-}  // namespace MarketService
+}  // namespace ApiGateway

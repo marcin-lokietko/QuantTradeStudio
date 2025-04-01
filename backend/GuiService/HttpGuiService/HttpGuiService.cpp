@@ -20,8 +20,8 @@ void HttpGuiService::start() {
   });
 
   CROW_ROUTE(app, "/wallet")
-  ([&account_ = account_]() {
-    crow::response res(Conversion::toJson(account_.getWallet()).dump());
+  ([&apiGateway_ = apiGateway_]() {
+    crow::response res(Conversion::toJson(apiGateway_.getWallet()).dump());
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;

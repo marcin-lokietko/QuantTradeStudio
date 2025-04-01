@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Account/Account.hpp"
+#include "ApiGateway/ApiGateway.hpp"
 #include "GuiService/HttpGuiService/HttpGuiService.hpp"
 #include "MarketService/Binance/BinanceService.hpp"
 
@@ -24,14 +25,11 @@ int main(int, char* argv[]) {
 
   LOG(INFO) << "########## Starting AlgoTrader";
 
-  std::unique_ptr<MarketService::IMarketService> marketService =
-      std::make_unique<MarketService::Binance::BinanceService>(argv[2]);
-
-  std::unique_ptr<Account::IAccount> account = std::make_unique<Account::Account>(*marketService.get());
-
-  std::unique_ptr<GuiService::IGuiService> guiService =
-      std::make_unique<GuiService::HttpGuiService::HttpGuiService>(*account.get());
-  guiService->start();
+  MarketService::Binance::BinanceService marketService{argv[2]};
+  Account::Account account{marketService};
+  ApiGateway::ApiGateway apiGateway{marketService, account};
+  GuiService::HttpGuiService::HttpGuiService guiService(apiGateway);
+  guiService.start();
 
   LOG(INFO) << "########## Ending AlgoTrader";
 }

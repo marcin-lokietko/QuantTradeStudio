@@ -5,9 +5,9 @@ namespace MarketService::Binance::Conversion {
 void fromJson(const nlohmann::json& j, MarketService::Wallet& wallet) {
   wallet.clear();
   for (const auto& item : j) {
-    std::string asset = item.at("asset").get<std::string>();
-    std::string amountFree = item.at("free").get<std::string>();
-    wallet.push_back({.asset = asset, .amountFree = amountFree, .marketId = MarketId::Binance});
+    wallet.push_back({.asset = item.at("asset").get<std::string>(),
+                      .freeAmount = item.at("free").get<std::string>(),
+                      .marketId = MarketId::Binance});
   }
 }
 

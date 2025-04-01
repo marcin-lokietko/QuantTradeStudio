@@ -91,6 +91,7 @@
     "clang-format.assumeFilename": "${workspaceFolder}/scripts/.clang-format",
     "C_Cpp.default.cppStandard": "gnu++20",
     "cSpell.words": [
+        "devel",
         "Glog",
         "Lokietko",
         "Marcin"

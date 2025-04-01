@@ -14,7 +14,7 @@ DEFINE_STRONG_TYPE(ValueInUsdt, std::string);
 
 struct WalletItem {
   Asset asset{};
-  FreeAssetAmount amountFree{};
+  FreeAssetAmount freeAmount{};
   ValueInUsdt usdtValue{};
 };
 

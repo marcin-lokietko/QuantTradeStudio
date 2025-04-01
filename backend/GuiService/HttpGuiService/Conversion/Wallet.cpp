@@ -3,20 +3,19 @@
 namespace GuiService::HttpGuiService::Conversion {
 
 namespace {
-nlohmann::json toJson(const ::Account::WalletItem& walletItem) {
+nlohmann::json toJson(const ApiGateway::WalletItem& walletItem) {
   nlohmann::json j;
   j = nlohmann::json{{"asset", walletItem.asset.val_},
-                     {"amountFree", walletItem.amountFree.val_},
+                     {"freeAmount", walletItem.freeAmount.val_},
                      {"usdtValue", walletItem.usdtValue.val_}};
   return j;
 }
 }  // namespace
 
-nlohmann::json toJson(const ::Account::Wallet& wallet) {
+nlohmann::json toJson(const ApiGateway::Wallet& wallet) {
   nlohmann::json j = nlohmann::json::array();
   for (const auto& walletItem : wallet) {
-    const auto walletItemJson = toJson(walletItem);
-    j.push_back(walletItemJson);
+    j.push_back(toJson(walletItem));
   }
   return j;
 }

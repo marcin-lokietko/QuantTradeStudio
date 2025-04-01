@@ -62,6 +62,7 @@ add_subdirectory(Account)
 add_subdirectory(GuiService)
 add_subdirectory(Http)
 add_subdirectory(MarketService)
+add_subdirectory(ApiGateway)
 
 #declare the target
 add_executable(${EXECUTABLE_NAME}
@@ -85,6 +86,7 @@ target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS}
     GuiService
     Http
     MarketService
+    ApiGateway
 )
 
 #### Unit tests

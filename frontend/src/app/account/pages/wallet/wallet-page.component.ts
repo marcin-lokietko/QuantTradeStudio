@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 
 export interface Balance {
   asset: string;
-  amountFree: string;
+  freeAmount: string;
   usdtValue: string;
 }
 
@@ -18,7 +18,7 @@ export interface Balance {
 })
 export class WalletPage {
   public balances: Balance[] = [];
-  public displayedColumns: string[] = ['asset', 'amountFree', 'usdtValue'];
+  public displayedColumns: string[] = ['asset', 'freeAmount', 'usdtValue'];
 
   dataSource = new MatTableDataSource(this.balances);
   @ViewChild(MatSort) sort!: MatSort;

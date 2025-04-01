@@ -1,18 +1,19 @@
 #pragma once
 
 #include "Account/IAccount.hpp"
+#include "ApiGateway/IApiGateway.hpp"
 #include "GuiService/IGuiService.hpp"
 
 namespace GuiService::HttpGuiService {
 
 class HttpGuiService : public IGuiService {
  public:
-  HttpGuiService(const Account::IAccount& account) : account_(account){};
+  HttpGuiService(const ApiGateway::IApiGateway& apiGateway) : apiGateway_(apiGateway){};
 
   void start() override;
 
  private:
-  const Account::IAccount& account_;
+  const ApiGateway::IApiGateway& apiGateway_;
 };
 
 }  // namespace GuiService::HttpGuiService

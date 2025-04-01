@@ -15,7 +15,7 @@ Wallet Account::getWallet() const {
   Wallet domainWallet;
   const auto domainWalletView = std::views::transform(marketWallet, [](const auto& elem) {
     return WalletItem{.asset = Asset{elem.asset.val_},
-                      .amountFree = FreeAssetAmount{elem.amountFree.val_},
+                      .freeAmount = FreeAssetAmount{elem.freeAmount.val_},
                       .usdtValue = ValueInUsdt{"1.1"}};
   });
   std::ranges::copy(domainWalletView, std::back_inserter(domainWallet));
@@ -33,7 +33,7 @@ Wallet Account::getWallet() const {
   // for (const auto& singlePrice : prices) {
   //   symbolToPriceMap[singlePrice.symbol] = singlePrice.price;
   // }
-  // double usdtValueDouble = std::stod(amountFree) * std::stod(symbolToPriceMap.at(asset));
+  // double usdtValueDouble = std::stod(freeAmount) * std::stod(symbolToPriceMap.at(asset));
 }
 
 }  // namespace Account
