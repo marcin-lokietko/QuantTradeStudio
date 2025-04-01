@@ -37,7 +37,7 @@ export class AppComponent {
       });
   }
 
-  navigateToWallet(): void {
-    this.router.navigate(['/account/wallet']);
+  navigateToAssets(): void {
+    this.router.navigate(['/account/assets']);
   }
 }

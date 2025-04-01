@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Account/IAccount.hpp"
 #include "ApiGateway/IApiGateway.hpp"
 #include "GuiService/IGuiService.hpp"
+#include "Wallet/IWallet.hpp"
 
 namespace GuiService::HttpGuiService {
 

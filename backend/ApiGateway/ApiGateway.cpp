@@ -1,13 +1,13 @@
 #include <glog/logging.h>
 
 #include "ApiGateway.hpp"
-#include "ApiGateway/Conversion/Wallet.hpp"
+#include "ApiGateway/Conversion/Assets.hpp"
 
 namespace ApiGateway {
 
-ApiGateway::ApiGateway(MarketService::IMarketService& marketService, Account::IAccount& account)
-    : marketService_(marketService), account_(account){};
+ApiGateway::ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet)
+    : marketService_(marketService), wallet_(wallet){};
 
-Wallet ApiGateway::getWallet() const { return Conversion::toApi(account_.getWallet()); }
+Assets ApiGateway::getAssets() const { return Conversion::toApi(wallet_.getAssets()); }
 
 }  // namespace ApiGateway

@@ -9,15 +9,15 @@
 
 namespace MarketService {
 
-DEFINE_STRONG_TYPE(Asset, std::string);
+DEFINE_STRONG_TYPE(AssetSymbol, std::string);
 DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
 
-struct WalletItem {
-  Asset asset{};
+struct SingleAsset {
+  AssetSymbol assetSymbol{};
   FreeAssetAmount freeAmount{};
   MarketId marketId{MarketId::Unknown};
 };
 
-using Wallet = std::vector<WalletItem>;
+using Assets = std::vector<SingleAsset>;
 
 }  // namespace MarketService

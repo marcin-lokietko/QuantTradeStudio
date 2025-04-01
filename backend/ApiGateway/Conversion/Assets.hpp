@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 
-#include "Account/Wallet.hpp"
-#include "ApiGateway/Wallet.hpp"
+#include "ApiGateway/Assets.hpp"
+#include "Wallet/Assets.hpp"
 
 namespace ApiGateway::Conversion {
 
-Wallet toApi(const Account::Wallet& wallet);
+Assets toApi(const Wallet::Assets& assets);
 
 }  // namespace ApiGateway::Conversion

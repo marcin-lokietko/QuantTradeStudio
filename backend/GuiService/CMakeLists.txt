@@ -1,5 +1,5 @@
 add_library(GuiService STATIC
-  HttpGuiService/Conversion/Wallet.cpp
+  HttpGuiService/Conversion/Assets.cpp
   HttpGuiService/HttpGuiService.cpp
 )
 

@@ -5,8 +5,8 @@
 
 #include "BinanceService.hpp"
 #include "Http/Http.hpp"
+#include "MarketService/Binance/Conversion/Assets.hpp"
 #include "MarketService/Binance/Conversion/Prices.hpp"
-#include "MarketService/Binance/Conversion/Wallet.hpp"
 
 namespace MarketService::Binance {
 
@@ -70,14 +70,14 @@ MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol
   return sequence;
 }
 
-Wallet BinanceService::getWallet() const {
+Assets BinanceService::getAssets() const {
   const auto accountUrl = getAccountUrl();
   const auto accountString = Http::Http().get(accountUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
   const auto accountJson = nlohmann::json::parse(accountString);
 
-  Wallet wallet;
-  MarketService::Binance::Conversion::fromJson(accountJson.at("balances"), wallet);
-  return wallet;
+  Assets assets;
+  MarketService::Binance::Conversion::fromJson(accountJson.at("balances"), assets);
+  return assets;
 }
 
 // e.g. symbol="BTCUSDT", quantity="0.0001", price="100000.00"

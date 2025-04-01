@@ -14,17 +14,15 @@ Orchestrates all the main backend components of the application.
 It should hide how those components interact with each other from the __GuiService__.
 
 It depends on:
-* interfaces of: __Account__, __MarketService__, __Bot__, __BotSimulation__.
+* interfaces of: __Wallet__, __MarketService__, __Bot__, __BotSimulation__.
 
 <!-- All the above interfaces should be defined in ApiGateway catalog, in order for the dependency inversion to be complete -->
 
-## Account
-Provides information about user's accounts on trading platforms - notably, user's assets.
+## Wallet
+Provides information about user's assets on all trading platforms.
 
 It depends on:
 * interfaces of: __MarketService__,
-
-<!-- The component's name requires rethinking after its responsibilities clarify -->
 
 ## MarketService
 Provides information about a single trading platform. Also accepts trading requests.

@@ -1,6 +1,6 @@
 add_library(MarketService STATIC
     Binance/BinanceService.cpp
-    Binance/Conversion/Wallet.cpp
+    Binance/Conversion/Assets.cpp
     Binance/Conversion/Prices.cpp
     Binance/Encryption.cpp
 )

@@ -5,10 +5,10 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "Account/Account.hpp"
 #include "ApiGateway/ApiGateway.hpp"
 #include "GuiService/HttpGuiService/HttpGuiService.hpp"
 #include "MarketService/Binance/BinanceService.hpp"
+#include "Wallet/Wallet.hpp"
 
 void setupLogger(const char* programName, const char* logDir) {
   std::filesystem::create_directory(logDir);
@@ -26,8 +26,8 @@ int main(int, char* argv[]) {
   LOG(INFO) << "########## Starting AlgoTrader";
 
   MarketService::Binance::BinanceService marketService{argv[2]};
-  Account::Account account{marketService};
-  ApiGateway::ApiGateway apiGateway{marketService, account};
+  Wallet::Wallet wallet{marketService};
+  ApiGateway::ApiGateway apiGateway{marketService, wallet};
   GuiService::HttpGuiService::HttpGuiService guiService(apiGateway);
   guiService.start();
 

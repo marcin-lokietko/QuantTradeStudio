@@ -2,11 +2,11 @@
 
 #include "Assets.hpp"
 
-namespace ApiGateway {
+namespace Wallet {
 
-class IApiGateway {
+class IWallet {
  public:
   virtual Assets getAssets() const = 0;
 };
 
-}  // namespace ApiGateway
+}  // namespace Wallet

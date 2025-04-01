@@ -5,20 +5,20 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 export interface Balance {
-  asset: string;
+  assetSymbol: string;
   freeAmount: string;
   usdtValue: string;
 }
 
 @Component({
-  selector: 'app-wallet-page',
+  selector: 'app-assets-page',
   imports: [MatTableModule, MatSortModule, MatIconModule],
-  templateUrl: './wallet-page.component.html',
-  styleUrls: ['./wallet-page.component.scss']
+  templateUrl: './assets-page.component.html',
+  styleUrls: ['./assets-page.component.scss']
 })
-export class WalletPage {
+export class AssetsPage {
   public balances: Balance[] = [];
-  public displayedColumns: string[] = ['asset', 'freeAmount', 'usdtValue'];
+  public displayedColumns: string[] = ['assetSymbol', 'freeAmount', 'usdtValue'];
 
   dataSource = new MatTableDataSource(this.balances);
   @ViewChild(MatSort) sort!: MatSort;
@@ -28,7 +28,7 @@ export class WalletPage {
   }
 
   getData(): void {
-    fetch('http://localhost:5000/wallet')
+    fetch('http://localhost:5000/assets')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -41,7 +41,7 @@ export class WalletPage {
           this.dataSource = new MatTableDataSource(this.balances);
           this.dataSource.sort = this.sort;
         } catch (error) {
-          console.error("Invalid wallet content:", error);
+          console.error("Invalid assets content:", error);
         }
         console.log('API Response:', JSON.stringify(data.balances));
       })

@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "GuiService/HttpGuiService/Conversion/Wallet.hpp"
+#include "GuiService/HttpGuiService/Conversion/Assets.hpp"
 #include "HttpGuiService.hpp"
 #include "crow.h"
 
@@ -19,9 +19,9 @@ void HttpGuiService::start() {
     return res;
   });
 
-  CROW_ROUTE(app, "/wallet")
+  CROW_ROUTE(app, "/assets")
   ([&apiGateway_ = apiGateway_]() {
-    crow::response res(Conversion::toJson(apiGateway_.getWallet()).dump());
+    crow::response res(Conversion::toJson(apiGateway_.getAssets()).dump());
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;

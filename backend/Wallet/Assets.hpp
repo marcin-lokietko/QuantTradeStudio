@@ -6,18 +6,18 @@
 
 #include "Utils/StrongType.hpp"
 
-namespace Account {
+namespace Wallet {
 
-DEFINE_STRONG_TYPE(Asset, std::string);
+DEFINE_STRONG_TYPE(AssetSymbol, std::string);
 DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
 DEFINE_STRONG_TYPE(ValueInUsdt, std::string);
 
-struct WalletItem {
-  Asset asset{};
+struct SingleAsset {
+  AssetSymbol assetSymbol{};
   FreeAssetAmount freeAmount{};
   ValueInUsdt usdtValue{};
 };
 
-using Wallet = std::vector<WalletItem>;
+using Assets = std::vector<SingleAsset>;
 
-}  // namespace Account
+}  // namespace Wallet

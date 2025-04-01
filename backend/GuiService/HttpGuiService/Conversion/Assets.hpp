@@ -2,9 +2,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include "ApiGateway/Wallet.hpp"
+#include "ApiGateway/Assets.hpp"
 
 namespace GuiService::HttpGuiService::Conversion {
 
-nlohmann::json toJson(const ApiGateway::Wallet& wallet);
+nlohmann::json toJson(const ApiGateway::Assets& assets);
 }
