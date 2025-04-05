@@ -10,11 +10,11 @@
 
 namespace MarketService {
 
-DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
+DEFINE_STRONG_TYPE(AssetQuantity, std::string);
 
 struct SingleAsset {
   AssetSymbol assetSymbol{};
-  FreeAssetAmount freeAmount{};
+  AssetQuantity freeQuantity{};
   MarketId marketId{MarketId::Unknown};
 };
 

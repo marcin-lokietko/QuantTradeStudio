@@ -6,7 +6,7 @@ namespace {
 nlohmann::json toJson(const ApiGateway::SingleAsset& singleAsset) {
   nlohmann::json j;
   j = nlohmann::json{{"assetSymbol", singleAsset.assetSymbol.val_},
-                     {"freeAmount", singleAsset.freeAmount.val_},
+                     {"freeQuantity", singleAsset.freeQuantity.val_},
                      {"usdtValue", singleAsset.usdtValue.val_}};
   return j;
 }

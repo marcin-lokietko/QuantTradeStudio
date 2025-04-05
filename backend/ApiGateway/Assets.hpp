@@ -4,17 +4,16 @@
 #include <string>
 #include <vector>
 
+#include "AssetQuantity.hpp"
+#include "AssetSymbol.hpp"
 #include "Utils/StrongType.hpp"
+#include "ValueInUsdt.hpp"
 
 namespace ApiGateway {
 
-DEFINE_STRONG_TYPE(AssetSymbol, std::string);
-DEFINE_STRONG_TYPE(FreeAssetAmount, std::string);
-DEFINE_STRONG_TYPE(ValueInUsdt, std::string);
-
 struct SingleAsset {
   AssetSymbol assetSymbol{};
-  FreeAssetAmount freeAmount{};
+  AssetQuantity freeQuantity{};
   ValueInUsdt usdtValue{};
 };
 

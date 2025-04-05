@@ -21,20 +21,20 @@ std::string BinanceService::getServerTime() {
   return Http::Http().get(timeUrl, "");
 }
 
-std::string BinanceService::getPrice(const std::string& tradingPairSymbol) {
-  std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbol=" + tradingPairSymbol;
+ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) {
+  std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbol=" + tradingPairSymbol.val_;
   const auto response = Http::Http().get(url, "");
 
   const auto jsonResponse = nlohmann::json::parse(response);
   if (jsonResponse.contains("price")) {
-    return jsonResponse["price"];
+    return ApiGateway::Price{jsonResponse["price"]};
   } else {
     LOG(ERROR) << "Failed to retrieve price.";
   }
-  return "";
+  return ApiGateway::Price{""};
 }
 
-Prices BinanceService::getPrices(const std::vector<MarketService::TradingPairSymbol>& tradingPairSymbols) const {
+Prices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const {
   std::string symbolsString = "[";
   for (const auto& singleSymbol : tradingPairSymbols) {
     if (symbolsString.back() != '[') {
@@ -82,10 +82,11 @@ Assets BinanceService::getAssets() const {
   return assets;
 }
 
-// e.g. symbol="BTCUSDT", quantity="0.0001", price="100000.00"
-void BinanceService::makeOrder(const std::string& symbol, const std::string& quantity, const std::string& price) {
-  const std::string queryString = "symbol=" + symbol + "&side=BUY&type=LIMIT&timeInForce=GTC&quantity=" + quantity +
-                                  "&price=" + price + "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
+void BinanceService::makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::AssetQuantity& quantity,
+                               const ApiGateway::Price& price) {
+  const std::string queryString = "symbol=" + symbol.val_ +
+                                  "&side=BUY&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ +
+                                  "&price=" + price.val_ + "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
   const auto orderUrl = getOrderUrl(queryString);
   const auto response = Http::Http().post(orderUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
 

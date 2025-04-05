@@ -12,6 +12,9 @@ class ApiGateway : public IApiGateway {
 
   Assets getAssets() const override;
 
+  virtual OrderResult makeOrder(const AssetSymbol& assetToBuy, const AssetSymbol& assetToSpend,
+                                const AssetQuantity& quantityToBuy) const;
+
  public:
   MarketService::IMarketService& marketService_;
   Wallet::IWallet& wallet_;

@@ -4,7 +4,7 @@ namespace ApiGateway::Conversion {
 
 namespace {
 SingleAsset toApi(const Wallet::SingleAsset& singleAsset) {
-  return {AssetSymbol{singleAsset.assetSymbol.val_}, FreeAssetAmount{singleAsset.freeAmount.val_},
+  return {AssetSymbol{singleAsset.assetSymbol.val_}, AssetQuantity{singleAsset.freeQuantity.val_},
           ValueInUsdt{singleAsset.usdtValue.val_}};
 }
 }  // namespace

@@ -11,15 +11,16 @@ class BinanceService : public IMarketService {
 
   std::string getServerTime() override;
 
-  std::string getPrice(const std::string& tradingPairSymbol) override;
+  ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) override;
 
-  Prices getPrices(const std::vector<MarketService::TradingPairSymbol>& tradingPairSymbols) const override;
+  Prices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const override;
 
   KlineSequence getKlines(const std::string& symbol, const std::string& interval) override;
 
   Assets getAssets() const override;
 
-  void makeOrder(const std::string& symbol, const std::string& quantity, const std::string& price) override;
+  void makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::AssetQuantity& quantity,
+                 const ApiGateway::Price& price) override;
 
   TradingPairs getTradingPairs(const AssetSymbol& quoteAsset) const override;
 

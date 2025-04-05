@@ -1,19 +1,27 @@
 <div>
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
-        <!-- column 1: assetSymbol -->
+        <!-- column: assetSymbol -->
         <ng-container matColumnDef="assetSymbol">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>AssetSymbol</th>
-            <td mat-cell *matCellDef="let element">{{ element.assetSymbol }}</td>
+            <td mat-cell *matCellDef="let element">
+                <button mat-button [matMenuTriggerFor]="menu">
+                    <mat-icon>sync_alt</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button (click)="showBuyDialog(element)" mat-menu-item>Buy</button>
+                </mat-menu>
+                {{ element.assetSymbol }}
+            </td>
         </ng-container>
 
-        <!-- column 2: free -->
-        <ng-container matColumnDef="freeAmount">
+        <!-- column: free -->
+        <ng-container matColumnDef="freeQuantity">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Free</th>
-            <td mat-cell *matCellDef="let element">{{ element.freeAmount }}</td>
+            <td mat-cell *matCellDef="let element">{{ element.freeQuantity }}</td>
         </ng-container>
 
-        <!-- column 2: usdt value -->
+        <!-- column: usdt value -->
         <ng-container matColumnDef="usdtValue">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>USDT value</th>
             <td mat-cell *matCellDef="let element">{{ element.usdtValue }}</td>

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <string>
+
 #include "Utils/StrongType.hpp"
 
-namespace MarketService {
+namespace ApiGateway {
 
 DEFINE_STRONG_TYPE(TradingPairSymbol, std::string);
 
-}  // namespace MarketService
+}  // namespace ApiGateway
