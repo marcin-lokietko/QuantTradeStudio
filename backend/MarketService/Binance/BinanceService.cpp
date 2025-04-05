@@ -2,11 +2,13 @@
 
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <ranges>
 
 #include "BinanceService.hpp"
 #include "Http/Http.hpp"
 #include "MarketService/Binance/Conversion/Assets.hpp"
 #include "MarketService/Binance/Conversion/Prices.hpp"
+#include "MarketService/Binance/Conversion/TradingPairs.hpp"
 
 namespace MarketService::Binance {
 
@@ -91,10 +93,15 @@ void BinanceService::makeOrder(const std::string& symbol, const std::string& qua
 }
 
 TradingPairs BinanceService::getTradingPairs(const AssetSymbol& quoteAsset) const {
-  (void)quoteAsset;
+  const std::string url = binanceTestnetBaseUrl + "/api/v3/exchangeInfo";
+  const auto tradingPairsString = Http::Http().get(url, "");
 
-  return {{TradingPairSymbol{"BTCUSDT"}, AssetSymbol{"BTC"}, AssetSymbol{"USDT"}}};
-  // TODO - /api/v3/exchangeInfo
+  TradingPairs tradingPairs;
+  Conversion::fromJson(nlohmann::json::parse(tradingPairsString), tradingPairs);
+
+  auto filteredPairsView =
+      tradingPairs | std::views::filter([&quoteAsset](const auto& pair) { return pair.quoteAsset == quoteAsset; });
+  return {filteredPairsView.begin(), filteredPairsView.end()};
 }
 
 std::string BinanceService::getAccountUrl() const {
