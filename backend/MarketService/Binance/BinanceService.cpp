@@ -6,8 +6,9 @@
 
 #include "BinanceService.hpp"
 #include "Http/Http.hpp"
+#include "MarketService/Binance/Conversion/AssetPrices.hpp"
 #include "MarketService/Binance/Conversion/Assets.hpp"
-#include "MarketService/Binance/Conversion/Prices.hpp"
+#include "MarketService/Binance/Conversion/Orders.hpp"
 #include "MarketService/Binance/Conversion/TradingPairs.hpp"
 
 namespace MarketService::Binance {
@@ -34,7 +35,7 @@ ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& 
   return ApiGateway::Price{""};
 }
 
-Prices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const {
+AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const {
   std::string symbolsString = "[";
   for (const auto& singleSymbol : tradingPairSymbols) {
     if (symbolsString.back() != '[') {
@@ -48,9 +49,9 @@ Prices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairSymbol
   const std::string url = binanceTestnetBaseUrl + "/api/v3/ticker/price?symbols=" + symbolsString;
   const auto response = Http::Http().get(url, "");
 
-  Prices prices;
-  Conversion::fromJson(nlohmann::json::parse(response), prices);
-  return prices;
+  AssetPrices assetPrices;
+  Conversion::fromJson(nlohmann::json::parse(response), assetPrices);
+  return assetPrices;
 }
 
 // e.g. symbol="BTCUSDT", interval="1h"
@@ -116,6 +117,19 @@ std::string BinanceService::getOrderUrl(const std::string& queryString) const {
   const std::string signature = encryption.generateSignature(queryString);
   const std::string signedQuery = queryString + "&signature=" + signature;
   return binanceTestnetBaseUrl + "/api/v3/order?" + signedQuery;
+}
+
+ApiGateway::Orders BinanceService::getOpenOrders() const {
+  const std::string timestamp = "timestamp=" + getTimeSinceEpoch();
+  const std::string signature = encryption.generateSignature(timestamp);
+  const std::string signedQuery = timestamp + "&signature=" + signature;
+  const std::string url = binanceTestnetBaseUrl + "/api/v3/openOrders" + "?" + signedQuery;
+
+  const auto openOrdersString = Http::Http().get(url, "X-MBX-APIKEY: " + encryption.getApiKey());
+
+  ApiGateway::Orders orders;
+  Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders);
+  return orders;
 }
 
 }  // namespace MarketService::Binance

@@ -40,4 +40,8 @@ export class AppComponent {
   navigateToAssets(): void {
     this.router.navigate(['/account/assets']);
   }
+
+  navigateToOrders(): void {
+    this.router.navigate(['/account/orders']);
+  }
 }

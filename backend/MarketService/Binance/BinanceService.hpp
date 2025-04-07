@@ -13,7 +13,7 @@ class BinanceService : public IMarketService {
 
   ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) override;
 
-  Prices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const override;
+  AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const override;
 
   KlineSequence getKlines(const std::string& symbol, const std::string& interval) override;
 
@@ -23,6 +23,8 @@ class BinanceService : public IMarketService {
                  const ApiGateway::Price& price) override;
 
   TradingPairs getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const override;
+
+  ApiGateway::Orders getOpenOrders() const override;
 
  private:
   std::string getAccountUrl() const;

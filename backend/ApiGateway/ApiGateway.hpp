@@ -14,6 +14,7 @@ class ApiGateway : public IApiGateway {
 
   virtual OrderResult makeOrder(const AssetSymbol& assetToBuy, const AssetSymbol& assetToSpend,
                                 const AssetQuantity& quantityToBuy) const;
+  virtual Orders getOpenOrders() const;
 
  public:
   MarketService::IMarketService& marketService_;

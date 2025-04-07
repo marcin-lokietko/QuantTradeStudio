@@ -22,4 +22,6 @@ OrderResult ApiGateway::makeOrder(const AssetSymbol& assetToBuy, const AssetSymb
   return OrderResult::Success;
 }
 
+Orders ApiGateway::getOpenOrders() const { return marketService_.getOpenOrders(); }
+
 }  // namespace ApiGateway

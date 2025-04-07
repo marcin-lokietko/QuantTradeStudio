@@ -18,9 +18,9 @@ ApiGateway::Assets Wallet::getAssets() const {
     supportedUsdtBasedTradingPairs.push_back(pair.symbol);
   }
 
-  const auto prices = marketService_.getPrices(supportedUsdtBasedTradingPairs);
-  std::map<ApiGateway::TradingPairSymbol, MarketService::Price> symbolToPriceMap;
-  for (const auto& singlePrice : prices) {
+  const auto assetPrices = marketService_.getPrices(supportedUsdtBasedTradingPairs);
+  std::map<ApiGateway::TradingPairSymbol, ApiGateway::Price> symbolToPriceMap;
+  for (const auto& singlePrice : assetPrices) {
     symbolToPriceMap[singlePrice.assetPair] = singlePrice.price;
   }
 

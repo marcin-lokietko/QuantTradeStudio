@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Assets.hpp"
+#include "Orders.hpp"
 
 namespace ApiGateway {
 
@@ -16,6 +17,8 @@ class IApiGateway {
 
   virtual OrderResult makeOrder(const AssetSymbol& assetToBuy, const AssetSymbol& assetToSpend,
                                 const AssetQuantity& quantityToBuy) const = 0;
+
+  virtual Orders getOpenOrders() const = 0;
 };
 
 }  // namespace ApiGateway

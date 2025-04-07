@@ -4,6 +4,7 @@
 
 #include "GuiService/HttpGuiService/Conversion/Assets.hpp"
 #include "GuiService/HttpGuiService/Conversion/OrderRequest.hpp"
+#include "GuiService/HttpGuiService/Conversion/Orders.hpp"
 #include "GuiService/OrderRequest.hpp"
 #include "HttpGuiService.hpp"
 #include "crow.h"
@@ -33,6 +34,14 @@ void HttpGuiService::start() {
   CROW_ROUTE(app, "/assets")
   ([&apiGateway_ = apiGateway_]() {
     crow::response res(Conversion::toJson(apiGateway_.getAssets()).dump());
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Content-Type", "application/json");
+    return res;
+  });
+
+  CROW_ROUTE(app, "/openOrders")
+  ([&apiGateway_ = apiGateway_]() {
+    crow::response res(Conversion::toJson(apiGateway_.getOpenOrders()).dump());
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;

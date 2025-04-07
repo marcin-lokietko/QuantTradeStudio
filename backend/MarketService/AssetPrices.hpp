@@ -4,18 +4,17 @@
 #include <string>
 #include <vector>
 
+#include "ApiGateway/Price.hpp"
 #include "ApiGateway/TradingPairSymbol.hpp"
 #include "Utils/StrongType.hpp"
 
 namespace MarketService {
 
-DEFINE_STRONG_TYPE(Price, std::string);
-
-struct SinglePrice {
+struct SingleAssetPrice {
   ApiGateway::TradingPairSymbol assetPair{};
-  Price price{};
+  ApiGateway::Price price{};
 };
 
-using Prices = std::vector<SinglePrice>;
+using AssetPrices = std::vector<SingleAssetPrice>;
 
 }  // namespace MarketService
