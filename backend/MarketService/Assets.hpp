@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "AssetSymbol.hpp"
+#include "ApiGateway/AssetSymbol.hpp"
 #include "MarketId.hpp"
 #include "Utils/StrongType.hpp"
 
@@ -13,7 +13,7 @@ namespace MarketService {
 DEFINE_STRONG_TYPE(AssetQuantity, std::string);
 
 struct SingleAsset {
-  AssetSymbol assetSymbol{};
+  ApiGateway::AssetSymbol assetSymbol{};
   AssetQuantity freeQuantity{};
   MarketId marketId{MarketId::Unknown};
 };

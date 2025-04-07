@@ -22,7 +22,7 @@ class BinanceService : public IMarketService {
   void makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::AssetQuantity& quantity,
                  const ApiGateway::Price& price) override;
 
-  TradingPairs getTradingPairs(const AssetSymbol& quoteAsset) const override;
+  TradingPairs getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const override;
 
  private:
   std::string getAccountUrl() const;

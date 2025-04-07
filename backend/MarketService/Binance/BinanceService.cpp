@@ -93,7 +93,7 @@ void BinanceService::makeOrder(const ApiGateway::TradingPairSymbol& symbol, cons
   LOG(INFO) << "Order complete, response: " << response;
 }
 
-TradingPairs BinanceService::getTradingPairs(const AssetSymbol& quoteAsset) const {
+TradingPairs BinanceService::getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const {
   const std::string url = binanceTestnetBaseUrl + "/api/v3/exchangeInfo";
   const auto tradingPairsString = Http::Http().get(url, "");
 

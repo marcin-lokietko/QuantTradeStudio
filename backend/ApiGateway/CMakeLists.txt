@@ -1,6 +1,5 @@
 add_library(ApiGateway STATIC
     ApiGateway.cpp
-    Conversion/Assets.cpp
 )
 
 #search for headers in root project directory

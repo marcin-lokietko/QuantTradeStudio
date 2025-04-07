@@ -6,7 +6,6 @@
 #include "ApiGateway/AssetSymbol.hpp"
 #include "ApiGateway/Price.hpp"
 #include "ApiGateway/TradingPairSymbol.hpp"
-#include "AssetSymbol.hpp"
 #include "Assets.hpp"
 #include "KlineSequence.hpp"
 #include "Prices.hpp"
@@ -24,7 +23,7 @@ class IMarketService {
   virtual Assets getAssets() const = 0;
   virtual void makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::AssetQuantity& quantity,
                          const ApiGateway::Price& price) = 0;
-  virtual TradingPairs getTradingPairs(const AssetSymbol& quoteAsset) const = 0;
+  virtual TradingPairs getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const = 0;
 };
 
 }  // namespace MarketService

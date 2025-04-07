@@ -2,15 +2,15 @@
 
 #include <vector>
 
+#include "ApiGateway/AssetSymbol.hpp"
 #include "ApiGateway/TradingPairSymbol.hpp"
-#include "AssetSymbol.hpp"
 
 namespace MarketService {
 
 struct SingleTradingPair {
   ApiGateway::TradingPairSymbol symbol{};
-  AssetSymbol baseAsset{};
-  AssetSymbol quoteAsset{};
+  ApiGateway::AssetSymbol baseAsset{};
+  ApiGateway::AssetSymbol quoteAsset{};
 };
 
 using TradingPairs = std::vector<SingleTradingPair>;

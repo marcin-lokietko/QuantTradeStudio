@@ -9,7 +9,7 @@ class Wallet : public IWallet {
  public:
   Wallet(const MarketService::IMarketService& marketService) : marketService_(marketService) {}
 
-  Assets getAssets() const override;
+  ApiGateway::Assets getAssets() const override;
 
  private:
   const MarketService::IMarketService& marketService_;

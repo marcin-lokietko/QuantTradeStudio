@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Assets.hpp"
+#include "ApiGateway/Assets.hpp"
 
 namespace Wallet {
 
 class IWallet {
  public:
-  virtual Assets getAssets() const = 0;
+  virtual ApiGateway::Assets getAssets() const = 0;
 };
 
 }  // namespace Wallet
