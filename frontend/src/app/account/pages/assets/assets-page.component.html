@@ -1,5 +1,6 @@
 <div>
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <mat-spinner *ngIf="isLoading" class="spinner" color="accent" diameter="50"></mat-spinner>
+    <table *ngIf="!isLoading" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
         <!-- column: assetSymbol -->
         <ng-container matColumnDef="assetSymbol">

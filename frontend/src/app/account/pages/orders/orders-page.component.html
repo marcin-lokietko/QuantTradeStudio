@@ -1,3 +1,6 @@
 <div>
-    {{orders}}
+    <mat-spinner *ngIf="isLoading" class="spinner" color="accent" diameter="50"></mat-spinner>
+    <div *ngIf="!isLoading">
+        {{orders}}
+    </div>
 </div>

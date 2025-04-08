@@ -1,11 +1,7 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Dialog } from '../../../common/dialog/dialog.component';
 
 export interface Balance {
@@ -16,12 +12,13 @@ export interface Balance {
 
 @Component({
   selector: 'app-assets-page',
-  imports: [MatTableModule, MatSortModule, MatIconModule, MatButtonModule, MatMenuModule, MatDialogModule],
+  standalone: false,
   templateUrl: './assets-page.component.html',
   styleUrls: ['./assets-page.component.scss']
 })
 export class AssetsPage {
   public balances: Balance[] = [];
+  public isLoading = true;
   public displayedColumns: string[] = ['assetSymbol', 'freeQuantity', 'usdtValue'];
 
   dataSource = new MatTableDataSource(this.balances);
@@ -52,6 +49,7 @@ export class AssetsPage {
   getData(): void {
     fetch('http://localhost:5000/assets')
       .then(response => {
+        this.isLoading = false;
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
