@@ -15,6 +15,8 @@ namespace MarketService::Binance {
 
 namespace {
 std::string getTimeSinceEpoch() { return std::to_string(time(nullptr) * 1000); }
+constexpr Http::HttpStatusCode statusCodeOk{200};
+constexpr Http::HttpStatusCode statusCodeRequestRateLimitBroken{429};
 }  // namespace
 
 std::string BinanceService::getServerTime() {
@@ -83,15 +85,20 @@ Assets BinanceService::getAssets() const {
   return assets;
 }
 
-void BinanceService::makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::AssetQuantity& quantity,
-                               const ApiGateway::Price& price) {
+ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairSymbol& symbol,
+                                                  const ApiGateway::AssetQuantity& quantity,
+                                                  const ApiGateway::Price& price) {
   const std::string queryString = "symbol=" + symbol.val_ +
                                   "&side=BUY&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ +
                                   "&price=" + price.val_ + "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
   const auto orderUrl = getOrderUrl(queryString);
   const auto response = Http::Http().post(orderUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
 
-  LOG(INFO) << "Order complete, response: " << response;
+  if (response.statusCode != statusCodeOk) {
+    LOG(WARNING) << "makeOrder returned NOK. Msg=" << response.body.val_;
+    return ApiGateway::OrderResult::Failure;
+  }
+  return ApiGateway::OrderResult::Success;
 }
 
 TradingPairs BinanceService::getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const {

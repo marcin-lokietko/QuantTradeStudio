@@ -4,6 +4,7 @@
 
 #include "ApiGateway/AssetQuantity.hpp"
 #include "ApiGateway/AssetSymbol.hpp"
+#include "ApiGateway/OrderResult.hpp"
 #include "ApiGateway/Orders.hpp"
 #include "ApiGateway/Price.hpp"
 #include "ApiGateway/TradingPairSymbol.hpp"
@@ -14,6 +15,12 @@
 
 namespace MarketService {
 
+enum MakeOrderResult
+{
+  Fail = 0,
+  Success
+};
+
 class IMarketService {
  public:
   virtual ~IMarketService() = default;
@@ -22,8 +29,9 @@ class IMarketService {
   virtual AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& symbols) const = 0;
   virtual KlineSequence getKlines(const std::string& symbol, const std::string& interval) = 0;
   virtual Assets getAssets() const = 0;
-  virtual void makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::AssetQuantity& quantity,
-                         const ApiGateway::Price& price) = 0;
+  virtual ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol,
+                                            const ApiGateway::AssetQuantity& quantity,
+                                            const ApiGateway::Price& price) = 0;
   virtual TradingPairs getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const = 0;
   virtual ApiGateway::Orders getOpenOrders() const = 0;
 };

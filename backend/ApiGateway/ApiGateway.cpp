@@ -17,9 +17,7 @@ OrderResult ApiGateway::makeOrder(const AssetSymbol& assetToBuy, const AssetSymb
 
   const auto price = marketService_.getPrice(tradingPairSymbol);
 
-  marketService_.makeOrder(TradingPairSymbol{assetToBuy.val_ + assetToSpend.val_}, quantityToBuy, price);
-
-  return OrderResult::Success;
+  return marketService_.makeOrder(TradingPairSymbol{assetToBuy.val_ + assetToSpend.val_}, quantityToBuy, price);
 }
 
 Orders ApiGateway::getOpenOrders() const { return marketService_.getOpenOrders(); }

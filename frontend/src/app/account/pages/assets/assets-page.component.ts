@@ -2,7 +2,9 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { Dialog } from '../../../common/dialog/dialog.component';
+import { Dialog } from '../../../shared/components/dialog/dialog.component';
+import { NotificationService } from '../../../services/notification.service';
+import { NotificationSeverity } from '../../../shared/components/notification/notification-severity-enum';
 
 export interface Balance {
   assetSymbol: string;
@@ -24,7 +26,7 @@ export class AssetsPage {
   dataSource = new MatTableDataSource(this.balances);
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private dialog: MatDialog, private cdr: ChangeDetectorRef) {}
+  constructor(private dialog: MatDialog, private notificationService: NotificationService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.getData();
@@ -85,6 +87,7 @@ export class AssetsPage {
     })
     .then(response => {
       if (!response.ok) {
+        this.notificationService.show('Failed to open the order', 3000, NotificationSeverity.Error);
         throw new Error('makeOrder HTTP error ' + response.status);
       }
       return response.json();

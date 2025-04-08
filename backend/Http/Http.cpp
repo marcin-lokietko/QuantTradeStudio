@@ -41,11 +41,11 @@ std::string Http::get(const std::string& url, const std::string& header) {
   return response;
 }
 
-std::string Http::post(const std::string& url, const std::string& header) {
+Http::Response Http::post(const std::string& url, const std::string& header) {
   CURL* curl = curl_easy_init();
-  std::string response;
-
+  std::string responseBody;
   const std::string postFields = "";
+  int64_t httpCode = 0;
 
   if (curl) {
     struct curl_slist* headers = nullptr;
@@ -54,13 +54,19 @@ std::string Http::post(const std::string& url, const std::string& header) {
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postFields.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBody);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_perform(curl);
+    const auto res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK) {
+      LOG(ERROR) << "HTTP GET failed, error: " << curl_easy_strerror(res);
+    } else {
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    }
+
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
-  return response;
+  return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
 }
-
 }  // namespace Http
