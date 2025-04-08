@@ -1,4 +1,15 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+
+export interface Order {
+  orderId: number;
+  assetPair: string;
+  origQuantity: string;
+  executedQuantity: string;
+  orderSide: string;
+  price: string;
+}
 
 @Component({
   selector: 'app-orders-page',
@@ -6,9 +17,14 @@ import { ChangeDetectorRef, Component } from '@angular/core';
   templateUrl: './orders-page.component.html',
   styleUrls: ['./orders-page.component.scss']
 })
+
 export class OrdersPage {
-  public orders = '';
+  public orders: Order[] = [];
   public isLoading = true;
+  public displayedColumns: string[] = ['assetPair', 'orderSide', 'price', 'origQuantity', 'executedQuantity'];
+
+  dataSource = new MatTableDataSource(this.orders);
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -23,12 +39,13 @@ export class OrdersPage {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.text();
+        return response.json();
       })
       .then(data => {
         try {
-          this.orders = data;
-          console.log(data)
+          this.orders = data as Order[];
+          this.dataSource = new MatTableDataSource(this.orders);
+          this.dataSource.sort = this.sort;
           this.cdr.markForCheck();
         } catch (error) {
           console.error("Invalid orders content:", error);
