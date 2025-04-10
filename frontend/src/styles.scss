@@ -1,11 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+.mat-mdc-table {
+    .mat-mdc-header-row {
+        background-color: #34383a;
+        font-weight: bold;
+        color: white;
+    }
+
+    .mat-mdc-row {
+        background-color: #4d5256;
+        color: white;
+    }
+
+    .mat-mdc-row:hover {
+        background-color: #34383a;
+        color: white;
+    }
+}
+
+button {
+
+    mat-icon,
+    .mdc-button__label {
+        color: #5ec0f1;
+    }
+}
 
 html,
 body {
     height: 100%;
-}
-
-body {
+    background: #1b1d1e;
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+// background: #52585c;
