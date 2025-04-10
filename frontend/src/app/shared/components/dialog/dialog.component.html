@@ -1,6 +1,10 @@
 <div>
     <h2 mat-dialog-title>{{title}}</h2>
     <mat-dialog-content>{{details}}</mat-dialog-content>
+    <mat-form-field *ngIf="isInputFieldVisible" appearance="fill">
+        <mat-label>{{inputFieldLabel}}</mat-label>
+        <input matInput [(ngModel)]="inputValue" [placeholder]="inputFieldPlaceholder" />
+    </mat-form-field>
     <mat-dialog-actions>
         <button mat-button (click)="closeWithResult()">Confirm</button>
         <button mat-button (click)="cancel()">Cancel</button>

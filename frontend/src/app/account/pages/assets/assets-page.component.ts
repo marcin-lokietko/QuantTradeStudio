@@ -33,17 +33,22 @@ export class AssetsPage {
   }
 
   showBuyDialog(element: any): void {
-    let usdtPrice = '';
+    let usdtPrice = 'x';
 
     const dialogRef = this.dialog.open(Dialog, {
       width: '40%',
-      data: { title: 'Buy: ' + element.assetSymbol, details: `Unit price: ${usdtPrice} USDT` }
+      data: {
+        title: 'Buy: ' + element.assetSymbol,
+        details: `Unit price: ${usdtPrice} USDT`,
+        isInputFieldVisible: true,
+        inputFieldLabel: 'How much ' + element.assetSymbol + ' to buy:',
+        inputFieldPlaceholder: '0.0' }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('Dialog closed with result:', result);
       if (result) {
-        this.buyAsset(element.assetSymbol, 'USDT', '0.001');
+        this.buyAsset(element.assetSymbol, 'USDT', result.enteredInputValue);
       }
     });
   }
