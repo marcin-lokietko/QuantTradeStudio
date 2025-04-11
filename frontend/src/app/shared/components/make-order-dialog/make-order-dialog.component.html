@@ -1,0 +1,28 @@
+<div>
+    <h2 mat-dialog-title>{{title}}</h2>
+    <mat-form-field appearance="fill">
+        <mat-label>Buy</mat-label>
+        <mat-select [(ngModel)]="selectedAssetToBuy" (selectionChange)="onAssetToBuyChange()">
+            <mat-option *ngFor="let asset of availableAssetsToBuy" [value]="asset">
+                {{ asset }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field *ngIf="isAssetToSellSelectionVisible" appearance="fill">
+        <mat-label>Sell</mat-label>
+        <mat-select [(ngModel)]="selectedAssetToSell">
+            <mat-option *ngFor="let asset of availableAssetsToSell" [value]="asset">
+                {{ asset }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field *ngIf="isInputFieldVisible" appearance="fill">
+        <mat-label>How much {{selectedAssetToBuy}} to buy</mat-label>
+        <input matInput [(ngModel)]="amountToBuy" placeholder="0.0" />
+    </mat-form-field>
+    <mat-dialog-content>{{details}}</mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button (click)="closeWithResult()">Confirm</button>
+        <button mat-button (click)="cancel()">Cancel</button>
+    </mat-dialog-actions>
+</div>

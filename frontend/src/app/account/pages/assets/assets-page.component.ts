@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { Dialog } from '../../../shared/components/dialog/dialog.component';
+import { MakeOrderDialog } from '../../../shared/components/make-order-dialog/make-order-dialog.component';
 import { NotificationService } from '../../../services/notification.service';
 import { NotificationSeverity } from '../../../shared/components/notification/notification-severity-enum';
 
@@ -33,22 +33,16 @@ export class AssetsPage {
   }
 
   showBuyDialog(element: any): void {
-    let usdtPrice = 'x';
-
-    const dialogRef = this.dialog.open(Dialog, {
-      width: '40%',
+    const dialogRef = this.dialog.open(MakeOrderDialog, {
+      width: '50%',
       data: {
-        title: 'Buy: ' + element.assetSymbol,
-        details: `Unit price: ${usdtPrice} USDT`,
-        isInputFieldVisible: true,
-        inputFieldLabel: 'How much ' + element.assetSymbol + ' to buy:',
-        inputFieldPlaceholder: '0.0' }
+        initialAssetToBuy: element.assetSymbol}
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('Dialog closed with result:', result);
       if (result) {
-        this.buyAsset(element.assetSymbol, 'USDT', result.enteredInputValue);
+        this.buyAsset(result.assetToBuy, result.assetToSell, result.amountToBuy);
       }
     });
   }
