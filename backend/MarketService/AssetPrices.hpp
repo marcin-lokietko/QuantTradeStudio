@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -16,5 +17,14 @@ struct SingleAssetPrice {
 };
 
 using AssetPrices = std::vector<SingleAssetPrice>;
+using AssetPricesMap = std::map<ApiGateway::TradingPairSymbol, ApiGateway::Price>;
+
+inline AssetPricesMap asMap(const AssetPrices& assetPrices) {
+  AssetPricesMap map;
+  for (const auto& singlePrice : assetPrices) {
+    map[singlePrice.assetPair] = singlePrice.price;
+  }
+  return map;
+}
 
 }  // namespace MarketService

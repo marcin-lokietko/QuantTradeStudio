@@ -32,9 +32,9 @@ export class AssetsPage {
     this.getData();
   }
 
-  showBuyDialog(element: any): void {
+  showMakeOrderDialog(element: any): void {
     const dialogRef = this.dialog.open(MakeOrderDialog, {
-      width: '50%',
+      width: '60vw',
       data: {
         initialAssetToBuy: element.assetSymbol}
     });
@@ -42,7 +42,7 @@ export class AssetsPage {
     dialogRef.afterClosed().subscribe(result => {
       console.log('Dialog closed with result:', result);
       if (result) {
-        this.buyAsset(result.assetToBuy, result.assetToSell, result.amountToBuy);
+        this.makeOrder(result.selectedBaseAsset, result.selectedQuoteAsset, result.orderSide, result.baseAssetAmount);
       }
     });
   }
@@ -72,9 +72,9 @@ export class AssetsPage {
       });
   }
 
-  buyAsset(assetToBuy: string, assetToSpend: string, quantityToBuy: string) : void
+  makeOrder(selectedBaseAsset: string, selectedQuoteAsset: string, orderSide: string, baseAssetAmount: string) : void
   {
-    console.log('Buying ' + quantityToBuy + ' ' + assetToBuy + ' for ' + assetToSpend );
+    console.log(`tradeAsset selectedBaseAsset=${selectedBaseAsset}, selectedQuoteAsset=${selectedQuoteAsset}, orderSide=${orderSide}, baseAssetAmount=${baseAssetAmount}` );
 
     fetch('http://localhost:5000/makeOrder', {
       method: 'POST',
@@ -82,7 +82,7 @@ export class AssetsPage {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Headers':'*'
       },
-      body: JSON.stringify({assetToBuy, assetToSpend, quantityToBuy})
+      body: JSON.stringify({selectedBaseAsset, selectedQuoteAsset, orderSide, baseAssetAmount})
     })
     .then(response => {
       if (!response.ok) {

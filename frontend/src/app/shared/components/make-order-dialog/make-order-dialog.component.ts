@@ -10,6 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-dialog',
@@ -23,20 +25,22 @@ import { MatSelectModule } from '@angular/material/select';
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
-    FormsModule],
+    FormsModule,
+    MatRadioModule,
+    MatProgressSpinnerModule],
   templateUrl: './make-order-dialog.component.html',
   styleUrls: ['./make-order-dialog.component.scss']
 })
 export class MakeOrderDialog {
-  public title = 'Make order';
+  public baseAssetAmount = '';
+  public availableBaseAssets: string[] = [];
+  public selectedBaseAsset = '';
+  public areAvailableBaseAssetsLoading = true;
 
-  public amountToBuy = '';
-  public amountToSell = '';
-  public availableAssetsToBuy = [ '', 'ETH', 'BTC'];
-  public selectedAssetToBuy = '';
-
-  public availableAssetsToSell = [ '', 'ETH', 'BTC', 'USDT'];
-  public selectedAssetToSell = '';
+  public availableQuoteAssets = [ '' ];
+  public selectedQuoteAsset = '';
+  public orderSide = '';
+  public areAvailableQuoteAssetsLoading = true;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -45,16 +49,15 @@ export class MakeOrderDialog {
   ) {}
 
   ngOnInit(): void {
-    this.selectedAssetToBuy = this.data.initialAssetToBuy;
-    this.cdr.markForCheck();
-    this.fetchAvailableAssetsToSell();
+    this.fetchAvailableBaseAssets();
   }
 
   closeWithResult() {
     this.dialogRef.close({
-      assetToBuy: this.selectedAssetToBuy,
-      assetToSell: this.selectedAssetToSell,
-      amountToBuy: this.amountToBuy});
+      selectedBaseAsset: this.selectedBaseAsset,
+      selectedQuoteAsset: this.selectedQuoteAsset,
+      orderSide: this.orderSide,
+      baseAssetAmount: this.baseAssetAmount});
   }
 
   cancel() {
@@ -62,33 +65,100 @@ export class MakeOrderDialog {
   }
 
   isInputValid() : boolean {
-    return this.amountToBuy != '' && this.selectedAssetToBuy != '' && this.selectedAssetToSell != '';
+    return this.baseAssetAmount != '' && this.selectedBaseAsset != '' && this.selectedQuoteAsset != '';
+  }
+
+  public get title(): string {
+    let pairSymbol = '';
+    if(this.selectedBaseAsset != '' && this.selectedQuoteAsset != '') {
+      pairSymbol = this.selectedBaseAsset + '/' + this.selectedQuoteAsset;
+    }
+
+    return "Trade " + pairSymbol;
+  }
+
+  public get subtitle(): string {
+    return 'Spot market order';
   }
 
   public get details(): string {
     if (!this.isInputValid()) {
       return '';
     }
-    return "You are buying " + this.amountToBuy + " " + this.selectedAssetToBuy +
-      " for " + this.amountToSell + " " + this.selectedAssetToSell;
+    return "You are buying " + this.baseAssetAmount + " " + this.selectedBaseAsset +
+      " for " + this.selectedQuoteAsset;
   }
 
-  public get isAssetToSellSelectionVisible(): boolean {
-    return this.selectedAssetToBuy != '';
+  public get isQuoteAssetSelectionVisible(): boolean {
+    return this.selectedBaseAsset != '';
+  }
+
+  public get isOrderSideSelectionVisible(): boolean {
+    return this.isQuoteAssetSelectionVisible && this.selectedQuoteAsset != '';
   }
 
   public get isInputFieldVisible(): boolean {
-    return this.selectedAssetToBuy != '' && this.selectedAssetToSell != '';
+    return this.isOrderSideSelectionVisible && this.orderSide != '';
+  }
+
+  public get inputFieldLabel(): string {
+    return 'How much ' + this.selectedBaseAsset + ' to ' + this.orderSide.toLowerCase();
   }
 
   public onAssetToBuyChange(): void {
-    this.selectedAssetToSell = '';
+    this.selectedQuoteAsset = '';
     this.cdr.markForCheck();
-    this.fetchAvailableAssetsToSell();
+    this.fetchAvailableQuoteAssets();
   }
 
-  public fetchAvailableAssetsToSell(): void {
-    console.log('fetchAvailableAssetsToSell');
+  public fetchAvailableBaseAssets(): void {
+    this.areAvailableBaseAssetsLoading = true;
+    fetch('http://localhost:5000/availableBaseAssets', {
+      method: 'GET'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('availableBaseAssets HTTP error ' + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      this.availableBaseAssets = data.map((elem: any)=>{ return elem.baseAsset; });
+      this.selectedBaseAsset = this.data.initialAssetToBuy;
+      this.areAvailableBaseAssetsLoading = false;
+      this.fetchAvailableQuoteAssets();
+      this.cdr.markForCheck();
+
+      console.log('availableBaseAssets successful:', data);
+    })
+    .catch(error => {
+      console.error('availableBaseAssets failed:', error);
+    });
+  }
+
+  public fetchAvailableQuoteAssets(): void {
+    this.areAvailableQuoteAssetsLoading = true;
+    const params = new URLSearchParams({
+      baseAsset: this.selectedBaseAsset
+    });
+    fetch(`http://localhost:5000/availableQuoteAssets?${params.toString()}`, {
+      method: 'GET'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('availableQuoteAssets HTTP error ' + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      this.availableQuoteAssets = data.map((elem: any)=>{ return elem.quoteAsset; });
+    this.areAvailableQuoteAssetsLoading = false;
+      this.cdr.markForCheck();
+      console.log('availableQuoteAssets successful:', data);
+    })
+    .catch(error => {
+      console.error('availableQuoteAssets failed:', error);
+    });
   }
 }
 

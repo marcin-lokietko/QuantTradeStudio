@@ -2,10 +2,23 @@
 
 namespace GuiService::HttpGuiService::Conversion {
 
+namespace {
+ApiGateway::OrderSide toOrderSide(std::string orderSideString) {
+  if (orderSideString == "Buy") {
+    return ApiGateway::OrderSide::Buy;
+  }
+  if (orderSideString == "Sell") {
+    return ApiGateway::OrderSide::Sell;
+  }
+  return ApiGateway::OrderSide::Invalid;
+}
+}  // namespace
+
 void fromJson(const nlohmann::json& j, OrderRequest& orderRequest) {
-  orderRequest = {.assetToBuy = ApiGateway::AssetSymbol{j.at("assetToBuy").get<std::string>()},
-                  .assetToSpend = ApiGateway::AssetSymbol{j.at("assetToSpend").get<std::string>()},
-                  .quantityToBuy = ApiGateway::AssetQuantity{j.at("quantityToBuy").get<std::string>()}
+  orderRequest = {.selectedBaseAsset = ApiGateway::AssetSymbol{j.at("selectedBaseAsset").get<std::string>()},
+                  .selectedQuoteAsset = ApiGateway::AssetSymbol{j.at("selectedQuoteAsset").get<std::string>()},
+                  .orderSide = toOrderSide(j.at("orderSide").get<std::string>()),
+                  .baseAssetAmount = ApiGateway::AssetQuantity{j.at("baseAssetAmount").get<std::string>()}
 
   };
 }

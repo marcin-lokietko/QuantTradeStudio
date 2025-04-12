@@ -2,7 +2,10 @@
 
 #include <nlohmann/json.hpp>
 
+#include "GuiService/HttpGuiService/Conversion/AssetSymbols.hpp"
 #include "GuiService/HttpGuiService/Conversion/Assets.hpp"
+#include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssets.hpp"
+#include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssetsRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/OrderRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/Orders.hpp"
 #include "GuiService/OrderRequest.hpp"
@@ -47,12 +50,43 @@ void HttpGuiService::start() {
     return res;
   });
 
+  //{"baseAsset":"BTC"} -> [{"quoteAsset":"USDT", "baseAssetUnitPrice":80000.0}, {{"quoteAsset":"ETH",
+  //"baseAssetUnitPrice":50.0}}]
+  CROW_ROUTE(app, "/availableQuoteAssets")
+  ([&apiGateway_ = apiGateway_](const crow::request& req) {
+    crow::response res{};
+
+    std::optional<AvailableQuoteAssetsRequest> availableQuoteAssetsRequest;
+    Conversion::fromQueryParams(crow::query_string(req.url_params), availableQuoteAssetsRequest);
+
+    if (!availableQuoteAssetsRequest) {
+      res.code = 500;
+    } else {
+      res.body = Conversion::toJson(apiGateway_.getAvailableQuoteAssets(availableQuoteAssetsRequest->baseAsset)).dump();
+    }
+
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Content-Type", "application/json");
+    return res;
+  });
+
+  //{} -> [{"baseAsset":"BTC"}, {{"baseAsset":"USDT"}]
+  CROW_ROUTE(app, "/availableBaseAssets")
+  ([&apiGateway_ = apiGateway_]() {
+    crow::response res{};
+    res.body = Conversion::toJson(apiGateway_.getAvailableBaseAssets()).dump();
+
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Content-Type", "application/json");
+    return res;
+  });
+
   CROW_ROUTE(app, "/makeOrder").methods("POST"_method)([&apiGateway_ = apiGateway_](const crow::request& req) {
     OrderRequest orderRequest;
     Conversion::fromJson(nlohmann::json::parse(req.body), orderRequest);
 
-    const auto result =
-        apiGateway_.makeOrder(orderRequest.assetToBuy, orderRequest.assetToSpend, orderRequest.quantityToBuy);
+    const auto result = apiGateway_.makeOrder(orderRequest.selectedBaseAsset, orderRequest.selectedQuoteAsset,
+                                              orderRequest.orderSide, orderRequest.baseAssetAmount);
 
     crow::response res{"result"};
     if (result != ApiGateway::OrderResult::Success) {

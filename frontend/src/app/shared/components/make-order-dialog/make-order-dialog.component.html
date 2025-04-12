@@ -1,28 +1,41 @@
 <div>
     <h2 mat-dialog-title>{{title}}</h2>
-    <mat-form-field appearance="fill">
-        <mat-label>Buy</mat-label>
-        <mat-select [(ngModel)]="selectedAssetToBuy" (selectionChange)="onAssetToBuyChange()">
-            <mat-option *ngFor="let asset of availableAssetsToBuy" [value]="asset">
+    <mat-dialog-content>{{subtitle}}</mat-dialog-content>
+    <mat-dialog-content></mat-dialog-content>
+    <mat-spinner *ngIf="areAvailableBaseAssetsLoading" class="spinner" color="accent" diameter="20"></mat-spinner>
+    <mat-form-field *ngIf="!areAvailableBaseAssetsLoading" appearance="fill">
+        <mat-label>Base asset</mat-label>
+        <mat-select [(ngModel)]="selectedBaseAsset" (selectionChange)="onAssetToBuyChange()">
+            <mat-option *ngFor="let asset of availableBaseAssets" [value]="asset">
                 {{ asset }}
             </mat-option>
         </mat-select>
     </mat-form-field>
-    <mat-form-field *ngIf="isAssetToSellSelectionVisible" appearance="fill">
-        <mat-label>Sell</mat-label>
-        <mat-select [(ngModel)]="selectedAssetToSell">
-            <mat-option *ngFor="let asset of availableAssetsToSell" [value]="asset">
+    <mat-spinner *ngIf="isQuoteAssetSelectionVisible && areAvailableQuoteAssetsLoading" class="spinner" color="accent"
+        diameter="20"></mat-spinner>
+    <mat-form-field *ngIf="isQuoteAssetSelectionVisible && !areAvailableQuoteAssetsLoading" appearance="fill">
+        <mat-label>Quote asset</mat-label>
+        <mat-select [(ngModel)]="selectedQuoteAsset">
+            <mat-option *ngFor="let asset of availableQuoteAssets" [value]="asset">
                 {{ asset }}
             </mat-option>
         </mat-select>
     </mat-form-field>
+    <div class="radio-wrapper">
+        <mat-radio-group *ngIf="isOrderSideSelectionVisible" class="radio-group" [(ngModel)]="orderSide">
+            <mat-radio-button value="Buy">Buy</mat-radio-button>
+            <mat-radio-button value="Sell">Sell</mat-radio-button>
+        </mat-radio-group>
+    </div>
     <mat-form-field *ngIf="isInputFieldVisible" appearance="fill">
-        <mat-label>How much {{selectedAssetToBuy}} to buy</mat-label>
-        <input matInput [(ngModel)]="amountToBuy" placeholder="0.0" />
+        <mat-label>{{inputFieldLabel}}</mat-label>
+        <input matInput [(ngModel)]="baseAssetAmount" placeholder="0.0" />
     </mat-form-field>
     <mat-dialog-content>{{details}}</mat-dialog-content>
-    <mat-dialog-actions>
-        <button mat-button (click)="closeWithResult()">Confirm</button>
-        <button mat-button (click)="cancel()">Cancel</button>
-    </mat-dialog-actions>
+    <div class="action-buttons-wrapper">
+        <mat-dialog-actions class="action-buttons">
+            <button mat-button (click)="closeWithResult()">Confirm</button>
+            <button mat-button (click)="cancel()">Cancel</button>
+        </mat-dialog-actions>
+    </div>
 </div>

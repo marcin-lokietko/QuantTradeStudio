@@ -86,11 +86,16 @@ Assets BinanceService::getAssets() const {
 }
 
 ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairSymbol& symbol,
+                                                  const ApiGateway::OrderSide& orderSide,
                                                   const ApiGateway::AssetQuantity& quantity,
                                                   const ApiGateway::Price& price) {
-  const std::string queryString = "symbol=" + symbol.val_ +
-                                  "&side=BUY&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ +
-                                  "&price=" + price.val_ + "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
+  std::string orderSideString = toString(orderSide);
+  std::transform(orderSideString.begin(), orderSideString.end(), orderSideString.begin(),
+                 [](unsigned char c) { return std::toupper(c); });
+
+  const std::string queryString = "symbol=" + symbol.val_ + "&side=" + orderSideString +
+                                  "&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ + "&price=" + price.val_ +
+                                  "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
   const auto orderUrl = getOrderUrl(queryString);
   const auto response = Http::Http().post(orderUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
 
@@ -101,15 +106,26 @@ ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairS
   return ApiGateway::OrderResult::Success;
 }
 
-TradingPairs BinanceService::getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const {
+TradingPairs BinanceService::getAllTradingPairs() const {
   const std::string url = binanceTestnetBaseUrl + "/api/v3/exchangeInfo";
   const auto tradingPairsString = Http::Http().get(url, "");
 
   TradingPairs tradingPairs;
   Conversion::fromJson(nlohmann::json::parse(tradingPairsString), tradingPairs);
+  return tradingPairs;
+}
 
+TradingPairs BinanceService::getTradingPairsWithQuoteAsset(const ApiGateway::AssetSymbol& quoteAsset) const {
+  const auto tradingPairs = getAllTradingPairs();
   auto filteredPairsView =
       tradingPairs | std::views::filter([&quoteAsset](const auto& pair) { return pair.quoteAsset == quoteAsset; });
+  return {filteredPairsView.begin(), filteredPairsView.end()};
+}
+
+TradingPairs BinanceService::getTradingPairsWithBaseAsset(const ApiGateway::AssetSymbol& baseAsset) const {
+  const auto tradingPairs = getAllTradingPairs();
+  auto filteredPairsView =
+      tradingPairs | std::views::filter([&baseAsset](const auto& pair) { return pair.baseAsset == baseAsset; });
   return {filteredPairsView.begin(), filteredPairsView.end()};
 }
 

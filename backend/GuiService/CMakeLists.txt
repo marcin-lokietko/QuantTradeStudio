@@ -1,5 +1,8 @@
 add_library(GuiService STATIC
   HttpGuiService/Conversion/Assets.cpp
+  HttpGuiService/Conversion/AssetSymbols.cpp
+  HttpGuiService/Conversion/AvailableQuoteAssets.cpp
+  HttpGuiService/Conversion/AvailableQuoteAssetsRequest.cpp
   HttpGuiService/Conversion/OrderRequest.cpp
   HttpGuiService/Conversion/Orders.cpp
   HttpGuiService/HttpGuiService.cpp

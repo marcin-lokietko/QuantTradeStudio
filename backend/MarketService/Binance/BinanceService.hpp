@@ -19,10 +19,12 @@ class BinanceService : public IMarketService {
 
   Assets getAssets() const override;
 
-  ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol,
+  ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
                                     const ApiGateway::AssetQuantity& quantity, const ApiGateway::Price& price) override;
 
-  TradingPairs getTradingPairs(const ApiGateway::AssetSymbol& quoteAsset) const override;
+  TradingPairs getAllTradingPairs() const override;
+  TradingPairs getTradingPairsWithQuoteAsset(const ApiGateway::AssetSymbol& quoteAsset) const override;
+  TradingPairs getTradingPairsWithBaseAsset(const ApiGateway::AssetSymbol& baseAsset) const override;
 
   ApiGateway::Orders getOpenOrders() const override;
 

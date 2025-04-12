@@ -12,9 +12,14 @@ class ApiGateway : public IApiGateway {
 
   Assets getAssets() const override;
 
-  virtual OrderResult makeOrder(const AssetSymbol& assetToBuy, const AssetSymbol& assetToSpend,
-                                const AssetQuantity& quantityToBuy) const;
-  virtual Orders getOpenOrders() const;
+  OrderResult makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,
+                        const OrderSide& orderSide, const AssetQuantity& baseAssetAmount) const override;
+
+  Orders getOpenOrders() const override;
+
+  AvailableQuoteAssets getAvailableQuoteAssets(const AssetSymbol& baseAsset) const override;
+
+  AssetSymbols getAvailableBaseAssets(const std::optional<AssetSymbol>& quoteAsset = std::nullopt) const override;
 
  public:
   MarketService::IMarketService& marketService_;

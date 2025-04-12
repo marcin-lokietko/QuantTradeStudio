@@ -14,15 +14,11 @@ ApiGateway::Assets Wallet::getAssets() const {
   const auto marketAssets = marketService_.getAssets();
 
   std::vector<ApiGateway::TradingPairSymbol> supportedUsdtBasedTradingPairs;
-  for (const auto& pair : marketService_.getTradingPairs(ApiGateway::AssetSymbol("USDT"))) {
+  for (const auto& pair : marketService_.getTradingPairsWithQuoteAsset(ApiGateway::AssetSymbol("USDT"))) {
     supportedUsdtBasedTradingPairs.push_back(pair.symbol);
   }
 
-  const auto assetPrices = marketService_.getPrices(supportedUsdtBasedTradingPairs);
-  std::map<ApiGateway::TradingPairSymbol, ApiGateway::Price> symbolToPriceMap;
-  for (const auto& singlePrice : assetPrices) {
-    symbolToPriceMap[singlePrice.assetPair] = singlePrice.price;
-  }
+  const auto symbolToPriceMap = asMap(marketService_.getPrices(supportedUsdtBasedTradingPairs));
 
   ApiGateway::Assets userAssets;
   for (const auto& singleMarketAsset : marketAssets) {
