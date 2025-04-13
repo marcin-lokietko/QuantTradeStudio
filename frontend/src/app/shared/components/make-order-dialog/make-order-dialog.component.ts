@@ -18,16 +18,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   standalone: true,
   imports: [
     CommonModule,
-    MatIconModule,
-    MatButtonModule,
-    MatMenuModule,
-    MatDialogModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
     FormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatMenuModule,
+    MatProgressSpinnerModule,
     MatRadioModule,
-    MatProgressSpinnerModule],
+    MatSelectModule,
+  ],
   templateUrl: './make-order-dialog.component.html',
   styleUrls: ['./make-order-dialog.component.scss']
 })
@@ -123,7 +124,7 @@ export class MakeOrderDialog {
       return response.json();
     })
     .then(data => {
-      this.availableBaseAssets = data.map((elem: any)=>{ return elem.baseAsset; });
+      this.availableBaseAssets = data.map((elem: any)=>{ return elem.assetSymbol; });
       this.selectedBaseAsset = this.data.initialAssetToBuy;
       this.areAvailableBaseAssetsLoading = false;
       this.fetchAvailableQuoteAssets();

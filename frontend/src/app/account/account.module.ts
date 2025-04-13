@@ -13,7 +13,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [AssetsPage, OrdersPage],
-  imports: [CommonModule, AccountRoutingModule, MatTableModule, MatSortModule, MatIconModule, MatButtonModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    AccountRoutingModule,
+    MatTableModule,
+    MatSortModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatDialogModule,
+    MatProgressSpinnerModule
+  ],
   exports: [],
 })
 export class AccountModule {}

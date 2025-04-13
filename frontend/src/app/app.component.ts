@@ -44,4 +44,8 @@ export class AppComponent {
   navigateToOrders(): void {
     this.router.navigate(['/account/orders']);
   }
+
+  navigateToBots(): void {
+    this.router.navigate(['/bots/launch']);
+  }
 }

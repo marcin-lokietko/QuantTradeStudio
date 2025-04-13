@@ -5,7 +5,7 @@ namespace GuiService::HttpGuiService::Conversion {
 namespace {
 nlohmann::json toJson(const ApiGateway::AssetSymbol& assetSymbol) {
   nlohmann::json j;
-  j = nlohmann::json{{"baseAsset", assetSymbol.val_}};
+  j = nlohmann::json{{"assetSymbol", assetSymbol.val_}};
   return j;
 }
 }  // namespace

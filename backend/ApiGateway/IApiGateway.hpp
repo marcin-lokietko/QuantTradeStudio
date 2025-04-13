@@ -4,8 +4,10 @@
 #include "AssetSymbols.hpp"
 #include "Assets.hpp"
 #include "AvailableQuoteAssets.hpp"
+#include "BotConfig.hpp"
 #include "OrderResult.hpp"
 #include "Orders.hpp"
+#include "StartBotResult.hpp"
 
 namespace ApiGateway {
 
@@ -21,6 +23,10 @@ class IApiGateway {
   virtual AvailableQuoteAssets getAvailableQuoteAssets(const AssetSymbol& baseAsset) const = 0;
 
   virtual AssetSymbols getAvailableBaseAssets(const std::optional<AssetSymbol>& quoteAsset = std::nullopt) const = 0;
+
+  virtual AssetSymbols getQuoteAssetsSuitableForRebalancing() const = 0;
+
+  virtual StartBotResult startBot(const BotConfig& botConfig) const = 0;
 };
 
 }  // namespace ApiGateway

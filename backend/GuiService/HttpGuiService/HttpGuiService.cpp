@@ -4,8 +4,10 @@
 
 #include "GuiService/HttpGuiService/Conversion/AssetSymbols.hpp"
 #include "GuiService/HttpGuiService/Conversion/Assets.hpp"
+#include "GuiService/HttpGuiService/Conversion/AvailableBaseAssetsRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssets.hpp"
 #include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssetsRequest.hpp"
+#include "GuiService/HttpGuiService/Conversion/BotConfig.hpp"
 #include "GuiService/HttpGuiService/Conversion/OrderRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/Orders.hpp"
 #include "GuiService/OrderRequest.hpp"
@@ -50,8 +52,8 @@ void HttpGuiService::start() {
     return res;
   });
 
-  //{"baseAsset":"BTC"} -> [{"quoteAsset":"USDT", "baseAssetUnitPrice":80000.0}, {{"quoteAsset":"ETH",
-  //"baseAssetUnitPrice":50.0}}]
+  // baseAsset=BTC ->
+  // [{"quoteAsset":"USDT", "baseAssetUnitPrice":80000.0}, {{"quoteAsset":"ETH", "baseAssetUnitPrice":50.0}}]
   CROW_ROUTE(app, "/availableQuoteAssets")
   ([&apiGateway_ = apiGateway_](const crow::request& req) {
     crow::response res{};
@@ -70,11 +72,25 @@ void HttpGuiService::start() {
     return res;
   });
 
-  //{} -> [{"baseAsset":"BTC"}, {{"baseAsset":"USDT"}]
+  // "" -> [{"baseAsset":"BTC"}, {{"baseAsset":"USDT"}]
+  // quoteAsset=BTC -> [{"baseAsset":"BTC"}, {{"baseAsset":"USDT"}]
   CROW_ROUTE(app, "/availableBaseAssets")
+  ([&apiGateway_ = apiGateway_](const crow::request& req) {
+    crow::response res{};
+
+    AvailableBaseAssetsRequest availableBaseAssetsRequest;
+    Conversion::fromQueryParams(crow::query_string(req.url_params), availableBaseAssetsRequest);
+
+    res.body = Conversion::toJson(apiGateway_.getAvailableBaseAssets(availableBaseAssetsRequest.quoteAsset)).dump();
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Content-Type", "application/json");
+    return res;
+  });
+
+  CROW_ROUTE(app, "/quoteAssetsSuitableForRebalancing")
   ([&apiGateway_ = apiGateway_]() {
     crow::response res{};
-    res.body = Conversion::toJson(apiGateway_.getAvailableBaseAssets()).dump();
+    res.body = Conversion::toJson(apiGateway_.getQuoteAssetsSuitableForRebalancing()).dump();
 
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
@@ -90,6 +106,21 @@ void HttpGuiService::start() {
 
     crow::response res{"result"};
     if (result != ApiGateway::OrderResult::Success) {
+      res.code = 500;
+    }
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Content-Type", "application/json");
+    return res;
+  });
+
+  CROW_ROUTE(app, "/startBot").methods("POST"_method)([&apiGateway_ = apiGateway_](const crow::request& req) {
+    ApiGateway::BotConfig botConfig;
+    Conversion::fromJson(nlohmann::json::parse(req.body), botConfig);
+
+    const auto result = apiGateway_.startBot(botConfig);
+
+    crow::response res{"result"};
+    if (result != ApiGateway::StartBotResult::Success) {
       res.code = 500;
     }
     res.add_header("Access-Control-Allow-Origin", "*");

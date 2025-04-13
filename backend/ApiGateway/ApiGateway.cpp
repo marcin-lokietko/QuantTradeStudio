@@ -1,5 +1,6 @@
 #include <glog/logging.h>
 
+#include <map>
 #include <ranges>
 #include <set>
 
@@ -56,6 +57,30 @@ AssetSymbols ApiGateway::getAvailableBaseAssets(const std::optional<AssetSymbol>
   }
 
   return {baseAssets.begin(), baseAssets.end()};
+}
+
+AssetSymbols ApiGateway::getQuoteAssetsSuitableForRebalancing() const {
+  MarketService::TradingPairs tradingPairs = marketService_.getAllTradingPairs();
+
+  std::map<AssetSymbol, uint64_t> quoteAssetToNumOccurrences;
+  for (const auto& singleTradingPair : tradingPairs) {
+    ++quoteAssetToNumOccurrences[singleTradingPair.quoteAsset];
+  }
+
+  constexpr auto minOccurrencesForRebalancing = 2;
+  AssetSymbols quoteAssetSymbols;
+  for (const auto& [quoteAsset, numOccurrences] : quoteAssetToNumOccurrences) {
+    if (numOccurrences >= minOccurrencesForRebalancing) {
+      quoteAssetSymbols.push_back(quoteAsset);
+    }
+  }
+
+  return {quoteAssetSymbols.begin(), quoteAssetSymbols.end()};
+}
+
+StartBotResult ApiGateway::startBot(const BotConfig& botConfig) const {
+  (void)botConfig;
+  return StartBotResult::Failure;
 }
 
 }  // namespace ApiGateway

@@ -21,6 +21,10 @@ class ApiGateway : public IApiGateway {
 
   AssetSymbols getAvailableBaseAssets(const std::optional<AssetSymbol>& quoteAsset = std::nullopt) const override;
 
+  AssetSymbols getQuoteAssetsSuitableForRebalancing() const override;
+
+  StartBotResult startBot(const BotConfig& botConfig) const override;
+
  public:
   MarketService::IMarketService& marketService_;
   Wallet::IWallet& wallet_;
