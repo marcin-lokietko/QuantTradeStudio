@@ -82,7 +82,8 @@
         "coroutine": "cpp",
         "list": "cpp",
         "future": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "*.ipp": "cpp"
     },
     "editor.formatOnSave": true,
     "clang-format.executable": "clang-format",

@@ -14,7 +14,7 @@ Orchestrates all the main backend components of the application.
 It should hide how those components interact with each other from the __GuiService__.
 
 It depends on:
-* interfaces of: __Wallet__, __MarketService__, __Bot__, __BotSimulation__.
+* interfaces of: __Wallet__, __MarketService__, __BotExecution__.
 
 <!-- All the above interfaces should be defined in ApiGateway catalog, in order for the dependency inversion to be complete -->
 
@@ -30,17 +30,11 @@ Provides information about a single trading platform. Also accepts trading reque
 It depends on:
 * components: __Http__.
 
-## Bot
+## BotExecution
 Decides when and what market action to take - based on user's assets and market state and history.
 
 It depends on:
 * interfaces of: __MarketService__,
-
-## BotSimulation
-Assesses bot's performance based on historical data.
-
-It depends on:
-* interfaces of: __MarketService__, __Bot__.
 
 ## Http
 Provides the basic functionality of performing HTTP requests.

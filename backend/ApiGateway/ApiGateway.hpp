@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BotExecution/IBotExecution.hpp"
 #include "IApiGateway.hpp"
 #include "MarketService/IMarketService.hpp"
 #include "Wallet/IWallet.hpp"
@@ -8,7 +9,8 @@ namespace ApiGateway {
 
 class ApiGateway : public IApiGateway {
  public:
-  ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet);
+  ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet,
+             BotExecution::IBotExecution& botExecution);
 
   Assets getAssets() const override;
 
@@ -28,6 +30,7 @@ class ApiGateway : public IApiGateway {
  public:
   MarketService::IMarketService& marketService_;
   Wallet::IWallet& wallet_;
+  BotExecution::IBotExecution& botExecution_;
 };
 
 }  // namespace ApiGateway

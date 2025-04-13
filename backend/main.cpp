@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "ApiGateway/ApiGateway.hpp"
+#include "BotExecution/BotExecution.hpp"
 #include "GuiService/HttpGuiService/HttpGuiService.hpp"
 #include "MarketService/Binance/BinanceService.hpp"
 #include "Wallet/Wallet.hpp"
@@ -27,7 +28,8 @@ int main(int, char* argv[]) {
 
   MarketService::Binance::BinanceService marketService{argv[2]};
   Wallet::Wallet wallet{marketService};
-  ApiGateway::ApiGateway apiGateway{marketService, wallet};
+  BotExecution::BotExecution botExecution{marketService};
+  ApiGateway::ApiGateway apiGateway{marketService, wallet, botExecution};
   GuiService::HttpGuiService::HttpGuiService guiService(apiGateway);
   guiService.start();
 

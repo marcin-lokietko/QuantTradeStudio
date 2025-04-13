@@ -31,5 +31,3 @@ struct BotConfig {
 };
 
 }  // namespace ApiGateway
-
-// baseAssetsConfig: this.selectedBaseAssetsConfig,

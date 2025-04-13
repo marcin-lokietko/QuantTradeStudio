@@ -58,11 +58,12 @@ find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 #Add components
-add_subdirectory(Wallet)
+add_subdirectory(ApiGateway)
+add_subdirectory(BotExecution)
 add_subdirectory(GuiService)
 add_subdirectory(Http)
 add_subdirectory(MarketService)
-add_subdirectory(ApiGateway)
+add_subdirectory(Wallet)
 
 #declare the target
 add_executable(${EXECUTABLE_NAME}
@@ -72,7 +73,7 @@ add_executable(${EXECUTABLE_NAME}
 #include directories for headers
 target_include_directories(${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
 
-#compile and link
+#compile and link static libraries to the executable
 message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
 message(STATUS "Using linking flags: ${LINKER_FLAGS}")
 
@@ -87,6 +88,7 @@ target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS}
     Http
     MarketService
     ApiGateway
+    BotExecution
 )
 
 #### Unit tests

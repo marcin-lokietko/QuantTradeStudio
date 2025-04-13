@@ -11,8 +11,9 @@
 
 namespace ApiGateway {
 
-ApiGateway::ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet)
-    : marketService_(marketService), wallet_(wallet){};
+ApiGateway::ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet,
+                       BotExecution::IBotExecution& botExecution)
+    : marketService_(marketService), wallet_(wallet), botExecution_(botExecution){};
 
 Assets ApiGateway::getAssets() const { return wallet_.getAssets(); }
 
@@ -78,9 +79,6 @@ AssetSymbols ApiGateway::getQuoteAssetsSuitableForRebalancing() const {
   return {quoteAssetSymbols.begin(), quoteAssetSymbols.end()};
 }
 
-StartBotResult ApiGateway::startBot(const BotConfig& botConfig) const {
-  (void)botConfig;
-  return StartBotResult::Failure;
-}
+StartBotResult ApiGateway::startBot(const BotConfig& botConfig) const { return botExecution_.startBot(botConfig); }
 
 }  // namespace ApiGateway
