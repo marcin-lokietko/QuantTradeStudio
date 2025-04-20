@@ -17,11 +17,11 @@ class BotExecution : public IBotExecution {
   ApiGateway::StartBotResult startBot(const ApiGateway::BotConfig& botConfig) override;
 
  private:
+  void stopAllBots();
+
   const MarketService::IMarketService& marketService_;
   const ConfigExtractor configExtractor_{};
   std::vector<std::jthread> runningBots_{};
-
-  Rebalancer::Rebalancer rebalancer_{};
 };
 
 }  // namespace BotExecution
