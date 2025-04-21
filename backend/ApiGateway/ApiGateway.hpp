@@ -12,7 +12,7 @@ class ApiGateway : public IApiGateway {
   ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet,
              BotExecution::IBotExecution& botExecution);
 
-  Assets getAssets() const override;
+  Assets getOwnedAssets() const override;
 
   OrderResult makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,
                         const OrderSide& orderSide, const AssetQuantity& baseAssetAmount) const override;

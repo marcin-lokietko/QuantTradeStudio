@@ -1,13 +1,22 @@
 #pragma once
 
+struct Addable {};
+
 // A unique tag is needed to differentiate two separate wrappers of the same primitive.
-template <typename T, typename UniqueTag>
-struct StrongType {
+template <typename T, typename UniqueTag, typename... Mixins>
+struct StrongType : public Mixins... {
+  using WrapperType = StrongType<T, UniqueTag, Mixins...>;
   T val_;
 
-  bool operator<(const StrongType<T, UniqueTag>& other) const { return val_ < other.val_; }
-  bool operator==(const StrongType<T, UniqueTag>& other) const = default;
-  bool operator!=(const StrongType<T, UniqueTag>& other) const = default;
+  bool operator<(const WrapperType& other) const { return val_ < other.val_; }
+  bool operator==(const WrapperType& other) const = default;
+  bool operator!=(const WrapperType& other) const = default;
+
+  WrapperType operator+(const WrapperType& other)
+    requires std::is_base_of_v<Addable, WrapperType>
+  {
+    return WrapperType{val_ + other.val_};
+  }
 };
 
 /*

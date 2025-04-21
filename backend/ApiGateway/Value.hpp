@@ -6,6 +6,6 @@
 
 namespace ApiGateway {
 
-DEFINE_STRONG_TYPE(ValueInUsdt, std::string);
+DEFINE_STRONG_TYPE(Value, std::string);
 
 }  // namespace ApiGateway

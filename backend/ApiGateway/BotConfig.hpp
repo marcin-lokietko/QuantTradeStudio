@@ -16,7 +16,7 @@ DEFINE_STRONG_TYPE(SharePercent, uint64_t);
 DEFINE_STRONG_TYPE(IsExecutedImmediately, bool);
 
 struct SingleAssetShare {
-  AssetSymbol quoteAsset{};
+  AssetSymbol assetSymbol{};
   SharePercent sharePercent{};
 };
 
@@ -30,4 +30,17 @@ struct BotConfig {
   std::optional<AssetShares> baseAssetShares{};
 };
 
+inline std::string toString(const AssetShares& assetShares) {
+  std::string ret;
+  for (const auto& singleAssetShare : assetShares) {
+    ret += "{";
+    ret += std::string("assetSymbol=") + singleAssetShare.assetSymbol.val_;
+    ret += std::string(", sharePercent=") + std::to_string(singleAssetShare.sharePercent.val_);
+    ret += "},";
+  }
+  if (ret.size() > 0) {
+    ret.pop_back();
+  }
+  return ret;
+}
 }  // namespace ApiGateway

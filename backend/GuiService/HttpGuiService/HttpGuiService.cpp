@@ -38,7 +38,7 @@ void HttpGuiService::start() {
 
   CROW_ROUTE(app, "/assets")
   ([&apiGateway_ = apiGateway_]() {
-    crow::response res(Conversion::toJson(apiGateway_.getAssets()).dump());
+    crow::response res(Conversion::toJson(apiGateway_.getOwnedAssets()).dump());
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;

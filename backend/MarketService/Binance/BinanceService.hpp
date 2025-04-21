@@ -17,16 +17,20 @@ class BinanceService : public IMarketService {
 
   KlineSequence getKlines(const std::string& symbol, const std::string& interval) override;
 
-  Assets getAssets() const override;
+  Assets getOwnedAssets() const override;
 
   ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
                                     const ApiGateway::AssetQuantity& quantity, const ApiGateway::Price& price) override;
 
+  ApiGateway::OrderResult makeMarketTypeOrderWithQuoteQuantity(
+      const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
+      const ApiGateway::AssetQuantity& quoteQuantity) const override;
   TradingPairs getAllTradingPairs() const override;
   TradingPairs getTradingPairsWithQuoteAsset(const ApiGateway::AssetSymbol& quoteAsset) const override;
   TradingPairs getTradingPairsWithBaseAsset(const ApiGateway::AssetSymbol& baseAsset) const override;
 
   ApiGateway::Orders getOpenOrders() const override;
+  ApiGateway::OrderResult cancelAllOrdersOnASymbol(const ApiGateway::TradingPairSymbol& symbol) const override;
 
  private:
   std::string getAccountUrl() const;
@@ -36,7 +40,6 @@ class BinanceService : public IMarketService {
   const Encryption encryption;
 
   const std::string binanceTestnetBaseUrl = "https://testnet.binance.vision";
-  const std::string binanceRealBaseUrl = "https://api.binance.com";
 };
 
 }  // namespace MarketService::Binance

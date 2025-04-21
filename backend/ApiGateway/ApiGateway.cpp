@@ -15,7 +15,7 @@ ApiGateway::ApiGateway(MarketService::IMarketService& marketService, Wallet::IWa
                        BotExecution::IBotExecution& botExecution)
     : marketService_(marketService), wallet_(wallet), botExecution_(botExecution){};
 
-Assets ApiGateway::getAssets() const { return wallet_.getAssets(); }
+Assets ApiGateway::getOwnedAssets() const { return wallet_.getOwnedAssets(); }
 
 OrderResult ApiGateway::makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,
                                   const OrderSide& orderSide, const AssetQuantity& baseAssetAmount) const {

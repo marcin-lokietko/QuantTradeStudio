@@ -69,4 +69,34 @@ Http::Response Http::post(const std::string& url, const std::string& header) {
   }
   return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
 }
+
+Http::Response Http::del(const std::string& url, const std::string& header) {
+  CURL* curl = curl_easy_init();
+  std::string responseBody;
+  int64_t httpCode = 0;
+
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, header.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBody);
+
+    const auto res = curl_easy_perform(curl);
+    if (res != CURLE_OK) {
+      LOG(ERROR) << "HTTP DELETE failed, error: " << curl_easy_strerror(res);
+    } else {
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    }
+
+    curl_easy_cleanup(curl);
+    curl_slist_free_all(headers);
+  }
+  return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
+}
+
 }  // namespace Http

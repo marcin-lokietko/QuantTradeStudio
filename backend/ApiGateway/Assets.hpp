@@ -7,14 +7,14 @@
 #include "AssetQuantity.hpp"
 #include "AssetSymbol.hpp"
 #include "Utils/StrongType.hpp"
-#include "ValueInUsdt.hpp"
+#include "Value.hpp"
 
 namespace ApiGateway {
 
 struct SingleAsset {
   AssetSymbol assetSymbol{};
   AssetQuantity freeQuantity{};
-  ValueInUsdt usdtValue{};
+  Value usdtValue{};
 };
 
 using Assets = std::vector<SingleAsset>;

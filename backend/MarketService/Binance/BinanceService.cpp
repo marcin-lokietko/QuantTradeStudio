@@ -75,7 +75,7 @@ MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol
   return sequence;
 }
 
-Assets BinanceService::getAssets() const {
+Assets BinanceService::getOwnedAssets() const {
   const auto accountUrl = getAccountUrl();
   const auto accountString = Http::Http().get(accountUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
   const auto accountJson = nlohmann::json::parse(accountString);
@@ -90,8 +90,7 @@ ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairS
                                                   const ApiGateway::AssetQuantity& quantity,
                                                   const ApiGateway::Price& price) {
   std::string orderSideString = toString(orderSide);
-  std::transform(orderSideString.begin(), orderSideString.end(), orderSideString.begin(),
-                 [](unsigned char c) { return std::toupper(c); });
+  std::ranges::transform(orderSideString, orderSideString.begin(), [](unsigned char c) { return std::toupper(c); });
 
   const std::string queryString = "symbol=" + symbol.val_ + "&side=" + orderSideString +
                                   "&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ + "&price=" + price.val_ +
@@ -101,6 +100,28 @@ ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairS
 
   if (response.statusCode != statusCodeOk) {
     LOG(WARNING) << "makeOrder returned NOK. Msg=" << response.body.val_;
+    return ApiGateway::OrderResult::Failure;
+  }
+  return ApiGateway::OrderResult::Success;
+}
+
+ApiGateway::OrderResult BinanceService::makeMarketTypeOrderWithQuoteQuantity(
+    const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
+    const ApiGateway::AssetQuantity& quoteQuantity) const {
+  std::string orderSideString = toString(orderSide);
+  LOG(INFO) << "makeMarketTypeOrderWithQuoteQuantity symbol=" << symbol.val_ << " orderSide=" << orderSideString
+            << " quoteQuantity=" << quoteQuantity.val_;
+
+  std::ranges::transform(orderSideString, orderSideString.begin(), [](unsigned char c) { return std::toupper(c); });
+
+  const std::string queryString = "symbol=" + symbol.val_ + "&side=" + orderSideString +
+                                  "&type=MARKET&quoteOrderQty=" + quoteQuantity.val_ +
+                                  "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
+  const auto orderUrl = getOrderUrl(queryString);
+  const auto response = Http::Http().post(orderUrl, "X-MBX-APIKEY: " + encryption.getApiKey());
+
+  if (response.statusCode != statusCodeOk) {
+    LOG(WARNING) << "makeMarketTypeOrderWithQuoteQuantity returned NOK. Msg=" << response.body.val_;
     return ApiGateway::OrderResult::Failure;
   }
   return ApiGateway::OrderResult::Success;
@@ -153,6 +174,23 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
   ApiGateway::Orders orders;
   Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders);
   return orders;
+}
+
+ApiGateway::OrderResult BinanceService::cancelAllOrdersOnASymbol(const ApiGateway::TradingPairSymbol& symbol) const {
+  LOG(INFO) << "cancelAllOrdersOnASymbol symbol=" << symbol.val_;
+
+  const std::string queryString = "symbol=" + symbol.val_ + "&recvWindow=5000" + "&timestamp=" + getTimeSinceEpoch();
+  const std::string signature = encryption.generateSignature(queryString);
+  const std::string signedQuery = queryString + "&signature=" + signature;
+  const std::string url = binanceTestnetBaseUrl + "/api/v3/openOrders" + "?" + signedQuery;
+
+  const auto response = Http::Http().del(url, "X-MBX-APIKEY: " + encryption.getApiKey());
+
+  if (response.statusCode != statusCodeOk) {
+    LOG(WARNING) << "cancelAllOrdersOnASymbol returned NOK. Msg=" << response.body.val_;
+    return ApiGateway::OrderResult::Failure;
+  }
+  return ApiGateway::OrderResult::Success;
 }
 
 }  // namespace MarketService::Binance

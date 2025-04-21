@@ -28,7 +28,7 @@ int main(int, char* argv[]) {
 
   MarketService::Binance::BinanceService marketService{argv[2]};
   Wallet::Wallet wallet{marketService};
-  BotExecution::BotExecution botExecution{marketService};
+  BotExecution::BotExecution botExecution{marketService, wallet};
   ApiGateway::ApiGateway apiGateway{marketService, wallet, botExecution};
   GuiService::HttpGuiService::HttpGuiService guiService(apiGateway);
   guiService.start();

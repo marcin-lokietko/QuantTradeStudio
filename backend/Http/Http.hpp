@@ -18,6 +18,7 @@ class Http {
  public:
   std::string get(const std::string& url, const std::string& header);
   Response post(const std::string& url, const std::string& header);
+  Response del(const std::string& url, const std::string& header);
 };
 
 }  // namespace Http
