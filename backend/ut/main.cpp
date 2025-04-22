@@ -1,5 +1,4 @@
 #include "gmock/gmock.h"
-// no need to include "gtest/gtest.h" also
 
 // TEST* macros implicitly register their tests with Google Test. So, unlike with many other C++ testing frameworks,
 // you don't have to re-list all your defined tests in order to run them.
