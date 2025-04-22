@@ -5,7 +5,7 @@ add_library(BotExecution STATIC
 )
 
 #search for headers in root project directory
-target_include_directories(BotExecution PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(BotExecution PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_options(BotExecution PUBLIC ${COMPILE_FLAGS})
 

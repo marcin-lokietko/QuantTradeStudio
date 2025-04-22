@@ -39,69 +39,10 @@ else()
     message( FATAL_ERROR "Invalid buildType configured, CMake will exit." )
 endif()
 
-
-message(STATUS "Configured sources directory: ${PROJECT_SOURCE_DIR}")
-message(STATUS "Configured binary output directory: ${CMAKE_CURRENT_BINARY_DIR}")
-
-
-# #Boost libraries
-# set(Boost_USE_STATIC_LIBS OFF)
-# set(Boost_USE_MULTITHREADED ON)
-# set(Boost_USE_STATIC_RUNTIME OFF)
-# find_package(Boost 1.79 REQUIRED COMPONENTS thread)
-# message(STATUS "Boost version: ${Boost_VERSION}")
-
-#Curl library
-find_package(CURL REQUIRED)
-
-#Openssl library
-find_package(OpenSSL REQUIRED)
-
-#Add components
-add_subdirectory(ApiGateway)
-add_subdirectory(BotExecution)
-add_subdirectory(GuiService)
-add_subdirectory(Http)
-add_subdirectory(MarketService)
-add_subdirectory(Wallet)
-
-#declare the target
-add_executable(${EXECUTABLE_NAME}
-    ${PROJECT_SOURCE_DIR}/main.cpp
-)
-
-#include directories for headers
-target_include_directories(${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
-
-#compile and link static libraries to the executable
-message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
-message(STATUS "Using linking flags: ${LINKER_FLAGS}")
-
-target_compile_options(${EXECUTABLE_NAME} PUBLIC ${COMPILE_FLAGS})
-target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} 
-    glog
-    CURL::libcurl
-    OpenSSL::SSL
-    OpenSSL::Crypto
-    Wallet
-    GuiService
-    Http
-    MarketService
-    ApiGateway
-    BotExecution
-)
+add_subdirectory(src)
 
 #### Unit tests
 if(buildUT)
-    find_package(GTest REQUIRED CONFIG)
-    message(STATUS "GTest version: ${GTest_VERSION}")
-
     enable_testing()
-
-    # Add test cpp files
-    add_executable(unitTests utMain.cpp ${PROJECT_SOURCE_DIR}/TestDummy.cpp)
-    target_compile_options(unitTests PUBLIC ${COMPILE_FLAGS})
-    # Link test executable against gmock and gtest
-    target_link_libraries(unitTests PRIVATE ${LINKER_FLAGS} GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-    add_test(runUnitTests runUnitTests)
+    add_subdirectory(ut)
 endif(buildUT)

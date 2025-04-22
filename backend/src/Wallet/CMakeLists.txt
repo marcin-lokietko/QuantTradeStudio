@@ -3,7 +3,7 @@ add_library(Wallet STATIC
 )
 
 #search for headers in root project directory
-target_include_directories(Wallet PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(Wallet PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_options(Wallet PUBLIC ${COMPILE_FLAGS})
 

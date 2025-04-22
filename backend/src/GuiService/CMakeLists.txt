@@ -11,7 +11,7 @@ add_library(GuiService STATIC
 )
 
 #search for headers in root project directory
-target_include_directories(GuiService PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(GuiService PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_options(GuiService PUBLIC ${COMPILE_FLAGS})
 

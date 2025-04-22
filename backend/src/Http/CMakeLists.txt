@@ -9,7 +9,7 @@ find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 #search for headers in root project directory
-target_include_directories(Http PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(Http PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_options(Http PUBLIC ${COMPILE_FLAGS})
 

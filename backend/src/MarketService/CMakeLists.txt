@@ -11,7 +11,7 @@ add_library(MarketService STATIC
 find_package(OpenSSL REQUIRED)
 
 #search for headers in root project directory
-target_include_directories(MarketService PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(MarketService PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_options(MarketService PUBLIC ${COMPILE_FLAGS})
 

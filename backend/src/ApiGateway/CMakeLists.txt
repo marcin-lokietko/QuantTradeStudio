@@ -3,7 +3,7 @@ add_library(ApiGateway STATIC
 )
 
 #search for headers in root project directory
-target_include_directories(ApiGateway PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(ApiGateway PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_options(ApiGateway PUBLIC ${COMPILE_FLAGS})
 
