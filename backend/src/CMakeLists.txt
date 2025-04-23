@@ -16,6 +16,7 @@ add_subdirectory(BotExecution)
 add_subdirectory(GuiService)
 add_subdirectory(Http)
 add_subdirectory(MarketService)
+add_subdirectory(Utils)
 add_subdirectory(Wallet)
 
 #declare the target

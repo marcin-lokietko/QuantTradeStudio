@@ -1,3 +1,5 @@
+#include <glog/logging.h>
+
 #include "gmock/gmock.h"
 
 // TEST* macros implicitly register their tests with Google Test. So, unlike with many other C++ testing frameworks,
@@ -10,6 +12,10 @@ int main(int argc, char **argv) {
   // ::testing::InitGoogleTest(&argc, argv);
   // if google mock also used - use the line above, which setups both gtest and gmock
   ::testing::InitGoogleMock(&argc, argv);
+
+  // Disable all glog messages below FATAL and prevent logs from going to stderr
+  FLAGS_minloglevel = google::GLOG_FATAL;
+  FLAGS_logtostderr = false;
 
   // RUN_ALL_TESTS() runs all tests in your link unit -- they can be from different test cases, or even different source
   // files.

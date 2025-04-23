@@ -3,7 +3,10 @@ add_library(BotExecutionUt STATIC
 )
 
 #search for headers in root project directory
-target_include_directories(BotExecutionUt PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(BotExecutionUt PRIVATE 
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/ut
+)
 
 target_link_libraries(BotExecutionUt
     GTest::gtest
@@ -12,5 +15,3 @@ target_link_libraries(BotExecutionUt
     GTest::gmock_main
     BotExecution
 )
-
-# GoogleTest setup

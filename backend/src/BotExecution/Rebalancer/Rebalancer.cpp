@@ -12,8 +12,8 @@ namespace BotExecution::Rebalancer {
 constexpr ApiGateway::SharePercent maxAcceptableShareDeviation{1};
 
 Rebalancer::Rebalancer(Config&& config, const MarketService::IMarketService& marketService,
-                       const Wallet::IWallet& wallet)
-    : config_(std::move(config)), marketService_(marketService), wallet_(wallet) {}
+                       const Wallet::IWallet& wallet, std::unique_ptr<Time::ITime> time)
+    : config_(std::move(config)), marketService_(marketService), wallet_(wallet), time_(std::move(time)) {}
 
 void Rebalancer::run(std::stop_token st) {
   LOG(INFO) << "Rebalancer started execution";
@@ -23,7 +23,7 @@ void Rebalancer::run(std::stop_token st) {
     rebalance();
   }
   while (!st.stop_requested()) {
-    std::this_thread::sleep_for(executionPeriod);
+    time_->sleepFor(executionPeriod);
     if (!st.stop_requested()) {
       rebalance();
     }

@@ -11,4 +11,5 @@ target_compile_options(BotExecution PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(BotExecution ${LINKER_FLAGS}
     glog
+    Utils
 )

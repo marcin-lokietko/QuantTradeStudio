@@ -13,6 +13,8 @@ namespace ApiGateway {
 
 class IApiGateway {
  public:
+  virtual ~IApiGateway() = default;
+
   virtual Assets getOwnedAssets() const = 0;
 
   virtual OrderResult makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,

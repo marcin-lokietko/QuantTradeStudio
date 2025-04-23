@@ -1,8 +1,10 @@
 #include <glog/logging.h>
 
+#include <memory>
 #include <variant>
 
 #include "BotExecution.hpp"
+#include "Utils/Time/Time.hpp"
 
 namespace BotExecution {
 
@@ -24,7 +26,7 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
 
           runningBots_.emplace_back([conf = std::move(config), &marketService_ = marketService_,
                                      &wallet_ = wallet_](std::stop_token st) mutable {
-            Rebalancer::Rebalancer bot(std::move(conf), marketService_, wallet_);
+            Rebalancer::Rebalancer bot(std::move(conf), marketService_, wallet_, std::make_unique<Time::Time>());
             bot.run(std::move(st));
           });
 

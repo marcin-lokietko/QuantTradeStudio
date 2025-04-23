@@ -43,6 +43,5 @@ add_subdirectory(src)
 
 #### Unit tests
 if(buildUT)
-    enable_testing()
     add_subdirectory(ut)
 endif(buildUT)

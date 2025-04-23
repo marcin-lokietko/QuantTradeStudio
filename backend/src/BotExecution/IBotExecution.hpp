@@ -7,6 +7,8 @@ namespace BotExecution {
 
 class IBotExecution {
  public:
+  virtual ~IBotExecution() = default;
+
   virtual ApiGateway::StartBotResult startBot(const ApiGateway::BotConfig& botConfig) = 0;
 };
 
