@@ -36,7 +36,7 @@ TEST_F(RebalancerTest, WhenConfiguredBaseAssetsNowOwned_ThenBotDoesNotTrade) {
   std::stop_token token = source.get_token();
 
   EXPECT_CALL(marketServiceMock_, getOpenOrders()).WillOnce([&source]() {
-    // Request top, so that the bot executes only once
+    // Request stop, so that the bot executes only once
     source.request_stop();
     return ApiGateway::Orders{};
   });

@@ -15,6 +15,7 @@
 			"extensions": [
 				"ms-vscode.cpptools",
 				"ms-vscode.cpptools-extension-pack",
+				"ms-python.python",
 				"xaver.clang-format"
 			]
 		}

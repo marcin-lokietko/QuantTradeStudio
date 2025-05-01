@@ -1,14 +1,15 @@
 #pragma once
 
-#include <gmock/gmock.h>
-
-#include "Wallet/IWallet.hpp"
+#include "ApiGateway/Assets.hpp"
+#include "AssetValues.hpp"
 
 namespace Wallet {
 
-class WalletMock : public IWallet {
+class IWallet {
  public:
+
   MOCK_METHOD(ApiGateway::Assets, getOwnedAssets, (), (const, override));
   MOCK_METHOD(AssetValues, getOwnedAssetValues, (const ApiGateway::AssetSymbol& quoteAsset), (const, override));
 };
+
 }  // namespace Wallet

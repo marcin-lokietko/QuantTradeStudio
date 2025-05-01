@@ -2,8 +2,6 @@
 
 #include <gmock/gmock.h>
 
-#include <chrono>
-
 #include "Utils/Time/ITime.hpp"
 
 namespace Time {

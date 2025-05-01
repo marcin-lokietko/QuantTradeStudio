@@ -49,3 +49,5 @@ RUN mkdir -p crow \
   && dpkg -i Crow-1.2.0-Linux.deb
 
 RUN apt install -y zlib1g-dev
+
+RUN apt install -y python3 python3-pip

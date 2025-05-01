@@ -6,7 +6,7 @@
 
 namespace MarketService {
 
-class MarketServiceMock : public MarketService::IMarketService {
+class MarketServiceMock : public IMarketService {
  public:
   MOCK_METHOD(std::string, getServerTime, (), (override));
   MOCK_METHOD(ApiGateway::Price, getPrice, (const ApiGateway::TradingPairSymbol& tradingPairSymbol), (override));
