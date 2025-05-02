@@ -5,6 +5,24 @@ message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
 message(STATUS "Using linking flags: ${LINKER_FLAGS}")
 message(STATUS "GTest version: ${GTest_VERSION}")
 
+# Generate common mocks
+include(GenerateMock.cmake)
+
+run_python_script(WalletMock
+    ${CMAKE_SOURCE_DIR}/src/Wallet/IWallet.hpp
+    ${CMAKE_SOURCE_DIR}/ut/CommonMocks/WalletMock.hpp
+)
+
+run_python_script(TimeMock
+    ${CMAKE_SOURCE_DIR}/src/Utils/Time/ITime.hpp
+    ${CMAKE_SOURCE_DIR}/ut/CommonMocks/TimeMock.hpp
+)
+
+run_python_script(MarketServiceMock
+    ${CMAKE_SOURCE_DIR}/src/MarketService/IMarketService.hpp
+    ${CMAKE_SOURCE_DIR}/ut/CommonMocks/MarketServiceMock.hpp
+)
+
 # Add test components
 add_subdirectory(BotExecutionUt)
 

@@ -3,3 +3,5 @@
 
 /keys/apiKey.txt
 /keys/secretKey.txt
+
+/backend/ut/CommonMocks/*.hpp
