@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  backend:
+    image: algo-trader-backend
+    restart: always
+    volumes:
+      - ../../backend:/algo-trader/backend
+      - ../../build:/algo-trader/build
+      - ../../logs:/algo-trader/logs
+      - ../../keys:/algo-trader/keys
+    ports:
+      - "5000:5000"
+    working_dir: /
+    command: bash -c "/algo-trader/build/debug/AlgoTrader /algo-trader/logs /algo-trader/keys"
+  backend-tests:
+    image: algo-trader-tests
+    volumes:
+        - ../../tests:/algo-trader/tests
+        - ../../scripts:/algo-trader/scripts
+    working_dir: /
+    command: bash -c "cd /algo-trader/tests/backend && behave"
+    stdin_open: true
+    tty: true

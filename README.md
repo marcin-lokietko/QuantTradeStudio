@@ -1,5 +1,8 @@
 # General description
 
+# Prerequisites
+Install docker and docker compose on your system.
+
 # Keys setup
 ## Binance testnet
 Create apiKey.txt and secretKey.txt containing keys generated on https://testnet.binance.vision/
