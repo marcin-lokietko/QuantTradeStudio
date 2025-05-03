@@ -24,14 +24,14 @@ std::string Encryption::generateSignature(const std::string& data) const {
 }
 
 std::string Encryption::getApiKey() const {
-  std::ifstream stream(keysDir + "/apiKey.txt");
+  std::ifstream stream(keysDir_.val_.string() + "/apiKey.txt");
   std::string key;
   stream >> key;
   return key;
 }
 
 std::string Encryption::getSecretKey() const {
-  std::ifstream stream(keysDir + "/secretKey.txt");
+  std::ifstream stream(keysDir_.val_.string() + "/secretKey.txt");
   std::string key;
   stream >> key;
   return key;

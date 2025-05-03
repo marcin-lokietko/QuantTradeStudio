@@ -12,7 +12,7 @@ services:
     ports:
       - "5000:5000"
     working_dir: /
-    command: bash -c "/algo-trader/build/debug/AlgoTrader /algo-trader/logs /algo-trader/keys"
+    command: bash -c "/algo-trader/build/debug/AlgoTrader /algo-trader/config/dockerDevelConfig.json"
   backend-tests:
     image: algo-trader-tests
     volumes:

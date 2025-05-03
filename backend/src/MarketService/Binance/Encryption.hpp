@@ -2,18 +2,20 @@
 
 #include <string>
 
+#include "Config/ConfigParams.hpp"
+
 namespace MarketService::Binance {
 
 class Encryption {
  public:
-  Encryption(std::string keysDir) : keysDir(std::move(keysDir)){};
+  Encryption(const Config::KeysCatalogPath& keysDir) : keysDir_(keysDir){};
 
   std::string generateSignature(const std::string& data) const;
   std::string getApiKey() const;
 
  private:
   std::string getSecretKey() const;
-  const std::string keysDir;
+  const Config::KeysCatalogPath& keysDir_;
 };
 
 }  // namespace MarketService::Binance

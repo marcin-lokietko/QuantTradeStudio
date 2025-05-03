@@ -1,0 +1,5 @@
+{
+    "logsCatalogPath": "/workspaces/algotrader/logs",
+    "keysCatalogPath": "/workspaces/algotrader/keys",
+    "binanceUrlPrefix": "https://testnet.binance.vision/api/v3"
+}

@@ -39,5 +39,8 @@ It depends on:
 ## Http
 Provides the basic functionality of performing HTTP requests.
 
+## Config
+Reads backend json config file.
+
 ## Utils
 Consists of all the minor helpers that can be used throughout the whole application. 

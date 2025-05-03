@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Config/ConfigParams.hpp"
 #include "MarketService/Binance/Encryption.hpp"
 #include "MarketService/IMarketService.hpp"
 
@@ -7,7 +8,8 @@ namespace MarketService::Binance {
 
 class BinanceService : public IMarketService {
  public:
-  BinanceService(std::string keysDir) : encryption(std::move(keysDir)){};
+  BinanceService(const Config::KeysCatalogPath& keysDir, const Config::BinanceUrlPrefix& binanceUrlPrefix)
+      : binanceUrlPrefix_(binanceUrlPrefix), encryption_(keysDir){};
 
   std::string getServerTime() override;
 
@@ -36,10 +38,8 @@ class BinanceService : public IMarketService {
   std::string getAccountUrl() const;
   std::string getOrderUrl(const std::string& queryString) const;
 
-  const std::string keysDir;
-  const Encryption encryption;
-
-  const std::string binanceTestnetBaseUrl = "https://testnet.binance.vision";
+  const Config::BinanceUrlPrefix& binanceUrlPrefix_;
+  const Encryption encryption_;
 };
 
 }  // namespace MarketService::Binance

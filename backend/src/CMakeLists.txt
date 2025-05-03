@@ -13,6 +13,7 @@ find_package(OpenSSL REQUIRED)
 #Add components
 add_subdirectory(ApiGateway)
 add_subdirectory(BotExecution)
+add_subdirectory(Config)
 add_subdirectory(GuiService)
 add_subdirectory(Http)
 add_subdirectory(MarketService)
@@ -30,14 +31,16 @@ target_include_directories(${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src)
 #compile and link static libraries to the executable
 target_compile_options(${EXECUTABLE_NAME} PUBLIC ${COMPILE_FLAGS})
 target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} 
-    glog
     CURL::libcurl
-    OpenSSL::SSL
+    glog
     OpenSSL::Crypto
-    Wallet
+    OpenSSL::SSL
+
+    ApiGateway
+    BotExecution
+    Config
     GuiService
     Http
     MarketService
-    ApiGateway
-    BotExecution
+    Wallet
 )
