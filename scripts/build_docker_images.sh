@@ -1,9 +1,17 @@
 #!/bin/bash
 set -e
 
+OPTIONS=""
+for inputArg in "$@"
+do
+    if [ $inputArg = "noCache" ]; then
+        OPTIONS="--no-cache"
+    fi
+done
+
 . $(dirname $(realpath -s $0))/.common.sh
 
-docker build -t algo-trader-backend ${SCRIPTS_PATH}/backend
-docker build -t algo-trader-frontend ${SCRIPTS_PATH}/frontend
-docker build -t algo-trader-tests ${SCRIPTS_PATH}/tests
+docker build ${OPTIONS} -t algo-trader-backend ${SCRIPTS_PATH}/backend
+docker build ${OPTIONS} -t algo-trader-frontend ${SCRIPTS_PATH}/frontend
+docker build ${OPTIONS} -t algo-trader-backend-tests ${SCRIPTS_PATH}/run_backend_tests
 

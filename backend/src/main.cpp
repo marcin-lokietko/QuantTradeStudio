@@ -14,9 +14,12 @@
 #include "Wallet/Wallet.hpp"
 
 void setupLogger(const char* programName, const Config::LogsCatalogPath& logDir) {
-  std::filesystem::create_directory(logDir.val_);
+  if (!std::filesystem::exists(logDir.val_)) {
+    std::filesystem::create_directory(logDir.val_);
+  }
   FLAGS_log_dir = logDir.val_;
   FLAGS_stderrthreshold = 0;
+  FLAGS_logbuflevel = -1;  // always flush
 
   google::InitGoogleLogging(programName);
 }
@@ -42,6 +45,4 @@ int main(int argc, char* argv[]) {
   ApiGateway::ApiGateway apiGateway{marketService, wallet, botExecution};
   GuiService::HttpGuiService::HttpGuiService guiService(apiGateway);
   guiService.start();
-
-  LOG(INFO) << "########## Ending AlgoTrader";
 }

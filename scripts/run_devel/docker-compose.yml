@@ -26,7 +26,8 @@ services:
       - ../../build:/algo-trader/build
       - ../../logs:/algo-trader/logs
       - ../../keys:/algo-trader/keys
+      - ../../config:/algo-trader/config
     ports:
       - "5000:5000"
     working_dir: /
-    command: bash -c "/algo-trader/build/debug/AlgoTrader /algo-trader/config/dockerDevelConfig.json"
+    command: bash -c "/algo-trader/build/debug/src/AlgoTrader /algo-trader/config/dockerDevelConfig.json"

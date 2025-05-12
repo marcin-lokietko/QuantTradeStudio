@@ -16,6 +16,8 @@ size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 }  // namespace
 
 std::string Http::get(const std::string& url, const std::string& header) {
+  LOG(INFO) << "GET url: " + url;
+
   CURL* curl = curl_easy_init();
   std::string response;
 
@@ -38,10 +40,13 @@ std::string Http::get(const std::string& url, const std::string& header) {
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
+  LOG(INFO) << "body: " + response;
   return response;
 }
 
 Http::Response Http::post(const std::string& url, const std::string& header) {
+  LOG(INFO) << "POST url: " + url;
+
   CURL* curl = curl_easy_init();
   std::string responseBody;
   const std::string postFields = "";
@@ -59,7 +64,7 @@ Http::Response Http::post(const std::string& url, const std::string& header) {
     const auto res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
-      LOG(ERROR) << "HTTP GET failed, error: " << curl_easy_strerror(res);
+      LOG(ERROR) << "HTTP POST failed, error: " << curl_easy_strerror(res);
     } else {
       curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     }
@@ -67,10 +72,13 @@ Http::Response Http::post(const std::string& url, const std::string& header) {
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
+  LOG(INFO) << "code: " + httpCode << "; body: " + responseBody;
   return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
 }
 
 Http::Response Http::del(const std::string& url, const std::string& header) {
+  LOG(INFO) << "DELETE url: " + url;
+
   CURL* curl = curl_easy_init();
   std::string responseBody;
   int64_t httpCode = 0;
@@ -96,6 +104,7 @@ Http::Response Http::del(const std::string& url, const std::string& header) {
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
+  LOG(INFO) << "code: " + httpCode << "; body: " + responseBody;
   return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
 }
 
