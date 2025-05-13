@@ -16,3 +16,5 @@ MAIN_EXE_NAME="AlgoTrader"
 
 LOGS_DIR=${SCRIPTS_PATH}"/../logs"
 KEYS_DIR=${SCRIPTS_PATH}"/../keys"
+CONFIG_DIR=${SCRIPTS_PATH}"/../config"
+

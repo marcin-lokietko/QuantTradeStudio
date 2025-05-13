@@ -1,6 +1,7 @@
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { environment } from '@env/environment';
 
 export interface Order {
   orderId: number;
@@ -26,14 +27,14 @@ export class OrdersPage {
   dataSource = new MatTableDataSource(this.orders);
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.getData();
   }
 
   getData(): void {
-    fetch('http://localhost:5000/openOrders')
+    fetch(environment.algoTraderBackendUrlPrefix + '/openOrders')
       .then(response => {
         this.isLoading = false;
         if (!response.ok) {

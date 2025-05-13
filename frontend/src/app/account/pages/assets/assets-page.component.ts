@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MakeOrderDialog } from '../../../shared/components/make-order-dialog/make-order-dialog.component';
 import { NotificationService } from '../../../services/notification.service';
 import { NotificationSeverity } from '../../../shared/components/notification/notification-severity-enum';
+import { environment } from '@env/environment';
 
 export interface Balance {
   assetSymbol: string;
@@ -26,7 +27,7 @@ export class AssetsPage {
   dataSource = new MatTableDataSource(this.balances);
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private dialog: MatDialog, private notificationService: NotificationService, private cdr: ChangeDetectorRef) {}
+  constructor(private dialog: MatDialog, private notificationService: NotificationService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.getData();
@@ -36,7 +37,8 @@ export class AssetsPage {
     const dialogRef = this.dialog.open(MakeOrderDialog, {
       width: '60vw',
       data: {
-        initialAssetToBuy: element.assetSymbol}
+        initialAssetToBuy: element.assetSymbol
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -48,7 +50,7 @@ export class AssetsPage {
   }
 
   getData(): void {
-    fetch('http://localhost:5000/assets')
+    fetch(environment.algoTraderBackendUrlPrefix + '/assets')
       .then(response => {
         this.isLoading = false;
         if (!response.ok) {
@@ -65,38 +67,37 @@ export class AssetsPage {
         } catch (error) {
           console.error("Invalid assets content:", error);
         }
-        console.log('API Response:', JSON.stringify(data.balances));
+        console.log('API Response:', JSON.stringify(this.balances));
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
   }
 
-  makeOrder(selectedBaseAsset: string, selectedQuoteAsset: string, orderSide: string, baseAssetAmount: string) : void
-  {
-    console.log(`tradeAsset selectedBaseAsset=${selectedBaseAsset}, selectedQuoteAsset=${selectedQuoteAsset}, orderSide=${orderSide}, baseAssetAmount=${baseAssetAmount}` );
+  makeOrder(selectedBaseAsset: string, selectedQuoteAsset: string, orderSide: string, baseAssetAmount: string): void {
+    console.log(`tradeAsset selectedBaseAsset=${selectedBaseAsset}, selectedQuoteAsset=${selectedQuoteAsset}, orderSide=${orderSide}, baseAssetAmount=${baseAssetAmount}`);
 
-    fetch('http://localhost:5000/makeOrder', {
+    fetch(environment.algoTraderBackendUrlPrefix + '/makeOrder', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Headers':'*'
+        'Access-Control-Allow-Headers': '*'
       },
-      body: JSON.stringify({selectedBaseAsset, selectedQuoteAsset, orderSide, baseAssetAmount})
+      body: JSON.stringify({ selectedBaseAsset, selectedQuoteAsset, orderSide, baseAssetAmount })
     })
-    .then(response => {
-      if (!response.ok) {
-        this.notificationService.show('Failed to open the order', 3000, NotificationSeverity.Error);
-        throw new Error('makeOrder HTTP error ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('makeOrder successful:', data);
-      this.getData();
-    })
-    .catch(error => {
-      console.error('makeOrder failed:', error);
-    });
-  } 
+      .then(response => {
+        if (!response.ok) {
+          this.notificationService.show('Failed to open the order', 3000, NotificationSeverity.Error);
+          throw new Error('makeOrder HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('makeOrder successful:', data);
+        this.getData();
+      })
+      .catch(error => {
+        console.error('makeOrder failed:', error);
+      });
+  }
 }

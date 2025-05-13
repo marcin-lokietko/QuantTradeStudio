@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-dialog',
@@ -38,7 +39,7 @@ export class MakeOrderDialog {
   public selectedBaseAsset = '';
   public areAvailableBaseAssetsLoading = true;
 
-  public availableQuoteAssets = [ '' ];
+  public availableQuoteAssets = [''];
   public selectedQuoteAsset = '';
   public orderSide = '';
   public areAvailableQuoteAssetsLoading = true;
@@ -47,7 +48,7 @@ export class MakeOrderDialog {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<Component>,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.fetchAvailableBaseAssets();
@@ -58,20 +59,21 @@ export class MakeOrderDialog {
       selectedBaseAsset: this.selectedBaseAsset,
       selectedQuoteAsset: this.selectedQuoteAsset,
       orderSide: this.orderSide,
-      baseAssetAmount: this.baseAssetAmount});
+      baseAssetAmount: this.baseAssetAmount
+    });
   }
 
   cancel() {
     this.dialogRef.close(undefined);
   }
 
-  isInputValid() : boolean {
+  isInputValid(): boolean {
     return this.baseAssetAmount != '' && this.selectedBaseAsset != '' && this.selectedQuoteAsset != '';
   }
 
   public get title(): string {
     let pairSymbol = '';
-    if(this.selectedBaseAsset != '' && this.selectedQuoteAsset != '') {
+    if (this.selectedBaseAsset != '' && this.selectedQuoteAsset != '') {
       pairSymbol = this.selectedBaseAsset + '/' + this.selectedQuoteAsset;
     }
 
@@ -114,27 +116,27 @@ export class MakeOrderDialog {
 
   public fetchAvailableBaseAssets(): void {
     this.areAvailableBaseAssetsLoading = true;
-    fetch('http://localhost:5000/availableBaseAssets', {
+    fetch(environment.algoTraderBackendUrlPrefix + '/availableBaseAssets', {
       method: 'GET'
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('availableBaseAssets HTTP error ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      this.availableBaseAssets = data.map((elem: any)=>{ return elem.assetSymbol; });
-      this.selectedBaseAsset = this.data.initialAssetToBuy;
-      this.areAvailableBaseAssetsLoading = false;
-      this.fetchAvailableQuoteAssets();
-      this.cdr.markForCheck();
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('availableBaseAssets HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.availableBaseAssets = data.map((elem: any) => { return elem.assetSymbol; });
+        this.selectedBaseAsset = this.data.initialAssetToBuy;
+        this.areAvailableBaseAssetsLoading = false;
+        this.fetchAvailableQuoteAssets();
+        this.cdr.markForCheck();
 
-      console.log('availableBaseAssets successful:', data);
-    })
-    .catch(error => {
-      console.error('availableBaseAssets failed:', error);
-    });
+        console.log('availableBaseAssets successful:', data);
+      })
+      .catch(error => {
+        console.error('availableBaseAssets failed:', error);
+      });
   }
 
   public fetchAvailableQuoteAssets(): void {
@@ -142,24 +144,24 @@ export class MakeOrderDialog {
     const params = new URLSearchParams({
       baseAsset: this.selectedBaseAsset
     });
-    fetch(`http://localhost:5000/availableQuoteAssets?${params.toString()}`, {
+    fetch(environment.algoTraderBackendUrlPrefix + `/availableQuoteAssets?${params.toString()}`, {
       method: 'GET'
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('availableQuoteAssets HTTP error ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      this.availableQuoteAssets = data.map((elem: any)=>{ return elem.quoteAsset; });
-    this.areAvailableQuoteAssetsLoading = false;
-      this.cdr.markForCheck();
-      console.log('availableQuoteAssets successful:', data);
-    })
-    .catch(error => {
-      console.error('availableQuoteAssets failed:', error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('availableQuoteAssets HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.availableQuoteAssets = data.map((elem: any) => { return elem.quoteAsset; });
+        this.areAvailableQuoteAssetsLoading = false;
+        this.cdr.markForCheck();
+        console.log('availableQuoteAssets successful:', data);
+      })
+      .catch(error => {
+        console.error('availableQuoteAssets failed:', error);
+      });
   }
 }
 

@@ -1,0 +1,5 @@
+{
+    "logsCatalogPath": "/algo-trader/logs/e2e_tests",
+    "keysCatalogPath": "/algo-trader/keys",
+    "binanceUrlPrefix": "e2e-tests:5001"
+}

@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { AddAssetShareDialog } from '../../components/add-asset-share-dialog/add-asset-share-dialog.component';
 import { NotificationService } from '../../../services/notification.service';
 import { NotificationSeverity } from '../../../shared/components/notification/notification-severity-enum';
+import { environment } from '@env/environment';
 
 interface BaseAssetConfig {
   assetSymbol: string;
@@ -21,10 +22,10 @@ export class BotsLaunchPage {
   public availableBots = ['Rebalancer'];
   public selectedBot = '';
   public executionPeriodInputFieldLabel = 'Execution period in seconds';
-  
+
   public executionPeriodInput = '';
   public isExecutedImmediately = false;
- 
+
   public availableQuoteAssets: string[] = [];
   public selectedQuoteAsset = '';
   public areAvailableQuoteAssetsLoading = true;
@@ -39,19 +40,19 @@ export class BotsLaunchPage {
   dataSource = new MatTableDataSource(this.selectedBaseAssetsConfig);
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private dialog: MatDialog, private notificationService: NotificationService, private cdr: ChangeDetectorRef) {}
+  constructor(private dialog: MatDialog, private notificationService: NotificationService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
   }
 
   public selectBot(botName: string): void {
     this.selectedBot = botName;
-    if(this.selectedBot === 'Rebalancer') {
+    if (this.selectedBot === 'Rebalancer') {
       this.fetchAvailableQuoteAssets();
     }
   }
 
-  public getBotButtonClasses(botName: string){
+  public getBotButtonClasses(botName: string) {
     return {
       isSelected: botName === this.selectedBot
     };
@@ -68,7 +69,7 @@ export class BotsLaunchPage {
   }
 
   public get configTitle(): string {
-    if(!this.selectedBot) {
+    if (!this.selectedBot) {
       return '';
     }
     return this.selectedBot + ' configuration';
@@ -80,23 +81,23 @@ export class BotsLaunchPage {
 
   public fetchAvailableQuoteAssets(): void {
     this.areAvailableQuoteAssetsLoading = true;
-    fetch(`http://localhost:5000/quoteAssetsSuitableForRebalancing`, {
+    fetch(environment.algoTraderBackendUrlPrefix + '/quoteAssetsSuitableForRebalancing', {
       method: 'GET'
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('quoteAssetsSuitableForRebalancing HTTP error ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      this.availableQuoteAssets = data.map((elem: any)=>{ return elem.assetSymbol; });
-      this.areAvailableQuoteAssetsLoading = false;
-      console.log('quoteAssetsSuitableForRebalancing successful:', data);
-    })
-    .catch(error => {
-      console.error('quoteAssetsSuitableForRebalancing failed:', error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('quoteAssetsSuitableForRebalancing HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.availableQuoteAssets = data.map((elem: any) => { return elem.assetSymbol; });
+        this.areAvailableQuoteAssetsLoading = false;
+        console.log('quoteAssetsSuitableForRebalancing successful:', data);
+      })
+      .catch(error => {
+        console.error('quoteAssetsSuitableForRebalancing failed:', error);
+      });
   }
 
   public fetchAvailableBaseAssets(): void {
@@ -104,27 +105,27 @@ export class BotsLaunchPage {
     const params = new URLSearchParams({
       quoteAsset: this.selectedQuoteAsset,
     });
-    fetch(`http://localhost:5000/availableBaseAssets?${params.toString()}`, {
+    fetch(environment.algoTraderBackendUrlPrefix + `/availableBaseAssets?${params.toString()}`, {
       method: 'GET'
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('availableBaseAssets HTTP error ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      this.availableBaseAssets = data.map((elem: any)=>{ return elem.assetSymbol; });
-      this.areAvailableBaseAssetsLoading = false;
-      console.log('availableBaseAssets successful:', data);
-    })
-    .catch(error => {
-      console.error('availableBaseAssets failed:', error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('availableBaseAssets HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.availableBaseAssets = data.map((elem: any) => { return elem.assetSymbol; });
+        this.areAvailableBaseAssetsLoading = false;
+        console.log('availableBaseAssets successful:', data);
+      })
+      .catch(error => {
+        console.error('availableBaseAssets failed:', error);
+      });
   }
 
   public deleteSelectedBaseAssetConfig(elementToRemove: BaseAssetConfig) {
-    this.selectedBaseAssetsConfig = this.selectedBaseAssetsConfig.filter((elem: BaseAssetConfig) => {return elem != elementToRemove;});
+    this.selectedBaseAssetsConfig = this.selectedBaseAssetsConfig.filter((elem: BaseAssetConfig) => { return elem != elementToRemove; });
     this.updateSelectedBaseAssetConfigTable();
   }
 
@@ -132,15 +133,16 @@ export class BotsLaunchPage {
     return this.selectedQuoteAsset != '';
   }
 
-  public addBaseAsset():void {
+  public addBaseAsset(): void {
     const dialogRef = this.dialog.open(AddAssetShareDialog, {
       width: '60vw',
       data: {
         title: 'Add base asset share',
         inputFieldLabel: 'Base asset share',
-        availableAssets: this.availableBaseAssets.filter((elem: string ) => {
+        availableAssets: this.availableBaseAssets.filter((elem: string) => {
           return this.selectedBaseAssetsConfig.findIndex((config => {
-            return config.assetSymbol === elem;} ))  === -1;
+            return config.assetSymbol === elem;
+          })) === -1;
         }),
       }
     });
@@ -148,7 +150,7 @@ export class BotsLaunchPage {
     dialogRef.afterClosed().subscribe(result => {
       console.log('Dialog closed with result:', result);
       if (result) {
-        this.selectedBaseAssetsConfig.push({assetSymbol: result.assetSymbol, expectedShare: Number(result.assetShare)})
+        this.selectedBaseAssetsConfig.push({ assetSymbol: result.assetSymbol, expectedShare: Number(result.assetShare) })
         this.updateSelectedBaseAssetConfigTable();
       }
     });
@@ -170,10 +172,10 @@ export class BotsLaunchPage {
   }
 
   public get baseAssetConfigSummary(): string {
-    if(this.executionPeriodInput === '') {
+    if (this.executionPeriodInput === '') {
       return 'Execution period is needed to launch the bot';
     }
-    if(this.selectedBaseAssetsConfig.length < 2) {
+    if (this.selectedBaseAssetsConfig.length < 2) {
       return 'At least two base assets are needed to launch the bot';
     }
     let msg = 'Shares of added base assets sum up to ' + this.baseAssetsTotalShare + ' percent.';
@@ -192,33 +194,33 @@ export class BotsLaunchPage {
   public startBot(): void {
     const body = JSON.stringify({
       botName: this.selectedBot,
-      executionPeriod: Number(this.executionPeriodInput), 
+      executionPeriod: Number(this.executionPeriodInput),
       isExecutedImmediately: this.isExecutedImmediately,
       quoteAsset: this.selectedQuoteAsset,
       baseAssetShares: this.selectedBaseAssetsConfig,
-     });
-    console.log(`startBot body=${body}` );
+    });
+    console.log(`startBot body=${body}`);
 
-    fetch('http://localhost:5000/startBot', {
+    fetch(environment.algoTraderBackendUrlPrefix + '/startBot', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Headers':'*'
+        'Access-Control-Allow-Headers': '*'
       },
       body
     })
-    .then(response => {
-      if (!response.ok) {
-        this.notificationService.show('Failed to launch the bot', 3000, NotificationSeverity.Error);
-        throw new Error('startBot HTTP error ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('startBot successful:', data);
-    })
-    .catch(error => {
-      console.error('startBot failed:', error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          this.notificationService.show('Failed to launch the bot', 3000, NotificationSeverity.Error);
+          throw new Error('startBot HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('startBot successful:', data);
+      })
+      .catch(error => {
+        console.error('startBot failed:', error);
+      });
   }
 }

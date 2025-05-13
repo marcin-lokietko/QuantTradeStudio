@@ -14,27 +14,9 @@ import { Router } from '@angular/router';
 export class AppComponent {
   title = 'algo-trader-gui';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
-    this.getData();
-  }
-
-  getData(): void {
-    fetch('http://localhost:5000/hello')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text();
-        //return response.json();
-      })
-      .then(data => {
-        console.log('API Response:', data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
   }
 
   navigateToAssets(): void {

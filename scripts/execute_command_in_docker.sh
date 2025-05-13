@@ -11,6 +11,7 @@ docker run \
     -v ${BACKEND_BUILD_MAIN_DIR}:/algo-trader/build \
     -v ${LOGS_DIR}:/algo-trader/logs \
     -v ${KEYS_DIR}:/algo-trader/keys \
+    -v ${CONFIG_DIR}:/algo-trader/config \
     -p $3:$3 \
     -it algo-trader-$1 \
     bash -c "$2"

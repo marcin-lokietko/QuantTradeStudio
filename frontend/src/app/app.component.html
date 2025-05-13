@@ -1,12 +1,12 @@
 <div>
-  <button mat-button [matMenuTriggerFor]="menu">
+  <button id="main-menu" mat-button [matMenuTriggerFor]="menu">
     Menu <mat-icon>menu</mat-icon>
   </button>
 
   <mat-menu #menu="matMenu">
-    <button (click)="navigateToAssets()" mat-menu-item>Assets</button>
-    <button (click)="navigateToOrders()" mat-menu-item>Orders</button>
-    <button (click)="navigateToBots()" mat-menu-item>Bots</button>
+    <button id="assets-menu-item" (click)="navigateToAssets()" mat-menu-item>Assets</button>
+    <button id="orders-menu-item" (click)="navigateToOrders()" mat-menu-item>Orders</button>
+    <button id="bots-menu-item" (click)="navigateToBots()" mat-menu-item>Bots</button>
   </mat-menu>
 
 </div>

@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  frontend:
+    image: algo-trader-frontend
+    restart: always
+    volumes:
+      - ../../frontend:/algo-trader/frontend
+    ports:
+      - '4200:4200'
+    working_dir: /algo-trader/frontend
+    command: bash -c "npm install && ng serve --host 0.0.0.0 --configuration=e2e"
+  backend:
+    image: algo-trader-backend
+    restart: always
+    volumes:
+      - ../../backend:/algo-trader/backend
+      - ../../build:/algo-trader/build
+      - ../../logs:/algo-trader/logs
+      - ../../keys:/algo-trader/keys
+      - ../../config:/algo-trader/config
+      - ../../tests:/algo-trader/tests
+    ports:
+      - "5000:5000"
+    working_dir: /
+    command: bash -c "/algo-trader/build/debug/src/AlgoTrader /algo-trader/tests/e2e/configuration.json"
+  selenium:
+    image: selenium/standalone-chrome:latest # official Selenium image - includes: Google Chrome (headless), ChromeDriver, Selenium server
+    ports:
+      - "4444:4444" # localhost:4444/ui/ -> Selenium Grid
+    shm_size: 2g # prevents Chrome crashes
+  e2e-tests:
+    image: algo-trader-e2e-tests
+    volumes:
+      - ../../tests:/algo-trader/tests
+      - ../../scripts:/algo-trader/scripts
+      - ../../logs:/algo-trader/logs
+    ports:
+      - "5001:5001"
+    working_dir: /
+    command: bash -c "cd /algo-trader/tests/e2e && behave"
+    stdin_open: true
+    tty: true

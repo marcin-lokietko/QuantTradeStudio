@@ -5,6 +5,8 @@ from behave import step
 from time import sleep
 from flask import Flask, jsonify
 from werkzeug.serving import make_server
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 class MarketServiceMock:
     def __init__(self):
@@ -77,17 +79,51 @@ class MarketServiceMock:
 def step_impl(context):
     sleep(5)
 
+@step('Frontend is available')
+def step_impl(context):
+    selenium_server_url = os.getenv('SELENIUM_URL', 'http://selenium:4444')
+    frontend_url = os.getenv('BASE_URL', 'http://frontend:4200')
+
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1280,1024")
+    options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
+
+    context.webdriver = webdriver.Remote(command_executor=selenium_server_url, options=options)
+    context.webdriver.get(frontend_url)
+
+    assert "Algo Trader" in context.webdriver.title, f'Actual title: {context.webdriver.title}'
+
 @step('MarketService mock is running')
 def step_impl(context):
     context.marketServiceMock = MarketServiceMock()
     context.marketServiceMock.run()
 
-@step('GET /assets request is sent')
+@step('Assets page is opened')
 def step_impl(context):
-    context.response = requests.get("http://backend:5000/assets")
+    main_menu = context.webdriver.find_element(By.ID, "main-menu")
+    main_menu.click()
 
-@step('GET /assets response is valid')
+    assets_menu_item = context.webdriver.find_element(By.ID, "assets-menu-item")
+    assets_menu_item.click()
+
+@step('Assets are presented')
 def step_impl(context):
-    assert context.response.text == r'[{"assetSymbol":"BTC","freeQuantity":"1.234","usdtValue":"98720.000000"},{"assetSymbol":"ETH","freeQuantity":"123.4","usdtValue":"246800.000000"}]',\
-        f"Actual response: {context.response.text}"
+    asset_table_body = context.webdriver.find_element(By.XPATH, "//tbody")
+    asset_table_entries = asset_table_body.find_elements(By.TAG_NAME, "tr")
 
+    assert 2 == len(asset_table_entries), f'actual size: {len(asset_table_entries)}'
+    
+    def assertAssetEntryEqual(tableEntry, expectedSymbol, expectedFreeQuantity, expectedUsdtValue):
+        assetSymbolCell = tableEntry.find_element(By.CLASS_NAME, "mat-column-assetSymbol")
+        assert expectedSymbol in assetSymbolCell.text, f'actual symbol: {assetSymbolCell.text}'
+
+        freeQuantityCell = tableEntry.find_element(By.CLASS_NAME, "mat-column-freeQuantity")
+        assert expectedFreeQuantity in freeQuantityCell.text, f'actual free quantity: {freeQuantityCell.text}'
+
+        usdtValueCell = tableEntry.find_element(By.CLASS_NAME, "mat-column-usdtValue")
+        assert expectedUsdtValue in usdtValueCell.text, f'actual USDT value: {usdtValueCell.text}'
+
+    assertAssetEntryEqual(asset_table_entries[0], "BTC", "1.234", "98720.")
+    assertAssetEntryEqual(asset_table_entries[1], "ETH", "123.4", "246800.")
