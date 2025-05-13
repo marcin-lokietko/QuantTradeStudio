@@ -1,0 +1,49 @@
+name: BE and FE automatic tests
+
+on:
+  push:
+    branches:
+      - main
+      - githubActionsIntegration
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  automatic-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker images
+        run: ./scripts/build_docker_images.sh
+
+      - name: Build backend
+        run: ./scripts/build_backend_in_docker.sh
+
+      - name: Run backend unit tests
+        run: ./scripts/run_backend_unit_tests.sh
+
+      - name: Run frontend unit tests
+        run: ./scripts/run_frontend_unit_tests.sh
+
+      - name: Run backend component tests
+        run: ./scripts/run_backend_component_tests.sh
+
+      - name: Run e2e tests
+        run: ./scripts/run_e2e_tests.sh
+
+      - name: Create artifacts
+        run: |
+          mkdir -p artifacts
+          zip -r artifacts/logs.zip ./logs
+        if: always()
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-archive
+          path: artifacts/logs.zip
+        if: always()

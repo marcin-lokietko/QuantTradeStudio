@@ -14,15 +14,6 @@ RUN apt-get install -y libcurl4-openssl-dev
 RUN apt-get install nlohmann-json3-dev
 RUN apt-get install libssl-dev
 
-RUN cd /home && wget http://downloads.sourceforge.net/project/boost/boost/1.79.0/boost_1_79_0.tar.gz \
-  && tar xfz boost_1_79_0.tar.gz \
-  && rm boost_1_79_0.tar.gz \
-  && cd boost_1_79_0 \
-  && ./bootstrap.sh --prefix=/usr/local \
-  && ./b2 install \
-  && cd /home \
-  && rm -rf boost_1_79_0
-
 RUN apt-get install -y libgoogle-glog-dev
 
 RUN mkdir -p gtest \

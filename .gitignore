@@ -5,3 +5,5 @@
 /keys/secretKey.txt
 
 /backend/ut/CommonMocks/*.hpp
+
+/frontend/.npm-cache

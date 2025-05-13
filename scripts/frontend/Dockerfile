@@ -14,3 +14,6 @@ RUN apt-get install -y curl nginx autotools-dev
 RUN apt-get install -y wget
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+
+# Needed for Github Actions environment. Without the variable, the Chrome will try to write to ~/.local/share, which is not writable
+ENV HOME=/tmp

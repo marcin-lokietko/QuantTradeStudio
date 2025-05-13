@@ -90,6 +90,16 @@ def step_impl(context):
     options.add_argument("--window-size=1280,1024")
     options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
 
+    for _ in range(60):
+        try:
+            response = requests.get(frontend_url)
+            if response.status_code == 200:
+                break
+        except requests.ConnectionError:
+            sleep(1)
+    else:
+        raise Exception(f"Could not connect to frontend on {frontend_url}")
+
     context.webdriver = webdriver.Remote(command_executor=selenium_server_url, options=options)
     context.webdriver.get(frontend_url)
 
