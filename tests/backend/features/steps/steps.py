@@ -5,6 +5,9 @@ from behave import step
 from time import sleep
 from flask import Flask, jsonify
 from werkzeug.serving import make_server
+from tests.common.common_steps import wait_for_backend
+
+backend_url = "http://backend:5000"
 
 class MarketServiceMock:
     def __init__(self):
@@ -75,7 +78,7 @@ class MarketServiceMock:
 
 @step('Backend is available')
 def step_impl(context):
-    sleep(5)
+    wait_for_backend(backend_url)
 
 @step('MarketService mock is running')
 def step_impl(context):
@@ -84,7 +87,7 @@ def step_impl(context):
 
 @step('GET /assets request is sent')
 def step_impl(context):
-    context.response = requests.get("http://backend:5000/assets")
+    context.response = requests.get(backend_url + "/assets")
 
 @step('GET /assets response is valid')
 def step_impl(context):

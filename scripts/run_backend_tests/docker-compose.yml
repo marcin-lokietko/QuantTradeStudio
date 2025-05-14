@@ -20,6 +20,8 @@ services:
       - ../../scripts:/algo-trader/scripts
     ports:
       - "5001:5001"
+    environment:
+      PYTHONPATH: "/algo-trader"
     working_dir: /
     command: bash -c "cd /algo-trader/tests/backend && behave"
     stdin_open: true

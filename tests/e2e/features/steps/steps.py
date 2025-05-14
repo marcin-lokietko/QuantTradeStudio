@@ -7,6 +7,9 @@ from flask import Flask, jsonify
 from werkzeug.serving import make_server
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from tests.common.common_steps import wait_for_backend
+
+backend_url = "http://backend:5000"
 
 class MarketServiceMock:
     def __init__(self):
@@ -77,12 +80,12 @@ class MarketServiceMock:
 
 @step('Backend is available')
 def step_impl(context):
-    sleep(5)
+    wait_for_backend(backend_url)
 
 @step('Frontend is available')
 def step_impl(context):
-    selenium_server_url = os.getenv('SELENIUM_URL', 'http://selenium:4444')
-    frontend_url = os.getenv('BASE_URL', 'http://frontend:4200')
+    selenium_server_url = 'http://selenium:4444'
+    frontend_url = 'http://frontend:4200'
 
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")

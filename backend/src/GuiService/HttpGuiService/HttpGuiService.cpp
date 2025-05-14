@@ -28,9 +28,9 @@ void HttpGuiService::start() {
       .allow_credentials();  // Allow credentials like cookies or Authorization header
 
   // Setup endpoints
-  CROW_ROUTE(app, "/hello")
+  CROW_ROUTE(app, "/health")
   ([]() {
-    crow::response res("Hello world from backend");
+    crow::response res{};
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
     return res;
