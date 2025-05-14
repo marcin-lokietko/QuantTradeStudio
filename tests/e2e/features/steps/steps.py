@@ -5,6 +5,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from tests.common.common_steps import wait_for_backend
 from tests.common.market_service_mock import MarketServiceMock
+from tests.e2e.pages.base_layout import BaseLayout
+from tests.e2e.pages.assets_page import AssetsPage
 
 backend_url = "http://backend:5000"
 
@@ -85,28 +87,20 @@ def step_impl(context):
 
 @step('Assets page is opened')
 def step_impl(context):
-    main_menu = context.webdriver.find_element(By.ID, "main-menu")
-    main_menu.click()
-
-    assets_menu_item = context.webdriver.find_element(By.ID, "assets-menu-item")
-    assets_menu_item.click()
+    base_layout = BaseLayout(context.webdriver)
+    base_layout.navigate_to_assets_page()
 
 @step('Assets are presented')
 def step_impl(context):
-    asset_table_body = context.webdriver.find_element(By.XPATH, "//tbody")
-    asset_table_entries = asset_table_body.find_elements(By.TAG_NAME, "tr")
+    assets_page = AssetsPage(context.webdriver)
 
-    assert 2 == len(asset_table_entries), f'actual size: {len(asset_table_entries)}'
-    
-    def assertAssetEntryEqual(tableEntry, expectedSymbol, expectedFreeQuantity, expectedUsdtValue):
-        assetSymbolCell = tableEntry.find_element(By.CLASS_NAME, "mat-column-assetSymbol")
-        assert expectedSymbol in assetSymbolCell.text, f'actual symbol: {assetSymbolCell.text}'
+    assets = assets_page.get_assets()
+    assert 2 == len(assets), f'actual number of assets: {len(assets)}'
 
-        freeQuantityCell = tableEntry.find_element(By.CLASS_NAME, "mat-column-freeQuantity")
-        assert expectedFreeQuantity in freeQuantityCell.text, f'actual free quantity: {freeQuantityCell.text}'
+    def assertAssetContains(tableEntry, expectedSymbol, expectedFreeQuantity, expectedUsdtValue):
+        assert expectedSymbol in tableEntry["assetSymbolText"], f'actual symbol text: {tableEntry["assetSymbolText"]}'
+        assert expectedFreeQuantity in tableEntry["freeQuantityText"], f'actual free quantity text: {tableEntry["freeQuantityText"]}'
+        assert expectedUsdtValue in tableEntry["usdtValueText"], f'actual USDT value text: {tableEntry["usdtValueText"]}'
 
-        usdtValueCell = tableEntry.find_element(By.CLASS_NAME, "mat-column-usdtValue")
-        assert expectedUsdtValue in usdtValueCell.text, f'actual USDT value: {usdtValueCell.text}'
-
-    assertAssetEntryEqual(asset_table_entries[0], "BTC", "1.234", "98720.")
-    assertAssetEntryEqual(asset_table_entries[1], "ETH", "123.4", "246800.")
+    assertAssetContains(assets[0], "BTC", "1.234", "98720.")
+    assertAssetContains(assets[1], "ETH", "123.4", "246800.")
