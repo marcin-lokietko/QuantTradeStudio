@@ -7,3 +7,5 @@
 /backend/ut/CommonMocks/*.hpp
 
 /frontend/.npm-cache
+
+**/__pycache__

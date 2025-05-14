@@ -1,82 +1,12 @@
 import requests
-import threading
-import os
 from behave import step
 from time import sleep
-from flask import Flask, jsonify
-from werkzeug.serving import make_server
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from tests.common.common_steps import wait_for_backend
+from tests.common.market_service_mock import MarketServiceMock
 
 backend_url = "http://backend:5000"
-
-class MarketServiceMock:
-    def __init__(self):
-        self.app = Flask('market_service_mock', root_path=os.getcwd())
-        self._server = None
-        self._thread = None
-        self.setup_routes()
-
-    def setup_routes(self):
-        @self.app.route('/account', methods=['GET'])
-        def get_account():
-            account_info = {
-                "balances": [
-                {
-                    "free": "1.234",
-                    "asset": "BTC"
-                },
-                {
-                    "free": "123.4",
-                    "asset": "ETH"
-                }]
-            }
-            print('MarketServiceMock /account returns: ' + str(account_info))
-            return jsonify(account_info)
-
-        @self.app.route('/exchangeInfo', methods=['GET'])
-        def get_exchange_info():
-            exchange_info = {
-                "symbols": [
-                {
-                    "symbol": "BTCUSDT",
-                    "baseAsset": "BTC",
-                    "quoteAsset": "USDT"
-                },
-                {
-                    "symbol": "ETHUSDT",
-                    "baseAsset": "ETH",
-                    "quoteAsset": "USDT"
-                }]
-            }
-            print('MarketServiceMock /exchangeInfo returns: ' + str(exchange_info))
-            return jsonify(exchange_info)
-
-        @self.app.route('/ticker/price', methods=['GET'])
-        def get_price():
-            prices = [
-                {
-                    "price": "80000",
-                    "symbol": "BTCUSDT"
-                },
-                {
-                    "price": "2000",
-                    "symbol": "ETHUSDT"
-                }]
-            print('MarketServiceMock /ticker/price returns: ' + str(prices))
-            return jsonify(prices)
-
-    #"0.0.0.0" binds to all available network interfaces - needed for Docker bridge network
-    def run(self, host="0.0.0.0", port=5001):
-        self._server = make_server(host, port, self.app)
-        self._thread = threading.Thread(target=self._server.serve_forever)
-        self._thread.start()
-
-    def stop(self):
-        if self._server:
-            self._server.shutdown()
-            self._thread.join()
 
 @step('Backend is available')
 def step_impl(context):
@@ -111,6 +41,46 @@ def step_impl(context):
 @step('MarketService mock is running')
 def step_impl(context):
     context.marketServiceMock = MarketServiceMock()
+
+    account_info = {
+        "balances": [
+        {
+            "free": "1.234",
+            "asset": "BTC"
+        },
+        {
+            "free": "123.4",
+            "asset": "ETH"
+        }]
+    }
+    context.marketServiceMock.set_endpoint('/account', 'GET', account_info)
+
+    exchange_info = {
+        "symbols": [
+        {
+            "symbol": "BTCUSDT",
+            "baseAsset": "BTC",
+            "quoteAsset": "USDT"
+        },
+        {
+            "symbol": "ETHUSDT",
+            "baseAsset": "ETH",
+            "quoteAsset": "USDT"
+        }]
+    }
+    context.marketServiceMock.set_endpoint('/exchangeInfo', 'GET', exchange_info)
+
+    prices = [
+    {
+        "price": "80000",
+        "symbol": "BTCUSDT"
+    },
+    {
+        "price": "2000",
+        "symbol": "ETHUSDT"
+    }]
+    context.marketServiceMock.set_endpoint('/ticker/price', 'GET', prices)
+
     context.marketServiceMock.run()
 
 @step('Assets page is opened')
