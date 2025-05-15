@@ -16,9 +16,8 @@ export interface Order {
   selector: 'app-orders-page',
   standalone: false,
   templateUrl: './orders-page.component.html',
-  styleUrls: ['./orders-page.component.scss']
+  styleUrls: ['./orders-page.component.scss'],
 })
-
 export class OrdersPage {
   public orders: Order[] = [];
   public isLoading = true;
@@ -27,7 +26,7 @@ export class OrdersPage {
   dataSource = new MatTableDataSource(this.orders);
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.getData();
@@ -35,24 +34,24 @@ export class OrdersPage {
 
   getData(): void {
     fetch(environment.algoTraderBackendUrlPrefix + '/openOrders')
-      .then(response => {
+      .then((response) => {
         this.isLoading = false;
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         try {
           this.orders = data as Order[];
           this.dataSource = new MatTableDataSource(this.orders);
           this.dataSource.sort = this.sort;
           this.cdr.markForCheck();
         } catch (error) {
-          console.error("Invalid orders content:", error);
+          console.error('Invalid orders content:', error);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching data:', error);
       });
   }

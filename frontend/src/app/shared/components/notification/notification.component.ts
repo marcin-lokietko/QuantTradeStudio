@@ -12,13 +12,12 @@ import { CommonModule } from '@angular/common';
   encapsulation: ViewEncapsulation.None, //Add CSS of thos component to the global styles to style the snackbar
 })
 export class NotificationComponent {
-
-  constructor(@Inject(MAT_SNACK_BAR_DATA) public data: { message: string, notificationSeverity: NotificationSeverity }) {}
+  constructor(@Inject(MAT_SNACK_BAR_DATA) public data: { message: string; notificationSeverity: NotificationSeverity }) {}
 
   public getClasses(): any {
     return {
-        isInfo: this.data.notificationSeverity == NotificationSeverity.Info,
-        isError: this.data.notificationSeverity == NotificationSeverity.Error,
-    }
+      isInfo: this.data.notificationSeverity == NotificationSeverity.Info,
+      isError: this.data.notificationSeverity == NotificationSeverity.Error,
+    };
   }
 }

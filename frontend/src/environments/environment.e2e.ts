@@ -1,4 +1,4 @@
 export const environment = {
-    production: false,
-    algoTraderBackendUrlPrefix: "http://backend:5000"
+  production: false,
+  algoTraderBackendUrlPrefix: 'http://backend:5000',
 };

@@ -1,4 +1,4 @@
 export enum NotificationSeverity {
-    Info = 'Info',
-    Error = 'Error',
+  Info = 'Info',
+  Error = 'Error',
 }

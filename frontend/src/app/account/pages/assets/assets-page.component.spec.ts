@@ -9,9 +9,7 @@ describe('AssetsPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [AssetsPage],
-      imports: [
-        MatProgressSpinnerModule
-      ]
+      imports: [MatProgressSpinnerModule],
     }).compileComponents();
   });
 
@@ -22,7 +20,7 @@ describe('AssetsPage', () => {
   }
 
   it('should create the component', () => {
-    const okResponse = new Response(JSON.stringify({}), { status: 200, statusText: 'OK', });
+    const okResponse = new Response(JSON.stringify({}), { status: 200, statusText: 'OK' });
     spyOn(window, 'fetch').and.resolveTo(okResponse);
 
     setupFixture();

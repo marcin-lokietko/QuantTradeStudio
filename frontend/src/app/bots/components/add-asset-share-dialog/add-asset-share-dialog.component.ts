@@ -30,7 +30,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatSelectModule,
   ],
   templateUrl: './add-asset-share-dialog.component.html',
-  styleUrls: ['./add-asset-share-dialog.component.scss']
+  styleUrls: ['./add-asset-share-dialog.component.scss'],
 })
 export class AddAssetShareDialog {
   public title = '';
@@ -42,7 +42,7 @@ export class AddAssetShareDialog {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<Component>,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -54,7 +54,7 @@ export class AddAssetShareDialog {
   closeWithResult() {
     this.dialogRef.close({
       assetSymbol: this.selectedAsset,
-      assetShare: this.assetShare
+      assetShare: this.assetShare,
     });
   }
 
@@ -62,4 +62,3 @@ export class AddAssetShareDialog {
     this.dialogRef.close(undefined);
   }
 }
-

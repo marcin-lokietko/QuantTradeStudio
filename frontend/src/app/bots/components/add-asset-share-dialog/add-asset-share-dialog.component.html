@@ -1,22 +1,22 @@
 <div>
-    <h2 mat-dialog-title>{{title}}</h2>
-    <mat-dialog-content></mat-dialog-content>
-    <mat-form-field appearance="fill">
-        <mat-label>Asset symbol</mat-label>
-        <mat-select [(ngModel)]="selectedAsset">
-            <mat-option *ngFor="let asset of availableAssets" [value]="asset">
-                {{ asset }}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-        <mat-label>{{inputFieldLabel}}</mat-label>
-        <input matInput [(ngModel)]="assetShare" placeholder="0" />
-    </mat-form-field>
-    <div class="action-buttons-wrapper">
-        <mat-dialog-actions class="action-buttons">
-            <button mat-button (click)="closeWithResult()">Confirm</button>
-            <button mat-button (click)="cancel()">Cancel</button>
-        </mat-dialog-actions>
-    </div>
+  <h2 mat-dialog-title>{{ title }}</h2>
+  <mat-dialog-content></mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Asset symbol</mat-label>
+    <mat-select [(ngModel)]="selectedAsset">
+      <mat-option *ngFor="let asset of availableAssets" [value]="asset">
+        {{ asset }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>{{ inputFieldLabel }}</mat-label>
+    <input matInput [(ngModel)]="assetShare" placeholder="0" />
+  </mat-form-field>
+  <div class="action-buttons-wrapper">
+    <mat-dialog-actions class="action-buttons">
+      <button mat-button (click)="closeWithResult()">Confirm</button>
+      <button mat-button (click)="cancel()">Cancel</button>
+    </mat-dialog-actions>
+  </div>
 </div>

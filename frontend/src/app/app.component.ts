@@ -9,15 +9,14 @@ import { Router } from '@angular/router';
   selector: 'app-root',
   imports: [RouterOutlet, MatButtonModule, MatMenuModule, MatIconModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent {
   title = 'algo-trader-gui';
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   navigateToAssets(): void {
     this.router.navigate(['/account/assets']);

@@ -16,7 +16,7 @@ interface BaseAssetConfig {
   selector: 'app-bots-launch-page',
   standalone: false,
   templateUrl: './bots-launch-page.component.html',
-  styleUrls: ['./bots-launch-page.component.scss']
+  styleUrls: ['./bots-launch-page.component.scss'],
 })
 export class BotsLaunchPage {
   public availableBots = ['Rebalancer'];
@@ -36,14 +36,16 @@ export class BotsLaunchPage {
 
   public displayedSelectedBaseAssetsTableColumns: string[] = ['assetSymbol', 'expectedShare'];
 
-
   dataSource = new MatTableDataSource(this.selectedBaseAssetsConfig);
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private dialog: MatDialog, private notificationService: NotificationService, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private dialog: MatDialog,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   public selectBot(botName: string): void {
     this.selectedBot = botName;
@@ -54,7 +56,7 @@ export class BotsLaunchPage {
 
   public getBotButtonClasses(botName: string) {
     return {
-      isSelected: botName === this.selectedBot
+      isSelected: botName === this.selectedBot,
     };
   }
 
@@ -82,20 +84,22 @@ export class BotsLaunchPage {
   public fetchAvailableQuoteAssets(): void {
     this.areAvailableQuoteAssetsLoading = true;
     fetch(environment.algoTraderBackendUrlPrefix + '/quoteAssetsSuitableForRebalancing', {
-      method: 'GET'
+      method: 'GET',
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error('quoteAssetsSuitableForRebalancing HTTP error ' + response.status);
         }
         return response.json();
       })
-      .then(data => {
-        this.availableQuoteAssets = data.map((elem: any) => { return elem.assetSymbol; });
+      .then((data) => {
+        this.availableQuoteAssets = data.map((elem: any) => {
+          return elem.assetSymbol;
+        });
         this.areAvailableQuoteAssetsLoading = false;
         console.log('quoteAssetsSuitableForRebalancing successful:', data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('quoteAssetsSuitableForRebalancing failed:', error);
       });
   }
@@ -106,26 +110,30 @@ export class BotsLaunchPage {
       quoteAsset: this.selectedQuoteAsset,
     });
     fetch(environment.algoTraderBackendUrlPrefix + `/availableBaseAssets?${params.toString()}`, {
-      method: 'GET'
+      method: 'GET',
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error('availableBaseAssets HTTP error ' + response.status);
         }
         return response.json();
       })
-      .then(data => {
-        this.availableBaseAssets = data.map((elem: any) => { return elem.assetSymbol; });
+      .then((data) => {
+        this.availableBaseAssets = data.map((elem: any) => {
+          return elem.assetSymbol;
+        });
         this.areAvailableBaseAssetsLoading = false;
         console.log('availableBaseAssets successful:', data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('availableBaseAssets failed:', error);
       });
   }
 
   public deleteSelectedBaseAssetConfig(elementToRemove: BaseAssetConfig) {
-    this.selectedBaseAssetsConfig = this.selectedBaseAssetsConfig.filter((elem: BaseAssetConfig) => { return elem != elementToRemove; });
+    this.selectedBaseAssetsConfig = this.selectedBaseAssetsConfig.filter((elem: BaseAssetConfig) => {
+      return elem != elementToRemove;
+    });
     this.updateSelectedBaseAssetConfigTable();
   }
 
@@ -140,17 +148,19 @@ export class BotsLaunchPage {
         title: 'Add base asset share',
         inputFieldLabel: 'Base asset share',
         availableAssets: this.availableBaseAssets.filter((elem: string) => {
-          return this.selectedBaseAssetsConfig.findIndex((config => {
-            return config.assetSymbol === elem;
-          })) === -1;
+          return (
+            this.selectedBaseAssetsConfig.findIndex((config) => {
+              return config.assetSymbol === elem;
+            }) === -1
+          );
         }),
-      }
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       console.log('Dialog closed with result:', result);
       if (result) {
-        this.selectedBaseAssetsConfig.push({ assetSymbol: result.assetSymbol, expectedShare: Number(result.assetShare) })
+        this.selectedBaseAssetsConfig.push({ assetSymbol: result.assetSymbol, expectedShare: Number(result.assetShare) });
         this.updateSelectedBaseAssetConfigTable();
       }
     });
@@ -165,10 +175,12 @@ export class BotsLaunchPage {
   }
 
   public get isConfigValid(): boolean {
-    return this.executionPeriodInput !== '' &&
+    return (
+      this.executionPeriodInput !== '' &&
       this.selectedQuoteAsset !== '' &&
       this.selectedBaseAssetsConfig.length >= 2 &&
-      this.baseAssetsTotalShare === 100;
+      this.baseAssetsTotalShare === 100
+    );
   }
 
   public get baseAssetConfigSummary(): string {
@@ -180,9 +192,9 @@ export class BotsLaunchPage {
     }
     let msg = 'Shares of added base assets sum up to ' + this.baseAssetsTotalShare + ' percent.';
     if (this.baseAssetsTotalShare === 100) {
-      msg += " The bot can be launched."
+      msg += ' The bot can be launched.';
     } else {
-      msg += " The total share must be equal to 100 percent."
+      msg += ' The total share must be equal to 100 percent.';
       return msg;
     }
     if (!this.isConfigValid) {
@@ -205,21 +217,21 @@ export class BotsLaunchPage {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Headers': '*'
+        'Access-Control-Allow-Headers': '*',
       },
-      body
+      body,
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           this.notificationService.show('Failed to launch the bot', 3000, NotificationSeverity.Error);
           throw new Error('startBot HTTP error ' + response.status);
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         console.log('startBot successful:', data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('startBot failed:', error);
       });
   }

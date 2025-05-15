@@ -4,10 +4,9 @@ import { NotificationComponent } from '../shared/components/notification/notific
 import { NotificationSeverity } from '../shared/components/notification/notification-severity-enum';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationService {
-
   constructor(private snackBar: MatSnackBar) {}
 
   show(message: string, duration = 3000, severity = NotificationSeverity.Info) {
@@ -15,12 +14,12 @@ export class NotificationService {
       // 'data' is passed to NotificationComponent. The rest parametrizes MatSnackBar.
       data: {
         message,
-        notificationSeverity : severity,
+        notificationSeverity: severity,
       },
       duration,
       horizontalPosition: 'center',
       verticalPosition: 'top',
-      panelClass: ['common-notification']
+      panelClass: ['common-notification'],
     });
   }
 }

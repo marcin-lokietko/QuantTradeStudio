@@ -1,36 +1,36 @@
 mat-form-field {
-    width: 100%;
-    margin: 0;
+  width: 100%;
+  margin: 0;
 }
 
 .mat-mdc-dialog-title {
-    padding-bottom: 0;
+  padding-bottom: 0;
 }
 
 .radio-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .radio-group {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    gap: 16vw;
+  }
 
-    .radio-group {
-        display: flex;
-        gap: 16vw;
-    }
-
-    margin-bottom: 3vh;
+  margin-bottom: 3vh;
 }
 
 .action-buttons-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-    .action-buttons {
-        display: flex;
-        gap: 10vw;
-    }
+  .action-buttons {
+    display: flex;
+    gap: 10vw;
+  }
 }
 
 .spinner {
-    margin-left: 4vw;
+  margin-left: 4vw;
 }

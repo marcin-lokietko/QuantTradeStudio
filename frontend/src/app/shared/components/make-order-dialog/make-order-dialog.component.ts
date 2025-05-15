@@ -31,7 +31,7 @@ import { environment } from '@env/environment';
     MatSelectModule,
   ],
   templateUrl: './make-order-dialog.component.html',
-  styleUrls: ['./make-order-dialog.component.scss']
+  styleUrls: ['./make-order-dialog.component.scss'],
 })
 export class MakeOrderDialog {
   public baseAssetAmount = '';
@@ -47,8 +47,8 @@ export class MakeOrderDialog {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<Component>,
-    private cdr: ChangeDetectorRef
-  ) { }
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.fetchAvailableBaseAssets();
@@ -59,7 +59,7 @@ export class MakeOrderDialog {
       selectedBaseAsset: this.selectedBaseAsset,
       selectedQuoteAsset: this.selectedQuoteAsset,
       orderSide: this.orderSide,
-      baseAssetAmount: this.baseAssetAmount
+      baseAssetAmount: this.baseAssetAmount,
     });
   }
 
@@ -77,7 +77,7 @@ export class MakeOrderDialog {
       pairSymbol = this.selectedBaseAsset + '/' + this.selectedQuoteAsset;
     }
 
-    return "Trade " + pairSymbol;
+    return 'Trade ' + pairSymbol;
   }
 
   public get subtitle(): string {
@@ -88,8 +88,7 @@ export class MakeOrderDialog {
     if (!this.isInputValid()) {
       return '';
     }
-    return "You are buying " + this.baseAssetAmount + " " + this.selectedBaseAsset +
-      " for " + this.selectedQuoteAsset;
+    return 'You are buying ' + this.baseAssetAmount + ' ' + this.selectedBaseAsset + ' for ' + this.selectedQuoteAsset;
   }
 
   public get isQuoteAssetSelectionVisible(): boolean {
@@ -117,16 +116,18 @@ export class MakeOrderDialog {
   public fetchAvailableBaseAssets(): void {
     this.areAvailableBaseAssetsLoading = true;
     fetch(environment.algoTraderBackendUrlPrefix + '/availableBaseAssets', {
-      method: 'GET'
+      method: 'GET',
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error('availableBaseAssets HTTP error ' + response.status);
         }
         return response.json();
       })
-      .then(data => {
-        this.availableBaseAssets = data.map((elem: any) => { return elem.assetSymbol; });
+      .then((data) => {
+        this.availableBaseAssets = data.map((elem: any) => {
+          return elem.assetSymbol;
+        });
         this.selectedBaseAsset = this.data.initialAssetToBuy;
         this.areAvailableBaseAssetsLoading = false;
         this.fetchAvailableQuoteAssets();
@@ -134,7 +135,7 @@ export class MakeOrderDialog {
 
         console.log('availableBaseAssets successful:', data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('availableBaseAssets failed:', error);
       });
   }
@@ -142,26 +143,27 @@ export class MakeOrderDialog {
   public fetchAvailableQuoteAssets(): void {
     this.areAvailableQuoteAssetsLoading = true;
     const params = new URLSearchParams({
-      baseAsset: this.selectedBaseAsset
+      baseAsset: this.selectedBaseAsset,
     });
     fetch(environment.algoTraderBackendUrlPrefix + `/availableQuoteAssets?${params.toString()}`, {
-      method: 'GET'
+      method: 'GET',
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error('availableQuoteAssets HTTP error ' + response.status);
         }
         return response.json();
       })
-      .then(data => {
-        this.availableQuoteAssets = data.map((elem: any) => { return elem.quoteAsset; });
+      .then((data) => {
+        this.availableQuoteAssets = data.map((elem: any) => {
+          return elem.quoteAsset;
+        });
         this.areAvailableQuoteAssetsLoading = false;
         this.cdr.markForCheck();
         console.log('availableQuoteAssets successful:', data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('availableQuoteAssets failed:', error);
       });
   }
 }
-
