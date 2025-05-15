@@ -2,9 +2,9 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { AddAssetShareDialog } from '../../components/add-asset-share-dialog/add-asset-share-dialog.component';
-import { NotificationService } from '../../../services/notification.service';
-import { NotificationSeverity } from '../../../shared/components/notification/notification-severity-enum';
+import { AddAssetShareDialog } from '@app/bots/components/add-asset-share-dialog/add-asset-share-dialog.component';
+import { NotificationService } from '@app/services/notification.service';
+import { NotificationSeverity } from '@app/shared/components/notification/notification-severity-enum';
 import { environment } from '@env/environment';
 
 interface BaseAssetConfig {
