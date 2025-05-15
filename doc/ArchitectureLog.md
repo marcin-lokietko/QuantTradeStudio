@@ -2,8 +2,9 @@ This file is supposed to present the rationale behind the significant design cha
 
 [30.03.2025/Marcin Lokietko]\
 Added Architecture.md with initial sketch of the backend architecture. It mostly documents current structure of the project, but also introduces components to be implemented in the future:
-* ApiGateway - needed not to pollute GuiService with domain logic
-* BotExecution - component for deciding which assets to buy and when
+
+- ApiGateway - needed not to pollute GuiService with domain logic
+- BotExecution - component for deciding which assets to buy and when
 
 [3.05.2025/Marcin Lokietko]\
 Added Config component that reads json configuration. The goal was to avoid adding more command line arguments to the backend application. Also added Binance URL config parameter, which will later allow to mock the market service in backend component tests.
