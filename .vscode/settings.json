@@ -89,6 +89,7 @@
     "clang-format.executable": "clang-format",
     "clang-format.style": "file",
     "clang-format.fallbackStyle": "Google",
+    "clang-format.sortIncludes": true,
     "clang-format.assumeFilename": "${workspaceFolder}/backend/.clang-format",
     "C_Cpp.default.cppStandard": "gnu++20",
     "cSpell.words": [

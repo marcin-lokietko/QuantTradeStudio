@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  automatic-tests:
+  be-and-fe-automatic-tests:
     runs-on: ubuntu-latest
 
     steps:

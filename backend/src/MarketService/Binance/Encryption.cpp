@@ -1,3 +1,5 @@
+#include "Encryption.hpp"
+
 #include <glog/logging.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
@@ -6,8 +8,6 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-
-#include "Encryption.hpp"
 
 namespace MarketService::Binance {
 std::string Encryption::generateSignature(const std::string& data) const {

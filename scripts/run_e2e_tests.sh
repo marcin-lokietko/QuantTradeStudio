@@ -4,7 +4,7 @@ set -e
 . $(dirname $(realpath -s $0))/.common.sh
 . ${SCRIPTS_PATH}/.clear_containers.sh
 
-docker compose -f ${SCRIPTS_PATH}/run_e2e_tests/docker-compose.yml up -d --build
+docker compose --file ${SCRIPTS_PATH}/run_e2e_tests/docker-compose.yml up -d --build
 TEST_CONTAINER_ID=$(docker ps -aqf "name=run_e2e_tests-e2e-tests-1")
 docker logs --follow ${TEST_CONTAINER_ID}
 
@@ -12,7 +12,7 @@ docker logs --follow ${TEST_CONTAINER_ID}
 TEST_EXIT_CODE=$(docker inspect ${TEST_CONTAINER_ID} --format='{{.State.ExitCode}}')
 
 # Stop and remove containers
-docker compose -f ${SCRIPTS_PATH}/run_e2e_tests/docker-compose.yml down
+docker compose --file ${SCRIPTS_PATH}/run_e2e_tests/docker-compose.yml down
 
 # Exit with the test container's exit code
 if [ "$TEST_EXIT_CODE" -ne 0 ]; then

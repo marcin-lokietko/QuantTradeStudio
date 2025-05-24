@@ -1,10 +1,11 @@
+#include "BinanceService.hpp"
+
 #include <glog/logging.h>
 
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <ranges>
 
-#include "BinanceService.hpp"
 #include "Http/Http.hpp"
 #include "MarketService/Binance/Conversion/AssetPrices.hpp"
 #include "MarketService/Binance/Conversion/Assets.hpp"

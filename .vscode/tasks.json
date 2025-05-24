@@ -38,8 +38,11 @@
         },
         {
             // Address sanitizer (leak detection disabled)
-            // E.g. try using after free:
-            // char *s = (char*)malloc(100); free(s); strcpy(s, "Hello world!");
+            // E.g. out-of-bounds write
+            // int* array = new int[3];
+            // array[3] = 42;
+            // std::cout << "Value: " << array[3] << std::endl;
+            // delete[] array;
             "label": "Build sanitizer",
             "type": "shell",
             "command": "scripts/build.sh",

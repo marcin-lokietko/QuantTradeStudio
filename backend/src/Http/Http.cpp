@@ -1,9 +1,9 @@
+#include "Http.hpp"
+
 #include <curl/curl.h>
 #include <glog/logging.h>
 
 #include <cstdio>
-
-#include "Http.hpp"
 
 namespace Http {
 

@@ -11,10 +11,11 @@ services:
       - ../../tests:/algo-trader/tests
     ports:
       - "5000:5000"
+    user: "${USER_ID}:${GROUP_ID}"
     working_dir: /
-    command: bash -c "/algo-trader/build/debug/src/AlgoTrader /algo-trader/tests/backend/configuration.json"
+    command: bash -c "${BACKEND_CMD}"
   backend-tests:
-    image: algo-trader-backend-tests
+    image: algo-trader-backend-component-tests
     volumes:
       - ../../tests:/algo-trader/tests
       - ../../scripts:/algo-trader/scripts

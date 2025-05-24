@@ -1,3 +1,5 @@
+#include "HttpGuiService.hpp"
+
 #include <glog/logging.h>
 
 #include <nlohmann/json.hpp>
@@ -11,7 +13,6 @@
 #include "GuiService/HttpGuiService/Conversion/OrderRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/Orders.hpp"
 #include "GuiService/OrderRequest.hpp"
-#include "HttpGuiService.hpp"
 #include "crow.h"
 #include "crow/middlewares/cors.h"
 

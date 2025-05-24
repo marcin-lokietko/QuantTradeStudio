@@ -10,7 +10,7 @@ if [ -t 1 ]; then
 fi
 
 docker run \
-    -u $(id -u) \
+    -u $(id -u):$(id -g) \
     -v ${BACKEND_DIR}:/algo-trader/backend \
     -v ${FRONTEND_DIR}:/algo-trader/frontend \
     -v ${SCRIPTS_PATH}:/algo-trader/scripts \

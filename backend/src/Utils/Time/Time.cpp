@@ -1,7 +1,7 @@
+#include "Time.hpp"
+
 #include <chrono>
 #include <thread>
-
-#include "Time.hpp"
 
 namespace Time {
 

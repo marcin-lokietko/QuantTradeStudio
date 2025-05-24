@@ -1,9 +1,10 @@
+#include "BotExecution.hpp"
+
 #include <glog/logging.h>
 
 #include <memory>
 #include <variant>
 
-#include "BotExecution.hpp"
 #include "Utils/Time/Time.hpp"
 
 namespace BotExecution {

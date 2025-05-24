@@ -1,0 +1,36 @@
+name: BE and FE static analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  be-and-fe-static-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker images
+        run: ./scripts/build_docker_images.sh
+
+      - name: Run backend clang format check
+        run: ./scripts/run_formatter_in_docker.sh validate
+
+      - name: Create artifacts
+        run: |
+          mkdir -p artifacts
+          zip -r artifacts/logs.zip ./logs
+        if: always()
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-archive
+          path: artifacts/logs.zip
+        if: always()

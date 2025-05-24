@@ -18,3 +18,10 @@ LOGS_DIR=${SCRIPTS_PATH}"/../logs"
 KEYS_DIR=${SCRIPTS_PATH}"/../keys"
 CONFIG_DIR=${SCRIPTS_PATH}"/../config"
 
+# Ensure directories exist. If they don't, and are created by mounting Docker's volumes, they may not be created with the correct permissions
+mkdir -p ${LOGS_DIR}
+mkdir -p ${KEYS_DIR}
+mkdir -p ${CONFIG_DIR}
+
+export USER_ID=$(id -u)
+export GROUP_ID=$(id -g)

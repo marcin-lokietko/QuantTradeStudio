@@ -1,3 +1,5 @@
+#include "Wallet.hpp"
+
 #include <glog/logging.h>
 
 #include <algorithm>
@@ -7,7 +9,6 @@
 
 #include "ApiGateway/Assets.hpp"
 #include "AssetValues.hpp"
-#include "Wallet.hpp"
 
 namespace Wallet {
 

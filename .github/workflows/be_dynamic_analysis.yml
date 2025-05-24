@@ -1,0 +1,51 @@
+name: BE dynamic analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  be-dynamic-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker images
+        run: ./scripts/build_docker_images.sh
+
+      - name: Build backend with gprof profiler support
+        run: ./scripts/build_backend_in_docker.sh profiler
+
+      - name: Run profiler on backend component tests
+        run: ./scripts/run_backend_component_tests_with_profiler.sh
+
+      - name: Build backend
+        run: ./scripts/build_backend_in_docker.sh
+
+      - name: Run Valgrind analysis on backend component tests
+        run: ./scripts/run_backend_component_tests_with_valgrind.sh
+
+      - name: Build backend with GCC address sanitizer support
+        run: ./scripts/build_backend_in_docker.sh sanitizer
+
+      - name: Run GCC address sanitizer on backend component tests
+        run: ./scripts/run_backend_component_tests_with_sanitizer.sh
+
+      - name: Create artifacts
+        run: |
+          mkdir -p artifacts
+          zip -r artifacts/logs.zip ./logs
+        if: always()
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-archive
+          path: artifacts/logs.zip
+        if: always()

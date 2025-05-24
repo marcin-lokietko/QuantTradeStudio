@@ -5,4 +5,3 @@ ColumnLimit: 120
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterEnum: true
-#  AfterLambda: true

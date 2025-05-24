@@ -1,7 +1,8 @@
+#include "ReadConfig.hpp"
+
 #include <fstream>
 
 #include "Config/Conversion/ConfigParams.hpp"
-#include "ReadConfig.hpp"
 
 namespace Config {
 std::optional<ConfigParams> readConfig(const std::filesystem::path& configPath) {

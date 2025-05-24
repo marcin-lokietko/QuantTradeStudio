@@ -1,9 +1,10 @@
+#include "Rebalancer.hpp"
+
 #include <algorithm>
 #include <ranges>
 #include <set>
 #include <thread>
 
-#include "Rebalancer.hpp"
 #include "glog/logging.h"
 
 namespace BotExecution::Rebalancer {

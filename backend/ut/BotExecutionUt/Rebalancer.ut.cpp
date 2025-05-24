@@ -1,4 +1,5 @@
 #include "BotExecution/Rebalancer/Rebalancer.hpp"
+
 #include "CommonMocks/MarketServiceMock.hpp"
 #include "CommonMocks/TimeMock.hpp"
 #include "CommonMocks/WalletMock.hpp"
