@@ -1,20 +1,19 @@
 FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Switch to a more stable mirror for apt-get: Cloudflare HTTPS mirror; also force IPv4
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|https://mirror.cloudflare.com/ubuntu|g' /etc/apt/sources.list && \
+  echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
+
 RUN apt-get clean
-RUN apt-get update
+RUN apt-get --allow-releaseinfo-change update
 RUN apt-get -y dist-upgrade
 
-RUN apt-get install -y build-essential
-RUN apt-get install -y make cmake g++ gdb
-RUN apt-get install -y autoconf libtool pkg-config git wget
-
-# TODO: Download specific versions:
-RUN apt-get install -y libcurl4-openssl-dev
-RUN apt-get install nlohmann-json3-dev
-RUN apt-get install libssl-dev
-
-RUN apt-get install -y libgoogle-glog-dev
+RUN apt-get update && apt-get install -y --fix-missing --no-install-recommends \
+  build-essential make cmake g++ gdb autoconf libtool pkg-config git wget \
+  libcurl4-openssl-dev nlohmann-json3-dev libssl-dev libgoogle-glog-dev \
+  clang clang-format clang-tidy valgrind libasio-dev zlib1g-dev \
+  python3 python3-pip
 
 RUN mkdir -p gtest \
   && cd gtest \
@@ -27,18 +26,7 @@ RUN mkdir -p gtest \
   && make \
   && make install
 
-# TODO: Download specific versions:
-RUN apt-get install -y clang
-RUN apt-get install -y clang-format
-RUN apt-get install -y clang-tidy
-RUN apt-get install -y valgrind
-
-RUN apt-get install -y libasio-dev
 RUN mkdir -p crow \
   && cd crow \
   && wget https://github.com/CrowCpp/Crow/releases/download/v1.2.0/Crow-1.2.0-Linux.deb \
   && dpkg -i Crow-1.2.0-Linux.deb
-
-RUN apt-get install -y zlib1g-dev
-
-RUN apt-get install -y python3 python3-pip
