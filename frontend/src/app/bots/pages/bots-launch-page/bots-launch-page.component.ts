@@ -226,10 +226,10 @@ export class BotsLaunchPage {
           this.notificationService.show('Failed to launch the bot', 3000, NotificationSeverity.Error);
           throw new Error('startBot HTTP error ' + response.status);
         }
-        return response.json();
+        return response;
       })
       .then((data) => {
-        console.log('startBot successful:', data);
+        console.log('startBot successful, response:', data);
       })
       .catch((error) => {
         console.error('startBot failed:', error);

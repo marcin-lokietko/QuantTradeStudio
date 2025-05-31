@@ -38,6 +38,6 @@ services:
     environment:
       PYTHONPATH: "/algo-trader"
     working_dir: /
-    command: bash -c "cd /algo-trader/tests/e2e && behave"
+    command: bash -c "cd /algo-trader/tests/e2e && behave ${TEST_ARGUMENTS}"
     stdin_open: true
     tty: true

@@ -32,8 +32,8 @@ def after_scenario(context, scenario):
         for entry in context.webdriver.get_log("browser"):
             f.write(f"{entry['level']} - {entry['message']}\n")
 
-    if hasattr(context, 'marketServiceMock'):
-        context.marketServiceMock.stop()
+    if hasattr(context, 'market_service_mock'):
+        context.market_service_mock.stop()
 
-    if hasattr(context, 'marketServiceMockwebdriver'):
+    if hasattr(context, 'webdriver'):
         context.webdriver.quit()

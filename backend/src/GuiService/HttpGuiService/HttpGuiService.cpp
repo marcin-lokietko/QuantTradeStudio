@@ -31,6 +31,8 @@ void HttpGuiService::start() {
   // Setup endpoints
   CROW_ROUTE(app, "/health")
   ([]() {
+    LOG(INFO) << "/health endpoint called";
+
     crow::response res{};
     res.add_header("Access-Control-Allow-Origin", "*");
     res.add_header("Content-Type", "application/json");
@@ -126,7 +128,7 @@ void HttpGuiService::start() {
     const auto result = apiGateway_.makeOrder(orderRequest.selectedBaseAsset, orderRequest.selectedQuoteAsset,
                                               orderRequest.orderSide, orderRequest.baseAssetAmount);
 
-    crow::response res{"result"};
+    crow::response res{""};
     if (result != ApiGateway::OrderResult::Success) {
       res.code = 500;
     }
@@ -145,7 +147,7 @@ void HttpGuiService::start() {
 
     const auto result = apiGateway_.startBot(botConfig);
 
-    crow::response res{"result"};
+    crow::response res{""};
     if (result != ApiGateway::StartBotResult::Success) {
       res.code = 500;
     }

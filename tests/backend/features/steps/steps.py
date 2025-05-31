@@ -9,9 +9,9 @@ backend_url = "http://backend:5000"
 def step_impl(context):
     wait_for_backend(backend_url)
 
-@step('MarketService mock is running')
+@step('MarketService mock is running with default configuration')
 def step_impl(context):
-    context.marketServiceMock = MarketServiceMock()
+    context.market_service_mock = MarketServiceMock()
 
     account_info = {
         "balances": [
@@ -24,7 +24,7 @@ def step_impl(context):
             "asset": "ETH"
         }]
     }
-    context.marketServiceMock.set_endpoint('/account', 'GET', account_info)
+    context.market_service_mock.set_endpoint('/account', 'GET', account_info)
 
     exchange_info = {
         "symbols": [
@@ -39,7 +39,7 @@ def step_impl(context):
             "quoteAsset": "USDT"
         }]
     }
-    context.marketServiceMock.set_endpoint('/exchangeInfo', 'GET', exchange_info)
+    context.market_service_mock.set_endpoint('/exchangeInfo', 'GET', exchange_info)
 
     prices = [
     {
@@ -50,9 +50,9 @@ def step_impl(context):
         "price": "2000",
         "symbol": "ETHUSDT"
     }]
-    context.marketServiceMock.set_endpoint('/ticker/price', 'GET', prices)
+    context.market_service_mock.set_endpoint('/ticker/price', 'GET', prices)
 
-    context.marketServiceMock.run()
+    context.market_service_mock.run()
 
 @step('GET /assets request is sent')
 def step_impl(context):

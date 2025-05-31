@@ -1,24 +1,22 @@
 import requests
-from behave import step
+import json
+from behave import step, given
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from tests.common.common_steps import wait_for_backend
-from tests.common.market_service_mock import MarketServiceMock
+from tests.common.market_service_mock import MarketServiceMock, set_default_config
 from tests.e2e.pages.base_layout import BaseLayout
 from tests.e2e.pages.assets_page import AssetsPage
+from tests.e2e.pages.orders_page import OrdersPage
+from tests.e2e.pages.bots_launch_page import BotsLaunchPage
+from tests.e2e.pages.make_order_dialog import MakeOrderDialog
 
 backend_url = "http://backend:5000"
+selenium_server_url = 'http://selenium:4444'
+frontend_url = 'http://frontend:4200'
 
-@step('Backend is available')
-def step_impl(context):
-    wait_for_backend(backend_url)
-
-@step('Frontend is available')
-def step_impl(context):
-    selenium_server_url = 'http://selenium:4444'
-    frontend_url = 'http://frontend:4200'
-
+def wait_for_frontend(context):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
@@ -40,61 +38,45 @@ def step_impl(context):
 
     assert "Algo Trader" in context.webdriver.title, f'Actual title: {context.webdriver.title}'
 
-@step('MarketService mock is running')
+def setup_pages(context):
+    context.base_layout = BaseLayout(context.webdriver)
+    context.assets_page = AssetsPage(context.webdriver)
+    context.orders_page = OrdersPage(context.webdriver)
+    context.bots_launch_page = BotsLaunchPage(context.webdriver)
+    context.make_order_dialog = MakeOrderDialog(context.webdriver)
+
+@given('AlgoTrader is running')
 def step_impl(context):
-    context.marketServiceMock = MarketServiceMock()
+    wait_for_backend(backend_url)
+    wait_for_frontend(context)
 
-    account_info = {
-        "balances": [
-        {
-            "free": "1.234",
-            "asset": "BTC"
-        },
-        {
-            "free": "123.4",
-            "asset": "ETH"
-        }]
-    }
-    context.marketServiceMock.set_endpoint('/account', 'GET', account_info)
+    setup_pages(context)
 
-    exchange_info = {
-        "symbols": [
-        {
-            "symbol": "BTCUSDT",
-            "baseAsset": "BTC",
-            "quoteAsset": "USDT"
-        },
-        {
-            "symbol": "ETHUSDT",
-            "baseAsset": "ETH",
-            "quoteAsset": "USDT"
-        }]
-    }
-    context.marketServiceMock.set_endpoint('/exchangeInfo', 'GET', exchange_info)
+@given('MarketService mock is running with default configuration')
+def step_impl(context):
+    context.market_service_mock = MarketServiceMock()
+    set_default_config(context.market_service_mock)
+    context.market_service_mock.run()
 
-    prices = [
-    {
-        "price": "80000",
-        "symbol": "BTCUSDT"
-    },
-    {
-        "price": "2000",
-        "symbol": "ETHUSDT"
-    }]
-    context.marketServiceMock.set_endpoint('/ticker/price', 'GET', prices)
-
-    context.marketServiceMock.run()
+@given('MarketService mock expects invocations on DELETE /openOrders')
+def step_impl(context):
+    context.market_service_mock.set_endpoint('/openOrders', 'DELETE')
 
 @step('Assets page is opened')
 def step_impl(context):
-    base_layout = BaseLayout(context.webdriver)
-    base_layout.navigate_to_assets_page()
+    context.base_layout.navigate_to_assets_page()
+
+@step('Orders page is opened')
+def step_impl(context):
+    context.base_layout.navigate_to_orders_page()
+
+@step('Bots page is opened')
+def step_impl(context):
+    context.base_layout.navigate_to_bots_page()
 
 @step('Assets are presented')
 def step_impl(context):
-    assets_page = AssetsPage(context.webdriver)
-
-    assets = assets_page.get_assets()
+    assets = context.assets_page.get_assets_texts()
     assert 2 == len(assets), f'actual number of assets: {len(assets)}'
 
     def assertAssetContains(tableEntry, expectedSymbol, expectedFreeQuantity, expectedUsdtValue):
@@ -104,3 +86,58 @@ def step_impl(context):
 
     assertAssetContains(assets[0], "BTC", "1.234", "98720.")
     assertAssetContains(assets[1], "ETH", "123.4", "246800.")
+
+@step('Make Order dialog is opened for "{assetSymbol}"')
+def step_impl(context, assetSymbol):
+    context.assets_page.open_make_order_dialog(assetSymbol)
+
+@step('Make Order dialog is filled with quote asset "{quoteAsset}", order side "{orderSide}", amount "{amount}" and confirmed')
+def step_impl(context, quoteAsset, orderSide, amount):
+    context.make_order_dialog.set_quote_asset(quoteAsset)
+    context.make_order_dialog.set_order_side(orderSide)
+    context.make_order_dialog.set_amount(amount)
+
+    context.make_order_dialog.click_confirm_button()
+
+@step('MarketService method {method} of endpoint {endpoint} has been invoked with query params "{expected_query_string_as_dict}"')
+def step_impl(context, method, endpoint, expected_query_string_as_dict):
+    context.market_service_mock.assert_endpoint_invoked_with(method, endpoint, json.loads(expected_query_string_as_dict))
+
+@step('Active orders are presented')
+def step_impl(context):
+    orders = context.orders_page.get_active_orders_texts()
+    assert 2 == len(orders), f'actual number of orders: {len(orders)}'
+
+    def assertOrderContains(tableEntry, expectedAssetPair, expectedSide, expectedPrice, expectedOrigQuantity, expectedExecutedQuantity):
+        assert expectedAssetPair in tableEntry["assetPairText"], f'actual asset pair text: {tableEntry["assetPairText"]}'
+        assert expectedSide in tableEntry["orderSideText"], f'actual order side text: {tableEntry["orderSideText"]}'
+        assert expectedPrice in tableEntry["priceText"], f'actual price text: {tableEntry["priceText"]}'
+        assert expectedOrigQuantity in tableEntry["origQuantityText"], f'actual original quantity text: {tableEntry["origQuantityText"]}'
+        assert expectedExecutedQuantity in tableEntry["executedQuantityText"], f'actual executed quantity text: {tableEntry["executedQuantityText"]}'
+
+    assertOrderContains(orders[0], "BTCUSDT", "Buy", "80000", "0.1", "0.01")
+    assertOrderContains(orders[1], "ETHUSDT", "Sell", "2000", "2", "1")
+
+@step('Bot "{bot_name}" is selected')
+def step_impl(context, bot_name):
+    context.bots_launch_page.select_bot(bot_name.lower())
+
+@step('Rebalancer bot configuration is filled with execution period "{execution_period}", quote asset "{quote_asset}", base assets [{base_assets}] with shares [{base_assets_shares}] and confirmed')
+def step_impl(context, execution_period, quote_asset, base_assets, base_assets_shares):
+    context.bots_launch_page.set_execution_period(execution_period)
+    context.bots_launch_page.toggle_is_executed_immediately()
+    context.bots_launch_page.set_quote_asset(quote_asset)
+
+    base_assets = base_assets.split(',')
+    base_assets_shares = base_assets_shares.split(',')
+    for single_base_asset, single_base_asset_share in zip(base_assets, base_assets_shares):
+        context.bots_launch_page.add_base_asset(
+            single_base_asset.strip().replace('"', '').replace("'", ""),
+            single_base_asset_share.strip().replace('"', '').replace("'", "")
+        )
+
+    context.bots_launch_page.click_launch_bot_button()
+
+@step('System runs for {num_seconds:g} sec')
+def step_impl(context, num_seconds):
+    sleep(num_seconds)

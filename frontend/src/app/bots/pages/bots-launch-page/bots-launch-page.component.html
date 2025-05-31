@@ -6,6 +6,7 @@
       [value]="botName"
       [ngClass]="getBotButtonClasses(botName)"
       (click)="selectBot(botName)"
+      [attr.data-testid]="'bots-launch-page-bot-list-elem-' + botName.toLowerCase()"
     >
       {{ botName }}
     </button>
@@ -14,14 +15,16 @@
     {{ configTitle }}
     <mat-form-field appearance="fill">
       <mat-label>{{ executionPeriodInputFieldLabel }}</mat-label>
-      <input matInput [(ngModel)]="executionPeriodInput" placeholder="0" />
+      <input data-testid="bots-launch-page-execution-period" matInput [(ngModel)]="executionPeriodInput" placeholder="0" />
     </mat-form-field>
-    <mat-checkbox class="checkbox" [(ngModel)]="isExecutedImmediately">Is executed immediately</mat-checkbox>
+    <mat-checkbox class="checkbox" data-testid="bots-launch-page-is-executed-immediately-checkbox" [(ngModel)]="isExecutedImmediately"
+      >Is executed immediately</mat-checkbox
+    >
     <mat-spinner *ngIf="areAvailableQuoteAssetsLoading" class="spinner" color="accent" diameter="20"></mat-spinner>
     <mat-form-field *ngIf="!areAvailableQuoteAssetsLoading" appearance="fill">
       <mat-label>Quote asset</mat-label>
-      <mat-select [(ngModel)]="selectedQuoteAsset" (selectionChange)="onQuoteAssetChange()">
-        <mat-option *ngFor="let asset of availableQuoteAssets" [value]="asset">
+      <mat-select data-testid="bots-launch-page-quote-asset" [(ngModel)]="selectedQuoteAsset" (selectionChange)="onQuoteAssetChange()">
+        <mat-option *ngFor="let asset of availableQuoteAssets" [attr.data-testid]="'bots-launch-page-quote-asset-' + asset" [value]="asset">
           {{ asset }}
         </mat-option>
       </mat-select>
@@ -52,12 +55,16 @@
       </table>
       <mat-spinner *ngIf="areAvailableBaseAssetsLoading" class="spinner" color="accent" diameter="20"></mat-spinner>
       <div *ngIf="!areAvailableBaseAssetsLoading" class="add-base-asset-button-wrapper">
-        <button class="add-base-asset-button" mat-button (click)="addBaseAsset()">Add base asset</button>
+        <button class="add-base-asset-button" data-testid="bots-launch-page-add-base-asset-button" mat-button (click)="addBaseAsset()">
+          Add base asset
+        </button>
       </div>
       {{ baseAssetConfigSummary }}
     </div>
     <div class="launch-button-wrapper">
-      <button *ngIf="isConfigValid" class="launch-button" mat-button (click)="startBot()">Launch bot</button>
+      <button *ngIf="isConfigValid" class="launch-button" data-testid="bots-launch-page-launch-bot-button" mat-button (click)="startBot()">
+        Launch bot
+      </button>
     </div>
   </div>
 </div>

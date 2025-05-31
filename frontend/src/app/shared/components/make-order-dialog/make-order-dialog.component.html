@@ -19,26 +19,26 @@
   ></mat-spinner>
   <mat-form-field *ngIf="isQuoteAssetSelectionVisible && !areAvailableQuoteAssetsLoading" appearance="fill">
     <mat-label>Quote asset</mat-label>
-    <mat-select [(ngModel)]="selectedQuoteAsset">
-      <mat-option *ngFor="let asset of availableQuoteAssets" [value]="asset">
+    <mat-select data-testid="make-order-dialog-quote-asset" [(ngModel)]="selectedQuoteAsset">
+      <mat-option [attr.data-testid]="'make-order-dialog-quote-asset-' + asset" *ngFor="let asset of availableQuoteAssets" [value]="asset">
         {{ asset }}
       </mat-option>
     </mat-select>
   </mat-form-field>
   <div class="radio-wrapper">
     <mat-radio-group *ngIf="isOrderSideSelectionVisible" class="radio-group" [(ngModel)]="orderSide">
-      <mat-radio-button value="Buy">Buy</mat-radio-button>
-      <mat-radio-button value="Sell">Sell</mat-radio-button>
+      <mat-radio-button data-testid="order-side-radio-buy" value="Buy">Buy</mat-radio-button>
+      <mat-radio-button data-testid="order-side-radio-sell" value="Sell">Sell</mat-radio-button>
     </mat-radio-group>
   </div>
   <mat-form-field *ngIf="isInputFieldVisible" appearance="fill">
     <mat-label>{{ inputFieldLabel }}</mat-label>
-    <input matInput [(ngModel)]="baseAssetAmount" placeholder="0.0" />
+    <input matInput data-testid="make-order-dialog-amount" [(ngModel)]="baseAssetAmount" placeholder="0.0" />
   </mat-form-field>
   <mat-dialog-content>{{ details }}</mat-dialog-content>
   <div class="action-buttons-wrapper">
     <mat-dialog-actions class="action-buttons">
-      <button mat-button (click)="closeWithResult()">Confirm</button>
+      <button data-testid="make-order-dialog-confirm" mat-button (click)="closeWithResult()">Confirm</button>
       <button mat-button (click)="cancel()">Cancel</button>
     </mat-dialog-actions>
   </div>

@@ -173,7 +173,11 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
   const auto openOrdersString = Http::Http().get(url, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   ApiGateway::Orders orders;
-  Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders);
+  try {
+    Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders);
+  } catch (const std::exception& exc) {
+    LOG(ERROR) << "Error parsing response. Url=" << url << "Exception:" << exc.what();
+  }
   return orders;
 }
 
