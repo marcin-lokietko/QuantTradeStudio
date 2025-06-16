@@ -22,8 +22,7 @@ class BotsLaunchPage:
         self.waiting_webdriver.find_element(By.CSS_SELECTOR, f'[data-testid="{list_element_id}"]').click()
 
     def add_base_asset(self, base_asset, base_asset_share):
-        # assert False, f'base_asset={base_asset}'
-        self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="bots-launch-page-add-base-asset-button"]', ignore_exceptions=True)
+        self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="bots-launch-page-add-base-asset-button"]', is_fallback_to_js_click=True)
 
         self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="add-asset-share-dialog-base-asset"]')
         list_element_id = "add-asset-share-dialog-base-asset-" + base_asset
