@@ -1,16 +1,7 @@
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
-import { DataService } from '@app/services/data.service';
-
-export interface Order {
-  orderId: number;
-  assetPair: string;
-  origQuantity: string;
-  executedQuantity: string;
-  orderSide: string;
-  price: string;
-}
+import { DataService, Order } from '@app/services/data.service';
 
 @Component({
   selector: 'app-orders-page',

@@ -1,11 +1,29 @@
 import { Injectable } from '@angular/core';
-import { Balance } from '@app/account/pages/assets/assets-page.component';
-import { Order } from '@app/account/pages/orders/orders-page.component';
 import { environment } from '@env/environment';
 
 export enum RequestResult {
   Success = 'Success',
   Fail = 'Fail',
+}
+
+export interface Order {
+  orderId: number;
+  assetPair: string;
+  origQuantity: string;
+  executedQuantity: string;
+  orderSide: string;
+  price: string;
+}
+
+export interface Balance {
+  assetSymbol: string;
+  freeQuantity: string;
+  usdtValue: string;
+}
+
+export interface AvailableQuoteAsset {
+  baseAssetUnitPrice: string;
+  quoteAsset: string;
 }
 
 @Injectable({
@@ -44,6 +62,54 @@ export class DataService {
     }
   }
 
+  async getAvailableBaseAssets(quoteAsset: string | undefined = undefined): Promise<string[] | undefined> {
+    console.log('DataService.getAvailableBaseAssets');
+
+    let urlWithQuery = '/availableBaseAssets';
+    if (quoteAsset !== undefined) {
+      const params = new URLSearchParams({
+        quoteAsset,
+      });
+      urlWithQuery += `?${params.toString()}`;
+    }
+
+    try {
+      const response = await fetch(environment.algoTraderBackendUrlPrefix + urlWithQuery);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('GET' + urlWithQuery + ' response:', JSON.stringify(data));
+
+      return data.map((elem: any) => {
+        return elem.assetSymbol;
+      });
+    } catch (error) {
+      console.error('GET' + urlWithQuery + ' error:', error);
+      return undefined;
+    }
+  }
+
+  async getAvailableQuoteAssets(selectedBaseAsset: string): Promise<AvailableQuoteAsset[] | undefined> {
+    console.log('DataService.getAvailableQuoteAssets');
+    const params = new URLSearchParams({
+      baseAsset: selectedBaseAsset,
+    });
+    const urlWithQuery = `/availableQuoteAssets?${params.toString()}`;
+    try {
+      const response = await fetch(environment.algoTraderBackendUrlPrefix + urlWithQuery);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('GET' + urlWithQuery + ' response:', JSON.stringify(data));
+      return data as AvailableQuoteAsset[];
+    } catch (error) {
+      console.error('GET' + urlWithQuery + ' error:', error);
+      return undefined;
+    }
+  }
+
   async makeOrder(
     selectedBaseAsset: string,
     selectedQuoteAsset: string,
@@ -71,6 +137,48 @@ export class DataService {
     } catch (error) {
       console.error('POST /makeOrder error:', error);
       return RequestResult.Fail;
+    }
+  }
+
+  async startBot(botParams: any): Promise<RequestResult> {
+    console.log('DataService.startBot, params:', JSON.stringify(botParams));
+
+    try {
+      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/startBot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Headers': '*',
+        },
+        body: JSON.stringify(botParams),
+      });
+      if (!response.ok) {
+        return RequestResult.Fail;
+      }
+      console.info('POST /startBot success:');
+      return RequestResult.Success;
+    } catch (error) {
+      console.error('POST /startBot error:', error);
+      return RequestResult.Fail;
+    }
+  }
+
+  async getQuoteAssetsSuitableForRebalancing(): Promise<string[] | undefined> {
+    console.log('DataService.getQuoteAssetsSuitableForRebalancing');
+    try {
+      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/quoteAssetsSuitableForRebalancing');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('GET /quoteAssetsSuitableForRebalancing response:', JSON.stringify(data));
+
+      return data.map((elem: any) => {
+        return elem.assetSymbol;
+      });
+    } catch (error) {
+      console.error('GET /quoteAssetsSuitableForRebalancing error:', error);
+      return undefined;
     }
   }
 }

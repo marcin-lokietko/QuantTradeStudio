@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { environment } from '@env/environment';
+import { AvailableQuoteAsset, DataService } from '@app/services/data.service';
 
 @Component({
   selector: 'app-dialog',
@@ -35,7 +36,7 @@ import { environment } from '@env/environment';
 })
 export class MakeOrderDialog {
   public baseAssetAmount = '';
-  public availableBaseAssets: string[] = [];
+  public availableBaseAssets = [''];
   public selectedBaseAsset = '';
   public areAvailableBaseAssetsLoading = true;
 
@@ -46,6 +47,7 @@ export class MakeOrderDialog {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
+    private dataService: DataService,
     public dialogRef: MatDialogRef<Component>,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -115,55 +117,28 @@ export class MakeOrderDialog {
 
   public fetchAvailableBaseAssets(): void {
     this.areAvailableBaseAssetsLoading = true;
-    fetch(environment.algoTraderBackendUrlPrefix + '/availableBaseAssets', {
-      method: 'GET',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('availableBaseAssets HTTP error ' + response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        this.availableBaseAssets = data.map((elem: any) => {
-          return elem.assetSymbol;
-        });
-        this.selectedBaseAsset = this.data.initialAssetToBuy;
+    this.dataService.getAvailableBaseAssets().then((data) => {
+      if (data) {
         this.areAvailableBaseAssetsLoading = false;
+
+        this.availableBaseAssets = data;
+        this.selectedBaseAsset = this.data.initialAssetToBuy;
         this.fetchAvailableQuoteAssets();
         this.cdr.markForCheck();
-
-        console.log('availableBaseAssets successful:', data);
-      })
-      .catch((error) => {
-        console.error('availableBaseAssets failed:', error);
-      });
+      }
+    });
   }
 
   public fetchAvailableQuoteAssets(): void {
     this.areAvailableQuoteAssetsLoading = true;
-    const params = new URLSearchParams({
-      baseAsset: this.selectedBaseAsset,
-    });
-    fetch(environment.algoTraderBackendUrlPrefix + `/availableQuoteAssets?${params.toString()}`, {
-      method: 'GET',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('availableQuoteAssets HTTP error ' + response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        this.availableQuoteAssets = data.map((elem: any) => {
+    this.dataService.getAvailableQuoteAssets(this.selectedBaseAsset).then((data) => {
+      if (data) {
+        this.areAvailableQuoteAssetsLoading = false;
+        this.availableQuoteAssets = data.map((elem: AvailableQuoteAsset) => {
           return elem.quoteAsset;
         });
-        this.areAvailableQuoteAssetsLoading = false;
         this.cdr.markForCheck();
-        console.log('availableQuoteAssets successful:', data);
-      })
-      .catch((error) => {
-        console.error('availableQuoteAssets failed:', error);
-      });
+      }
+    });
   }
 }

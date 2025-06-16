@@ -5,13 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MakeOrderDialog } from '@app/shared/components/make-order-dialog/make-order-dialog.component';
 import { NotificationService } from '@app/services/notification.service';
 import { NotificationSeverity } from '@app/shared/components/notification/notification-severity-enum';
-import { DataService, RequestResult } from '@app/services/data.service';
-
-export interface Balance {
-  assetSymbol: string;
-  freeQuantity: string;
-  usdtValue: string;
-}
+import { Balance, DataService, RequestResult } from '@app/services/data.service';
 
 @Component({
   selector: 'app-assets-page',

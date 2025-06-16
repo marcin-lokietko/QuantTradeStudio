@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { AddAssetShareDialog } from '@app/bots/components/add-asset-share-dialog/add-asset-share-dialog.component';
+import { DataService, RequestResult } from '@app/services/data.service';
 import { NotificationService } from '@app/services/notification.service';
 import { NotificationSeverity } from '@app/shared/components/notification/notification-severity-enum';
 import { environment } from '@env/environment';
@@ -40,6 +41,7 @@ export class BotsLaunchPage {
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
+    private dataService: DataService,
     private dialog: MatDialog,
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef,
@@ -83,51 +85,25 @@ export class BotsLaunchPage {
 
   public fetchAvailableQuoteAssets(): void {
     this.areAvailableQuoteAssetsLoading = true;
-    fetch(environment.algoTraderBackendUrlPrefix + '/quoteAssetsSuitableForRebalancing', {
-      method: 'GET',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('quoteAssetsSuitableForRebalancing HTTP error ' + response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        this.availableQuoteAssets = data.map((elem: any) => {
-          return elem.assetSymbol;
-        });
+    this.dataService.getQuoteAssetsSuitableForRebalancing().then((data) => {
+      if (data) {
+        this.availableQuoteAssets = data;
         this.areAvailableQuoteAssetsLoading = false;
-        console.log('quoteAssetsSuitableForRebalancing successful:', data);
-      })
-      .catch((error) => {
-        console.error('quoteAssetsSuitableForRebalancing failed:', error);
-      });
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   public fetchAvailableBaseAssets(): void {
     this.areAvailableBaseAssetsLoading = true;
-    const params = new URLSearchParams({
-      quoteAsset: this.selectedQuoteAsset,
-    });
-    fetch(environment.algoTraderBackendUrlPrefix + `/availableBaseAssets?${params.toString()}`, {
-      method: 'GET',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('availableBaseAssets HTTP error ' + response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        this.availableBaseAssets = data.map((elem: any) => {
-          return elem.assetSymbol;
-        });
+
+    this.dataService.getAvailableBaseAssets(this.selectedQuoteAsset).then((data) => {
+      if (data) {
+        this.availableBaseAssets = data;
         this.areAvailableBaseAssetsLoading = false;
-        console.log('availableBaseAssets successful:', data);
-      })
-      .catch((error) => {
-        console.error('availableBaseAssets failed:', error);
-      });
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   public deleteSelectedBaseAssetConfig(elementToRemove: BaseAssetConfig) {
@@ -204,35 +180,20 @@ export class BotsLaunchPage {
   }
 
   public startBot(): void {
-    const body = JSON.stringify({
+    const botParams = {
       botName: this.selectedBot,
       executionPeriod: Number(this.executionPeriodInput),
       isExecutedImmediately: this.isExecutedImmediately,
       quoteAsset: this.selectedQuoteAsset,
       baseAssetShares: this.selectedBaseAssetsConfig,
-    });
-    console.log(`startBot body=${body}`);
+    };
 
-    fetch(environment.algoTraderBackendUrlPrefix + '/startBot', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Headers': '*',
-      },
-      body,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          this.notificationService.show('Failed to launch the bot', 3000, NotificationSeverity.Error);
-          throw new Error('startBot HTTP error ' + response.status);
-        }
-        return response;
-      })
-      .then((data) => {
-        console.log('startBot successful, response:', data);
-      })
-      .catch((error) => {
-        console.error('startBot failed:', error);
-      });
+    this.dataService.startBot(botParams).then((result) => {
+      if (result === RequestResult.Success) {
+        console.log('Bot started successfully');
+      } else if (result === RequestResult.Fail) {
+        this.notificationService.show('Failed to launch the bot', 3000, NotificationSeverity.Error);
+      }
+    });
   }
 }
