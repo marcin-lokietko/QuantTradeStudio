@@ -12,7 +12,6 @@ import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { environment } from '@env/environment';
 import { AvailableQuoteAsset, DataService } from '@app/services/data.service';
 
 @Component({
