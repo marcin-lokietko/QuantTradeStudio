@@ -4,6 +4,12 @@
 	"name": "Algo Trader devcontainer config",
 	// Sets the run context to one level up instead of the .devcontainer folder.
 	"context": "..",
+
+	// Make the path inside the .devcontainer's container independent from the path on the host machine.
+	// The path after /workspace/ should always start with algo-trader, because this is used in scripts (it's same in docker-compose.yml and Dockerfiles).
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/algo-trader,type=bind",
+	"workspaceFolder": "/workspaces/algo-trader",
+
 	"dockerFile": "../scripts/backend/Dockerfile",
 	// Configure tool-specific properties.
 	"customizations": {
