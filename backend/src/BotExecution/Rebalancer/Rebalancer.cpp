@@ -24,7 +24,7 @@ void Rebalancer::run(std::stop_token st) {
     rebalance();
   }
   while (!st.stop_requested()) {
-    time_->sleepFor(executionPeriod);
+    time_->sleepFor(st, executionPeriod);
     if (!st.stop_requested()) {
       rebalance();
     }

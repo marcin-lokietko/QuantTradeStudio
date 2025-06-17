@@ -8,6 +8,7 @@
 #include "OrderResult.hpp"
 #include "Orders.hpp"
 #include "StartBotResult.hpp"
+#include "StopAllBotsResult.hpp"
 
 namespace ApiGateway {
 
@@ -29,6 +30,8 @@ class IApiGateway {
   virtual AssetSymbols getQuoteAssetsSuitableForRebalancing() const = 0;
 
   virtual StartBotResult startBot(const BotConfig& botConfig) const = 0;
+
+  virtual StopAllBotsResult stopAllBots() const = 0;
 };
 
 }  // namespace ApiGateway

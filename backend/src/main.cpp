@@ -19,7 +19,10 @@ void setupLogger(const char* programName, const Config::LogsCatalogPath& logDir)
   }
   FLAGS_log_dir = logDir.val_;
   FLAGS_stderrthreshold = 0;
-  FLAGS_logbuflevel = -1;  // always flush
+
+  // always flush:
+  FLAGS_logbuflevel = -1;
+  FLAGS_logbufsecs = 0;
 
   google::InitGoogleLogging(programName);
 }

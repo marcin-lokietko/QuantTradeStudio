@@ -4,7 +4,6 @@ set -e
 . $(dirname $(realpath -s $0))/.common.sh
 . ${SCRIPTS_PATH}/.clear_containers.sh
 
-
 # E.g. to run one scenario: run_e2e_tests.sh "--name \"My scenario name\""
 if [ -n "$1" ]; then
   export TEST_ARGUMENTS=$1

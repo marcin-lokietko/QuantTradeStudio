@@ -1,16 +1,11 @@
 Feature: Bots page
 
-# With the default configuration of MarketService, the user owns
-#  1. 123.4 ETH, which is worth 123.4*2000=246 800 USDT
-#  2. 1.234 BTC, which is worth 1.234*80000=98 720 USDT
-# So the total worth of the owned ETH and BTC is 345 520
-# With the expected value proportion of BTC/ETH= 9/1, the expected wallet is:
-#  1. 34 552 USDT in ETH => need to sell ETH worth 246 800 - 34 552 = 212248 USDT
-#  2. need to buy BTC worth 212248 USDT
+
+# See tests/backend/features/Bots.feature, scenario "Single rebalancing of 2 assets" for explanation of the expected requests to MarketService
 Scenario: Rebalancer bot is started
     Given AlgoTrader is running
     And MarketService mock is running with default configuration
-    And MarketService mock expects invocations on DELETE /openOrders
+    And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     When Bots page is opened
     And Bot "rebalancer" is selected
     And Rebalancer bot configuration is filled with execution period "10", quote asset "USDT", base assets ["BTC", "ETH"] with shares ["90", "10"] and confirmed

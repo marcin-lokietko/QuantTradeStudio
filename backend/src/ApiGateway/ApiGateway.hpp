@@ -27,6 +27,8 @@ class ApiGateway : public IApiGateway {
 
   StartBotResult startBot(const BotConfig& botConfig) const override;
 
+  StopAllBotsResult stopAllBots() const override;
+
  public:
   MarketService::IMarketService& marketService_;
   Wallet::IWallet& wallet_;

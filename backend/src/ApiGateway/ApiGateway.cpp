@@ -47,11 +47,14 @@ AvailableQuoteAssets ApiGateway::getAvailableQuoteAssets(const AssetSymbol& base
 }
 
 AssetSymbols ApiGateway::getAvailableBaseAssets(const std::optional<AssetSymbol>& quoteAsset) const {
+  const auto argumentAsStr = quoteAsset ? quoteAsset.value().val_ : "nullopt";
+  LOG(INFO) << "getAvailableBaseAssets quoteAsset=" << argumentAsStr;
   MarketService::TradingPairs tradingPairs{};
   if (quoteAsset) {
     tradingPairs = marketService_.getTradingPairsWithQuoteAsset(quoteAsset.value());
+  } else {
+    tradingPairs = marketService_.getAllTradingPairs();
   }
-  tradingPairs = marketService_.getAllTradingPairs();
 
   std::set<AssetSymbol> baseAssets;
   for (const auto& singleTradingPair : tradingPairs) {
@@ -81,5 +84,7 @@ AssetSymbols ApiGateway::getQuoteAssetsSuitableForRebalancing() const {
 }
 
 StartBotResult ApiGateway::startBot(const BotConfig& botConfig) const { return botExecution_.startBot(botConfig); }
+
+StopAllBotsResult ApiGateway::stopAllBots() const { return botExecution_.stopAllBots(); }
 
 }  // namespace ApiGateway

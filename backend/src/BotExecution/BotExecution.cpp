@@ -18,6 +18,8 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
   std::visit(
       [&runningBots_ = runningBots_, &marketService_ = marketService_, &startBotResult = startBotResult,
        &wallet_ = wallet_](auto&& config) {
+        LOG(INFO) << "Received bot configuration. Attempting to start the bot...";
+
         using T = std::decay_t<decltype(config)>;
 
         if constexpr (std::is_same_v<T, std::monostate>) {
@@ -39,13 +41,20 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
   return startBotResult;
 }
 
-void BotExecution::stopAllBots() {
+ApiGateway::StopAllBotsResult BotExecution::stopAllBots() {
+  LOG(INFO) << "Attempting to stop all running bots";
+
   for (auto& workerThread : runningBots_) {
     workerThread.request_stop();
   }
+  LOG(INFO) << "All bots requeste to stop. Waiting for all bots to finish";
   for (auto& workerThread : runningBots_) {
     workerThread.join();
   }
+
+  LOG(INFO) << "All bots stopped";
+  runningBots_.clear();
+  return ApiGateway::StopAllBotsResult::Success;
 }
 
 }  // namespace BotExecution

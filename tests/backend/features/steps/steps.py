@@ -1,65 +1,42 @@
 import requests
+import json
 from behave import step
 from tests.common.common_steps import wait_for_backend
-from tests.common.market_service_mock import MarketServiceMock
+from tests.common import common_steps
 
 backend_url = "http://backend:5000"
 
 @step('Backend is available')
 def step_impl(context):
     wait_for_backend(backend_url)
+    requests.request('POST', backend_url + '/stopAllBots')
 
-@step('MarketService mock is running with default configuration')
-def step_impl(context):
-    context.market_service_mock = MarketServiceMock()
+@step('Request {method} {endpoint} is sent')
+def step_impl(context, method, endpoint):
+    context.responses.store_response(method, endpoint, requests.get(backend_url + endpoint))
 
-    account_info = {
-        "balances": [
-        {
-            "free": "1.234",
-            "asset": "BTC"
-        },
-        {
-            "free": "123.4",
-            "asset": "ETH"
-        }]
-    }
-    context.market_service_mock.set_endpoint('/account', 'GET', account_info)
+@step('Request {method} {endpoint} is sent with body "{body_as_string}"')
+def step_impl(context, method, endpoint, body_as_string):
+    headers = {'Content-Type': 'application/json'}
+    body_as_object = json.loads(body_as_string)
+    response = requests.request(method, backend_url + endpoint, json=body_as_object, headers=headers)
+    context.responses.store_response(method, endpoint, response)
 
-    exchange_info = {
-        "symbols": [
-        {
-            "symbol": "BTCUSDT",
-            "baseAsset": "BTC",
-            "quoteAsset": "USDT"
-        },
-        {
-            "symbol": "ETHUSDT",
-            "baseAsset": "ETH",
-            "quoteAsset": "USDT"
-        }]
-    }
-    context.market_service_mock.set_endpoint('/exchangeInfo', 'GET', exchange_info)
+@step('Request {method} {endpoint} is sent with query "{query_string}"')
+def step_impl(context, method, endpoint, query_string):
+    context.responses.store_response(method, endpoint, requests.get(backend_url + endpoint + '?' + query_string))
 
-    prices = [
-    {
-        "price": "80000",
-        "symbol": "BTCUSDT"
-    },
-    {
-        "price": "2000",
-        "symbol": "ETHUSDT"
-    }]
-    context.market_service_mock.set_endpoint('/ticker/price', 'GET', prices)
+def valudate_response(context, method, endpoint, status_code, body_as_string):
+    actual_response = context.responses.get_last_response(method, endpoint)
+    assert actual_response is not None, f"No response found for {method} {endpoint}"
+    assert actual_response.status_code == status_code, f"Actual status code: {actual_response.status_code}; expected: {status_code}"
+    assert actual_response.text == body_as_string, f"Actual body: {actual_response.text}; expected: {body_as_string}"
 
-    context.market_service_mock.run()
+@step('Response for {method} {endpoint} was received with status code "{status_code:d}" and body "{body_as_string}"')
+def step_impl(context, method, endpoint, status_code, body_as_string):
+    valudate_response(context, method, endpoint, status_code, body_as_string)
 
-@step('GET /assets request is sent')
-def step_impl(context):
-    context.response = requests.get(backend_url + "/assets")
-
-@step('GET /assets response is valid')
-def step_impl(context):
-    assert context.response.text == r'[{"assetSymbol":"BTC","freeQuantity":"1.234","usdtValue":"98720.000000"},{"assetSymbol":"ETH","freeQuantity":"123.4","usdtValue":"246800.000000"}]',\
-        f"Actual response: {context.response.text}"
-
+# This step is used when the response body is expected to be empty - Behave does not support "" param as an empty string
+@step('Response for {method} {endpoint} was received with status code "{status_code:d}" and no body')
+def step_impl(context, method, endpoint, status_code):
+    valudate_response(context, method, endpoint, status_code, "")

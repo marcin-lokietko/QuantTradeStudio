@@ -18,9 +18,9 @@ class BotExecution : public IBotExecution {
 
   ApiGateway::StartBotResult startBot(const ApiGateway::BotConfig& botConfig) override;
 
- private:
-  void stopAllBots();
+  virtual ApiGateway::StopAllBotsResult stopAllBots() override;
 
+ private:
   const MarketService::IMarketService& marketService_;
   const Wallet::IWallet& wallet_;
   const ConfigExtractor configExtractor_{};

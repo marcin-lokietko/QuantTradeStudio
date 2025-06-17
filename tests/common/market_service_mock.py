@@ -11,7 +11,7 @@ class MarketServiceMock:
         self._received_requests = []
 
     def set_endpoint(self, endpoint, method, response=None, status_code=200):
-        print(f"Setting up mock endpoint: {method} {endpoint} -> {response}")
+        print(f"Setting up mock endpoint: |{method}| |{endpoint}| -> {response}")
 
         # Flask requires unique endpoint name for each route
         endpoint_name = f"{method}_{endpoint}".replace('/', '_')

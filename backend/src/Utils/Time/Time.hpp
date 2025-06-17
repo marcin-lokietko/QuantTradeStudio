@@ -6,7 +6,7 @@ namespace Time {
 
 class Time : public ITime {
  public:
-  void sleepFor(const ::std::chrono::seconds& seconds) const override;
+  void sleepFor(std::stop_token st, const ::std::chrono::milliseconds& duration) const override;
 };
 
 }  // namespace Time

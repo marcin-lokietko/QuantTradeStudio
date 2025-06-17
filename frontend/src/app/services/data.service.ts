@@ -63,7 +63,7 @@ export class DataService {
   }
 
   async getAvailableBaseAssets(quoteAsset: string | undefined = undefined): Promise<string[] | undefined> {
-    console.log('DataService.getAvailableBaseAssets');
+    console.log('DataService.getAvailableBaseAssets quoteAsset=' + quoteAsset);
 
     let urlWithQuery = '/availableBaseAssets';
     if (quoteAsset !== undefined) {

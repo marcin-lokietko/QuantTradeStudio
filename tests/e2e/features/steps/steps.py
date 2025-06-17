@@ -3,14 +3,13 @@ import json
 from behave import step, given
 from time import sleep
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from tests.common.common_steps import wait_for_backend
-from tests.common.market_service_mock import MarketServiceMock, set_default_config
 from tests.e2e.pages.base_layout import BaseLayout
 from tests.e2e.pages.assets_page import AssetsPage
 from tests.e2e.pages.orders_page import OrdersPage
 from tests.e2e.pages.bots_launch_page import BotsLaunchPage
 from tests.e2e.pages.make_order_dialog import MakeOrderDialog
+from tests.common import common_steps
 
 backend_url = "http://backend:5000"
 selenium_server_url = 'http://selenium:4444'
@@ -45,22 +44,13 @@ def setup_pages(context):
     context.bots_launch_page = BotsLaunchPage(context.webdriver)
     context.make_order_dialog = MakeOrderDialog(context.webdriver)
 
-@given('AlgoTrader is running')
+@step('AlgoTrader is running')
 def step_impl(context):
     wait_for_backend(backend_url)
+    requests.request('POST', backend_url + '/stopAllBots')
     wait_for_frontend(context)
 
     setup_pages(context)
-
-@given('MarketService mock is running with default configuration')
-def step_impl(context):
-    context.market_service_mock = MarketServiceMock()
-    set_default_config(context.market_service_mock)
-    context.market_service_mock.run()
-
-@given('MarketService mock expects invocations on DELETE /openOrders')
-def step_impl(context):
-    context.market_service_mock.set_endpoint('/openOrders', 'DELETE')
 
 @step('Assets page is opened')
 def step_impl(context):
@@ -99,10 +89,6 @@ def step_impl(context, quoteAsset, orderSide, amount):
 
     context.make_order_dialog.click_confirm_button()
 
-@step('MarketService method {method} of endpoint {endpoint} has been invoked with query params "{expected_query_string_as_dict}"')
-def step_impl(context, method, endpoint, expected_query_string_as_dict):
-    context.market_service_mock.assert_endpoint_invoked_with(method, endpoint, json.loads(expected_query_string_as_dict))
-
 @step('Active orders are presented')
 def step_impl(context):
     orders = context.orders_page.get_active_orders_texts()
@@ -138,6 +124,3 @@ def step_impl(context, execution_period, quote_asset, base_assets, base_assets_s
 
     context.bots_launch_page.click_launch_bot_button()
 
-@step('System runs for {num_seconds:g} sec')
-def step_impl(context, num_seconds):
-    sleep(num_seconds)

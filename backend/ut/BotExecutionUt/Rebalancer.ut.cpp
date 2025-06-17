@@ -12,6 +12,7 @@ using ApiGateway::ExecutionPeriod;
 using ApiGateway::IsExecutedImmediately;
 using ApiGateway::SharePercent;
 using ApiGateway::SingleAssetShare;
+using testing::_;
 using testing::Return;
 
 const ApiGateway::AssetShares assetShares{SingleAssetShare{AssetSymbol{"BTC"}, SharePercent{80}},
@@ -45,7 +46,8 @@ TEST_F(RebalancerTest, WhenConfiguredBaseAssetsNowOwned_ThenBotDoesNotTrade) {
       .WillOnce(Return(Wallet::AssetValues{}));
 
   auto time = std::make_unique<Time::TimeMock>();
-  EXPECT_CALL(*time, sleepFor(std::chrono::seconds(config.executionPeriod.val_))).WillOnce(Return());
+  std::chrono::seconds seconds(config.executionPeriod.val_);
+  EXPECT_CALL(*time, sleepFor(_, std::chrono::duration_cast<std::chrono::milliseconds>(seconds))).WillOnce(Return());
 
   getSut(config, std::move(time)).run(token);
 }

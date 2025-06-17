@@ -158,6 +158,22 @@ void HttpGuiService::start() {
     return res;
   });
 
+  CROW_ROUTE(app, "/stopAllBots").methods("POST"_method)([&apiGateway_ = apiGateway_]() {
+    LOG(INFO) << "/stopAllBots endpoint called";
+
+    const auto result = apiGateway_.stopAllBots();
+
+    crow::response res{""};
+    if (result != ApiGateway::StopAllBotsResult::Success) {
+      res.code = 500;
+    }
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Content-Type", "application/json");
+
+    LOG(INFO) << "/stopAllBots endpoint response: " << res.body << "; status code: " << res.code;
+    return res;
+  });
+
   LOG(INFO) << "Starting service";
   app.port(5000).run();
 }
