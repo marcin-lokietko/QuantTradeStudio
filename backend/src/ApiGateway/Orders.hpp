@@ -18,6 +18,8 @@ struct SingleOrder {
   AssetQuantity origQuantity{};
   AssetQuantity executedQuantity{};
   OrderSide side{};
+
+  bool operator==(const SingleOrder& other) const = default;
 };
 
 using Orders = std::vector<SingleOrder>;

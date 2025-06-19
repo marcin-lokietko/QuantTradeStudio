@@ -1,24 +1,14 @@
 #pragma once
 
-#include <string>
-
-#include "Utils/StrongType.hpp"
+#include "Http/IHttp.hpp"
 
 namespace Http {
 
-DEFINE_STRONG_TYPE(HttpStatusCode, int64_t);
-DEFINE_STRONG_TYPE(HttpBody, std::string);
-
-class Http {
-  struct Response {
-    HttpStatusCode statusCode{};
-    HttpBody body{};
-  };
-
+class Http : public IHttp {
  public:
-  std::string get(const std::string& url, const std::string& header);
-  Response post(const std::string& url, const std::string& header);
-  Response del(const std::string& url, const std::string& header);
+  std::string get(const std::string& url, const std::string& header) const override;
+  Response post(const std::string& url, const std::string& header) const override;
+  Response del(const std::string& url, const std::string& header) const override;
 };
 
 }  // namespace Http

@@ -23,7 +23,7 @@ class Rebalancer {
   void rebalance();
   void cancelOpenOrders();
   Wallet::AssetValues getRelevantOwnedAssetValues();
-  double calcTotalValueOfRelevantOwnedAssets(const Wallet::AssetValues& relevantOwnedAssetValues);
+  std::optional<double> calcTotalValueOfRelevantOwnedAssets(const Wallet::AssetValues& relevantOwnedAssetValues);
   AssetSharesFloating getActualAssetShares(const Wallet::AssetValues& relevantOwnedAssetValues,
                                            const double totalValueOfRelevantOwnedAssets);
 

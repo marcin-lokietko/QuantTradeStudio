@@ -10,6 +10,8 @@ namespace ApiGateway {
 struct SingleAvailableQuoteAsset {
   AssetSymbol quoteAsset{};
   Price baseAssetUnitPrice{};
+
+  bool operator==(const SingleAvailableQuoteAsset& other) const = default;
 };
 
 using AvailableQuoteAssets = std::vector<SingleAvailableQuoteAsset>;

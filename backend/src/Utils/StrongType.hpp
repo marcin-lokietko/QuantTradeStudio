@@ -1,5 +1,8 @@
 #pragma once
 
+#include <type_traits>
+#include <utility>
+
 struct Addable {};
 
 // A unique tag is needed to differentiate two separate wrappers of the same primitive.
@@ -8,9 +11,12 @@ struct StrongType : public Mixins... {
   using WrapperType = StrongType<T, UniqueTag, Mixins...>;
   T val_;
 
+  constexpr StrongType() = default;
+  explicit constexpr StrongType(T val) : val_(std::move(val)) {}
+
   bool operator<(const WrapperType& other) const { return val_ < other.val_; }
-  bool operator==(const WrapperType& other) const = default;
-  bool operator!=(const WrapperType& other) const = default;
+  bool operator==(const WrapperType& other) const { return val_ == other.val_; }
+  bool operator!=(const WrapperType& other) const { return val_ != other.val_; }
 
   WrapperType operator+(const WrapperType& other)
     requires std::is_base_of_v<Addable, WrapperType>
@@ -32,10 +38,10 @@ namespace B {
   DEFINE_STRONG_TYPE(AssetSymbol, std::string);
 }
 the resulting types are:
-StrongType<std::string, A::AssetTag>
+StrongType<std::string, A::AssetSymbolTag>
 and
-StrongType<std::string, B::AssetTag>
+StrongType<std::string, B::AssetSymbolTag>
 
 So the A::AssetSymbol and B::AssetSymbol are two separate types.
 */
-#define DEFINE_STRONG_TYPE(Name, Type) using Name = StrongType<Type, struct Name##Tag>
+#define DEFINE_STRONG_TYPE(Name, Type, ...) using Name = StrongType<Type, struct Name##Tag, ##__VA_ARGS__>

@@ -16,6 +16,8 @@ struct SingleAsset {
   ApiGateway::AssetSymbol assetSymbol{};
   AssetQuantity freeQuantity{};
   MarketId marketId{MarketId::Unknown};
+
+  bool operator==(const SingleAsset& other) const = default;
 };
 
 using Assets = std::vector<SingleAsset>;

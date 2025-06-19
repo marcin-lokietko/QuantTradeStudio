@@ -6,7 +6,6 @@
 #include <nlohmann/json.hpp>
 #include <ranges>
 
-#include "Http/Http.hpp"
 #include "MarketService/Binance/Conversion/AssetPrices.hpp"
 #include "MarketService/Binance/Conversion/Assets.hpp"
 #include "MarketService/Binance/Conversion/Orders.hpp"
@@ -15,19 +14,18 @@
 namespace MarketService::Binance {
 
 namespace {
-std::string getTimeSinceEpoch() { return std::to_string(time(nullptr) * 1000); }
 constexpr Http::HttpStatusCode statusCodeOk{200};
 constexpr Http::HttpStatusCode statusCodeRequestRateLimitBroken{429};
 }  // namespace
 
 std::string BinanceService::getServerTime() {
   const std::string timeUrl = binanceUrlPrefix_.val_ + "/time";
-  return Http::Http().get(timeUrl, "");
+  return http_.get(timeUrl, "");
 }
 
 ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) {
   std::string url = binanceUrlPrefix_.val_ + "/ticker/price?symbol=" + tradingPairSymbol.val_;
-  const auto response = Http::Http().get(url, "");
+  const auto response = http_.get(url, "");
 
   const auto jsonResponse = nlohmann::json::parse(response);
   if (jsonResponse.contains("price")) {
@@ -50,7 +48,7 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
   }
   symbolsString += "]";
   const std::string url = binanceUrlPrefix_.val_ + "/ticker/price?symbols=" + symbolsString;
-  const auto response = Http::Http().get(url, "");
+  const auto response = http_.get(url, "");
 
   AssetPrices assetPrices;
   Conversion::fromJson(nlohmann::json::parse(response), assetPrices);
@@ -61,7 +59,7 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
 MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
   const std::string klinesUrl =
       binanceUrlPrefix_.val_ + "/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
-  const auto klinesString = Http::Http().get(klinesUrl, "");
+  const auto klinesString = http_.get(klinesUrl, "");
   const auto klinesJson = nlohmann::json::parse(klinesString);
 
   MarketService::KlineSequence sequence;
@@ -78,7 +76,7 @@ MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol
 
 Assets BinanceService::getOwnedAssets() const {
   const auto accountUrl = getAccountUrl();
-  const auto accountString = Http::Http().get(accountUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
+  const auto accountString = http_.get(accountUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
   const auto accountJson = nlohmann::json::parse(accountString);
 
   Assets assets;
@@ -95,9 +93,10 @@ ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairS
 
   const std::string queryString = "symbol=" + symbol.val_ + "&side=" + orderSideString +
                                   "&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ + "&price=" + price.val_ +
-                                  "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
+                                  "&recvWindow=5000&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
+
   const auto orderUrl = getOrderUrl(queryString);
-  const auto response = Http::Http().post(orderUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
+  const auto response = http_.post(orderUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   if (response.statusCode != statusCodeOk) {
     LOG(WARNING) << "makeOrder returned NOK. Msg=" << response.body.val_;
@@ -117,9 +116,9 @@ ApiGateway::OrderResult BinanceService::makeMarketTypeOrderWithQuoteQuantity(
 
   const std::string queryString = "symbol=" + symbol.val_ + "&side=" + orderSideString +
                                   "&type=MARKET&quoteOrderQty=" + quoteQuantity.val_ +
-                                  "&recvWindow=5000&timestamp=" + getTimeSinceEpoch();
+                                  "&recvWindow=5000&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
   const auto orderUrl = getOrderUrl(queryString);
-  const auto response = Http::Http().post(orderUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
+  const auto response = http_.post(orderUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   if (response.statusCode != statusCodeOk) {
     LOG(WARNING) << "makeMarketTypeOrderWithQuoteQuantity returned NOK. Msg=" << response.body.val_;
@@ -130,7 +129,7 @@ ApiGateway::OrderResult BinanceService::makeMarketTypeOrderWithQuoteQuantity(
 
 TradingPairs BinanceService::getAllTradingPairs() const {
   const std::string url = binanceUrlPrefix_.val_ + "/exchangeInfo";
-  const auto tradingPairsString = Http::Http().get(url, "");
+  const auto tradingPairsString = http_.get(url, "");
 
   TradingPairs tradingPairs;
   Conversion::fromJson(nlohmann::json::parse(tradingPairsString), tradingPairs);
@@ -152,7 +151,7 @@ TradingPairs BinanceService::getTradingPairsWithBaseAsset(const ApiGateway::Asse
 }
 
 std::string BinanceService::getAccountUrl() const {
-  const std::string timestamp = "timestamp=" + getTimeSinceEpoch();
+  const std::string timestamp = "timestamp=" + std::to_string(time_.getTimeSinceEpoch());
   const std::string signature = encryption_.generateSignature(timestamp);
   const std::string signedQuery = timestamp + "&signature=" + signature;
   return binanceUrlPrefix_.val_ + "/account?" + signedQuery;
@@ -165,12 +164,12 @@ std::string BinanceService::getOrderUrl(const std::string& queryString) const {
 }
 
 ApiGateway::Orders BinanceService::getOpenOrders() const {
-  const std::string timestamp = "timestamp=" + getTimeSinceEpoch();
+  const std::string timestamp = "timestamp=" + std::to_string(time_.getTimeSinceEpoch());
   const std::string signature = encryption_.generateSignature(timestamp);
   const std::string signedQuery = timestamp + "&signature=" + signature;
   const std::string url = binanceUrlPrefix_.val_ + "/openOrders" + "?" + signedQuery;
 
-  const auto openOrdersString = Http::Http().get(url, "X-MBX-APIKEY: " + encryption_.getApiKey());
+  const auto openOrdersString = http_.get(url, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   ApiGateway::Orders orders;
   try {
@@ -184,12 +183,13 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
 ApiGateway::OrderResult BinanceService::cancelAllOrdersOnASymbol(const ApiGateway::TradingPairSymbol& symbol) const {
   LOG(INFO) << "cancelAllOrdersOnASymbol symbol=" << symbol.val_;
 
-  const std::string queryString = "symbol=" + symbol.val_ + "&recvWindow=5000" + "&timestamp=" + getTimeSinceEpoch();
+  const std::string queryString =
+      "symbol=" + symbol.val_ + "&recvWindow=5000" + "&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
   const std::string signature = encryption_.generateSignature(queryString);
   const std::string signedQuery = queryString + "&signature=" + signature;
   const std::string url = binanceUrlPrefix_.val_ + "/openOrders" + "?" + signedQuery;
 
-  const auto response = Http::Http().del(url, "X-MBX-APIKEY: " + encryption_.getApiKey());
+  const auto response = http_.del(url, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   if (response.statusCode != statusCodeOk) {
     LOG(WARNING) << "cancelAllOrdersOnASymbol returned NOK. Msg=" << response.body.val_;

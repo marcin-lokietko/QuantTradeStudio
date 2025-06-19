@@ -40,7 +40,12 @@ void Rebalancer::rebalance() {
   const auto relevantOwnedAssetValues = getRelevantOwnedAssetValues();
   const auto totalValueOfRelevantOwnedAssets = calcTotalValueOfRelevantOwnedAssets(relevantOwnedAssetValues);
 
-  auto actualAssetShares = getActualAssetShares(relevantOwnedAssetValues, totalValueOfRelevantOwnedAssets);
+  if (!totalValueOfRelevantOwnedAssets.has_value()) {
+    LOG(ERROR) << "Could not calculate total value of relevant owned assets";
+    return;
+  }
+
+  auto actualAssetShares = getActualAssetShares(relevantOwnedAssetValues, totalValueOfRelevantOwnedAssets.value());
   if (actualAssetShares.size() != config_.baseAssetShares.size()) {
     LOG(ERROR) << "Could not calculate actual asset shares";
     return;
@@ -80,13 +85,13 @@ void Rebalancer::rebalance() {
   for (const auto& singleAssetToSell : sharesToSell) {
     const ApiGateway::TradingPairSymbol symbol{singleAssetToSell.assetSymbol.val_ + config_.quoteAsset.val_};
     const ApiGateway::AssetQuantity quoteQuantity{
-        std::to_string(totalValueOfRelevantOwnedAssets * singleAssetToSell.share.val_)};
+        std::to_string(totalValueOfRelevantOwnedAssets.value() * singleAssetToSell.share.val_)};
     marketService_.makeMarketTypeOrderWithQuoteQuantity(symbol, ApiGateway::OrderSide::Sell, quoteQuantity);
   }
   for (const auto& singleAssetToBuy : sharesToBuy) {
     const ApiGateway::TradingPairSymbol symbol{singleAssetToBuy.assetSymbol.val_ + config_.quoteAsset.val_};
     const ApiGateway::AssetQuantity quoteQuantity{
-        std::to_string(totalValueOfRelevantOwnedAssets * singleAssetToBuy.share.val_)};
+        std::to_string(totalValueOfRelevantOwnedAssets.value() * singleAssetToBuy.share.val_)};
     marketService_.makeMarketTypeOrderWithQuoteQuantity(symbol, ApiGateway::OrderSide::Buy, quoteQuantity);
   }
 }
@@ -126,7 +131,8 @@ Wallet::AssetValues Rebalancer::getRelevantOwnedAssetValues() {
   return {relevantOwnedAssetValues.begin(), relevantOwnedAssetValues.end()};
 }
 
-double Rebalancer::calcTotalValueOfRelevantOwnedAssets(const Wallet::AssetValues& relevantOwnedAssetValues) {
+std::optional<double> Rebalancer::calcTotalValueOfRelevantOwnedAssets(
+    const Wallet::AssetValues& relevantOwnedAssetValues) {
   double totalValueOfRelevantOwnedAssets = 0;
   try {
     for (const auto& singleAssetValue : relevantOwnedAssetValues) {

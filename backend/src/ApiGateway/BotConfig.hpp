@@ -18,6 +18,8 @@ DEFINE_STRONG_TYPE(IsExecutedImmediately, bool);
 struct SingleAssetShare {
   AssetSymbol assetSymbol{};
   SharePercent sharePercent{};
+
+  bool operator==(const SingleAssetShare& other) const = default;
 };
 
 using AssetShares = std::vector<SingleAssetShare>;
@@ -28,6 +30,8 @@ struct BotConfig {
   std::optional<IsExecutedImmediately> isExecutedImmediately{};
   std::optional<AssetSymbol> quoteAsset{};
   std::optional<AssetShares> baseAssetShares{};
+
+  bool operator==(const BotConfig& other) const = default;
 };
 
 inline std::string toString(const AssetShares& assetShares) {

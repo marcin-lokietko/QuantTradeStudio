@@ -15,6 +15,8 @@ struct SingleAsset {
   AssetSymbol assetSymbol{};
   AssetQuantity freeQuantity{};
   Value usdtValue{};
+
+  bool operator==(const SingleAsset& other) const = default;
 };
 
 using Assets = std::vector<SingleAsset>;

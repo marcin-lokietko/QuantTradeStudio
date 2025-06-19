@@ -14,6 +14,8 @@ namespace MarketService {
 struct SingleAssetPrice {
   ApiGateway::TradingPairSymbol assetPair{};
   ApiGateway::Price price{};
+
+  bool operator==(const SingleAssetPrice& other) const = default;
 };
 
 using AssetPrices = std::vector<SingleAssetPrice>;

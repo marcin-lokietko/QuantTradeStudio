@@ -1,17 +1,15 @@
 #pragma once
 
-#include <string>
-
-#include "Config/ConfigParams.hpp"
+#include "MarketService/Binance/IEncryption.hpp"
 
 namespace MarketService::Binance {
 
-class Encryption {
+class Encryption : public IEncryption {
  public:
   Encryption(const Config::KeysCatalogPath& keysDir) : keysDir_(keysDir){};
 
-  std::string generateSignature(const std::string& data) const;
-  std::string getApiKey() const;
+  std::string generateSignature(const std::string& data) const override;
+  std::string getApiKey() const override;
 
  private:
   std::string getSecretKey() const;

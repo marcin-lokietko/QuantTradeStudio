@@ -15,7 +15,7 @@ size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 }
 }  // namespace
 
-std::string Http::get(const std::string& url, const std::string& header) {
+std::string Http::get(const std::string& url, const std::string& header) const {
   CURL* curl = curl_easy_init();
   std::string response;
 
@@ -42,7 +42,7 @@ std::string Http::get(const std::string& url, const std::string& header) {
   return response;
 }
 
-Http::Response Http::post(const std::string& url, const std::string& header) {
+Response Http::post(const std::string& url, const std::string& header) const {
   CURL* curl = curl_easy_init();
   std::string responseBody;
   const std::string postFields = "";
@@ -73,7 +73,7 @@ Http::Response Http::post(const std::string& url, const std::string& header) {
   return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
 }
 
-Http::Response Http::del(const std::string& url, const std::string& header) {
+Response Http::del(const std::string& url, const std::string& header) const {
   CURL* curl = curl_easy_init();
   std::string responseBody;
   int64_t httpCode = 0;

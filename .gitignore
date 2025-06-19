@@ -4,7 +4,7 @@
 /keys/apiKey.txt
 /keys/secretKey.txt
 
-/backend/ut/CommonMocks/*.hpp
+/backend/ut/GeneratedMocks/*.hpp
 
 /frontend/.npm-cache
 

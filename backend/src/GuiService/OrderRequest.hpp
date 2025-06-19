@@ -13,6 +13,8 @@ struct OrderRequest {
   ApiGateway::AssetSymbol selectedQuoteAsset;
   ApiGateway::OrderSide orderSide;
   ApiGateway::AssetQuantity baseAssetAmount;
+
+  bool operator==(const OrderRequest& other) const = default;
 };
 
 }  // namespace GuiService

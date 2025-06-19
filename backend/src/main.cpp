@@ -10,7 +10,10 @@
 #include "BotExecution/BotExecution.hpp"
 #include "Config/ReadConfig.hpp"
 #include "GuiService/HttpGuiService/HttpGuiService.hpp"
+#include "Http/Http.hpp"
 #include "MarketService/Binance/BinanceService.hpp"
+#include "MarketService/Binance/Encryption.hpp"
+#include "Utils/Time/Time.hpp"
 #include "Wallet/Wallet.hpp"
 
 void setupLogger(const char* programName, const Config::LogsCatalogPath& logDir) {
@@ -42,7 +45,10 @@ int main(int argc, char* argv[]) {
 
   LOG(INFO) << "########## Config read; starting AlgoTrader";
 
-  MarketService::Binance::BinanceService marketService{config->keysCatalogPath, config->binanceUrlPrefix};
+  const MarketService::Binance::Encryption encryption{config->keysCatalogPath};
+  const Http::Http http{};
+  const Time::Time time{};
+  MarketService::Binance::BinanceService marketService{encryption, http, time, config->binanceUrlPrefix};
   Wallet::Wallet wallet{marketService};
   BotExecution::BotExecution botExecution{marketService, wallet};
   ApiGateway::ApiGateway apiGateway{marketService, wallet, botExecution};
