@@ -17,7 +17,6 @@ target_compile_options(MarketService PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(MarketService ${LINKER_FLAGS}
     CURL::libcurl
-    fmt::fmt
     OpenSSL::Crypto
     OpenSSL::SSL
     spdlog

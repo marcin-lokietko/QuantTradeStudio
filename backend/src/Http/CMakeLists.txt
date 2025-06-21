@@ -15,7 +15,6 @@ target_compile_options(Http PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(Http ${LINKER_FLAGS}
     CURL::libcurl
-    fmt::fmt
     OpenSSL::Crypto
     OpenSSL::SSL
     spdlog

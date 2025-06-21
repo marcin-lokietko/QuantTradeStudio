@@ -11,7 +11,7 @@ RUN apt-get -y dist-upgrade
 
 RUN apt-get update && apt-get install -y --fix-missing --no-install-recommends \
   build-essential make cmake g++ gdb autoconf libtool pkg-config git wget \
-  libcurl4-openssl-dev nlohmann-json3-dev libssl-dev libspdlog-dev libfmt-dev \
+  libcurl4-openssl-dev nlohmann-json3-dev libssl-dev libspdlog-dev \
   clang clang-format clang-tidy valgrind libasio-dev zlib1g-dev \
   python3 python3-pip
 

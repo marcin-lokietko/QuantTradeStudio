@@ -21,6 +21,9 @@ set(SANITIZER_COMPILE_FLAGS ";-ggdb;-O0;-fsanitize=address,undefined")
 set(PROFILER_COMPILE_FLAGS ";-O3;-pg")
 set(DEBUG_COMPILE_FLAGS ";-ggdb;-O0")
 
+# spdlog library will will not depend on fmt string formatting library (needs to be set for both /src and /ut)
+add_definitions(-DSPDLOG_USE_STD_FORMAT)
+
 if(buildType STREQUAL "production")
     message("### Running production build ###")
     set(COMPILE_FLAGS ${BASIC_COMPILE_FLAGS} ${PROD_COMPILE_FLAGS})

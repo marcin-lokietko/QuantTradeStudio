@@ -8,6 +8,5 @@ target_include_directories(ApiGateway PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(ApiGateway PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(ApiGateway ${LINKER_FLAGS}
-    fmt::fmt
     spdlog
 )

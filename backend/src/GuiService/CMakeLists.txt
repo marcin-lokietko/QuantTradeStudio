@@ -23,6 +23,5 @@ set_target_properties(Crow::Crow PROPERTIES
 
 target_link_libraries(GuiService ${LINKER_FLAGS}
   Crow::Crow
-  fmt::fmt
   spdlog
 )

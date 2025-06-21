@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "Utils/StrongType.hpp"
+template <typename T, typename UniqueTag, typename... Mixins>
+class StrongType;
 
 template <typename T, typename UniqueTag, typename... Mixins>
 inline std::string toString(const StrongType<T, UniqueTag, Mixins...>& strongTypedObject) {

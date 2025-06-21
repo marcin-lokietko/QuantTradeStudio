@@ -4,11 +4,9 @@ message(STATUS "Configured binary output directory: ${CMAKE_CURRENT_BINARY_DIR}"
 message(STATUS "Using compilation flags: ${COMPILE_FLAGS}")
 message(STATUS "Using linking flags: ${LINKER_FLAGS}")
 
-
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(fmt REQUIRED) #Required by spdlog
 
 
 #Add components
@@ -33,7 +31,6 @@ target_include_directories(${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(${EXECUTABLE_NAME} PUBLIC ${COMPILE_FLAGS})
 target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS} 
     CURL::libcurl
-    fmt::fmt
     OpenSSL::Crypto
     OpenSSL::SSL
     spdlog

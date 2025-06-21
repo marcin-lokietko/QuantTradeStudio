@@ -1,10 +1,11 @@
 #pragma once
 
-#include <fmt/format.h>
-
+#include <format>
 #include <optional>
 #include <type_traits>
 #include <utility>
+
+#include "Utils/ToString.hpp"
 
 struct Addable {};
 
@@ -28,24 +29,21 @@ struct StrongType : public Mixins... {
   }
 };
 
-// Allows to make fmt::format (used by spdlog) to work with StrongType:
+// Those functions enable std::format (and thus spdlog with std::format backend) support for StrongType and
+// std::optional<StrongType> by just delegating to ::toString functions
 template <typename T, typename UniqueTag, typename... Mixins>
-struct fmt::formatter<StrongType<T, UniqueTag, Mixins...>> : fmt::formatter<T> {
+struct std::formatter<StrongType<T, UniqueTag, Mixins...>> : std::formatter<T> {
   template <typename FormatContext>
   auto format(const StrongType<T, UniqueTag, Mixins...>& val, FormatContext& ctx) const {
-    return fmt::formatter<T>::format(val.val_, ctx);
+    return std::formatter<T>::format(::toString(val), ctx);
   }
 };
 
 template <typename T, typename UniqueTag, typename... Mixins>
-struct fmt::formatter<std::optional<StrongType<T, UniqueTag, Mixins...>>> : fmt::formatter<std::string> {
+struct std::formatter<std::optional<StrongType<T, UniqueTag, Mixins...>>> : std::formatter<std::string> {
   template <typename FormatContext>
-  auto format(const std::optional<StrongType<T, UniqueTag, Mixins...>>& opt, FormatContext& ctx) const {
-    if (opt.has_value()) {
-      return fmt::formatter<std::string>::format(fmt::format("{}", opt.value()), ctx);
-    } else {
-      return fmt::formatter<std::string>::format("std::nullptr", ctx);
-    }
+  auto format(const std::optional<StrongType<T, UniqueTag, Mixins...>>& val, FormatContext& ctx) const {
+    return std::formatter<T>::format(::toString(val), ctx);
   }
 };
 

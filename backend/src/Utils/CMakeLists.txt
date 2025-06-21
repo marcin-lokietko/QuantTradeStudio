@@ -8,6 +8,5 @@ target_include_directories(Utils PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(Utils PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(Utils ${LINKER_FLAGS}
-    fmt::fmt
     spdlog
 )
