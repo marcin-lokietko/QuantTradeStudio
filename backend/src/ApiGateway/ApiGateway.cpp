@@ -9,6 +9,7 @@
 #include "MarketService/TradingPairs.hpp"
 #include "Price.hpp"
 #include "TradingPairSymbol.hpp"
+#include "Utils/ToString.hpp"
 
 namespace ApiGateway {
 
@@ -16,20 +17,41 @@ ApiGateway::ApiGateway(MarketService::IMarketService& marketService, Wallet::IWa
                        BotExecution::IBotExecution& botExecution)
     : marketService_(marketService), wallet_(wallet), botExecution_(botExecution){};
 
-Assets ApiGateway::getOwnedAssets() const { return wallet_.getOwnedAssets(); }
+Assets ApiGateway::getOwnedAssets() const {
+  SPDLOG_INFO("getOwnedAssets called");
+
+  const auto ownedAssets = wallet_.getOwnedAssets();
+
+  SPDLOG_INFO("getOwnedAssets result: ownedAssets={}", ::toString(ownedAssets));
+  return ownedAssets;
+}
 
 OrderResult ApiGateway::makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,
                                   const OrderSide& orderSide, const AssetQuantity& baseAssetAmount) const {
-  TradingPairSymbol tradingPairSymbol{selectedBaseAsset.val_ + selectedQuoteAsset.val_};
+  const TradingPairSymbol tradingPairSymbol{selectedBaseAsset.val_ + selectedQuoteAsset.val_};
+
+  SPDLOG_INFO("getOwnedAssets called: tradingPair={}; orderSide={}; baseAssetAmount={}", tradingPairSymbol,
+              toString(orderSide), baseAssetAmount);
 
   const auto price = marketService_.getPrice(tradingPairSymbol);
+  const auto orderResult = marketService_.makeOrder(tradingPairSymbol, orderSide, baseAssetAmount, price);
 
-  return marketService_.makeOrder(tradingPairSymbol, orderSide, baseAssetAmount, price);
+  SPDLOG_INFO("getOwnedAssets result: orderResult={}", toString(orderResult));
+  return orderResult;
 }
 
-Orders ApiGateway::getOpenOrders() const { return marketService_.getOpenOrders(); }
+Orders ApiGateway::getOpenOrders() const {
+  SPDLOG_INFO("getOpenOrders called");
+
+  const auto orders = marketService_.getOpenOrders();
+
+  SPDLOG_INFO("getOpenOrders result: orders={}", ::toString(orders));
+  return orders;
+}
 
 AvailableQuoteAssets ApiGateway::getAvailableQuoteAssets(const AssetSymbol& baseAsset) const {
+  SPDLOG_INFO("getAvailableQuoteAssets called: baseAsset={}", baseAsset);
+
   const auto tradingPairs = marketService_.getTradingPairsWithBaseAsset(baseAsset);
 
   std::vector<TradingPairSymbol> tradingPairSymbols;
@@ -43,12 +65,13 @@ AvailableQuoteAssets ApiGateway::getAvailableQuoteAssets(const AssetSymbol& base
     availableQuoteAssets.emplace_back(singleTradingPair.quoteAsset,
                                       tradingPairSymbolToPriceMap.at(singleTradingPair.symbol));
   }
+  SPDLOG_INFO("getAvailableQuoteAssets result: availableQuoteAssets={}", ::toString(availableQuoteAssets));
   return availableQuoteAssets;
 }
 
 AssetSymbols ApiGateway::getAvailableBaseAssets(const std::optional<AssetSymbol>& quoteAsset) const {
-  const auto argumentAsStr = quoteAsset ? quoteAsset.value().val_ : "nullopt";
-  SPDLOG_INFO("getAvailableBaseAssets quoteAsset={}", argumentAsStr);
+  SPDLOG_INFO("getAvailableBaseAssets quoteAsset={}", quoteAsset);
+
   MarketService::TradingPairs tradingPairs{};
   if (quoteAsset) {
     tradingPairs = marketService_.getTradingPairsWithQuoteAsset(quoteAsset.value());
@@ -61,10 +84,13 @@ AssetSymbols ApiGateway::getAvailableBaseAssets(const std::optional<AssetSymbol>
     baseAssets.insert(singleTradingPair.baseAsset);
   }
 
-  return {baseAssets.begin(), baseAssets.end()};
+  const AssetSymbols assetSymbols{baseAssets.begin(), baseAssets.end()};
+  SPDLOG_INFO("getAvailableBaseAssets result: assetSymbols={}", ::toString(assetSymbols));
+  return assetSymbols;
 }
 
 AssetSymbols ApiGateway::getQuoteAssetsSuitableForRebalancing() const {
+  SPDLOG_INFO("getQuoteAssetsSuitableForRebalancing called");
   MarketService::TradingPairs tradingPairs = marketService_.getAllTradingPairs();
 
   std::map<AssetSymbol, uint64_t> quoteAssetToNumOccurrences;
@@ -80,11 +106,27 @@ AssetSymbols ApiGateway::getQuoteAssetsSuitableForRebalancing() const {
     }
   }
 
-  return {quoteAssetSymbols.begin(), quoteAssetSymbols.end()};
+  AssetSymbols suitableBaseAssets{quoteAssetSymbols.begin(), quoteAssetSymbols.end()};
+  SPDLOG_INFO("getQuoteAssetsSuitableForRebalancing result: suitableBaseAssets={}", ::toString(suitableBaseAssets));
+  return suitableBaseAssets;
 }
 
-StartBotResult ApiGateway::startBot(const BotConfig& botConfig) const { return botExecution_.startBot(botConfig); }
+StartBotResult ApiGateway::startBot(const BotConfig& botConfig) const {
+  SPDLOG_INFO("startBot called: botConfig={}", toString(botConfig));
 
-StopAllBotsResult ApiGateway::stopAllBots() const { return botExecution_.stopAllBots(); }
+  const auto result = botExecution_.startBot(botConfig);
+
+  SPDLOG_INFO("startBot result: result={}", toString(result));
+  return result;
+}
+
+StopAllBotsResult ApiGateway::stopAllBots() const {
+  SPDLOG_INFO("stopAllBots called");
+
+  const auto result = botExecution_.stopAllBots();
+
+  SPDLOG_INFO("stopAllBots result: result={}", toString(result));
+  return result;
+}
 
 }  // namespace ApiGateway

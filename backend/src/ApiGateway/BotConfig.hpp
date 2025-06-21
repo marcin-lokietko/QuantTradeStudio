@@ -1,12 +1,14 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "AssetSymbol.hpp"
 #include "Utils/StrongType.hpp"
+#include "Utils/ToString.hpp"
 
 namespace ApiGateway {
 
@@ -22,6 +24,11 @@ struct SingleAssetShare {
   bool operator==(const SingleAssetShare& other) const = default;
 };
 
+inline std::string toString(const SingleAssetShare& singleAssetShare) {
+  return std::format("{{assetSymbol={}, sharePercent={}}}", singleAssetShare.assetSymbol.val_,
+                     singleAssetShare.sharePercent.val_);
+}
+
 using AssetShares = std::vector<SingleAssetShare>;
 
 struct BotConfig {
@@ -34,17 +41,10 @@ struct BotConfig {
   bool operator==(const BotConfig& other) const = default;
 };
 
-inline std::string toString(const AssetShares& assetShares) {
-  std::string ret;
-  for (const auto& singleAssetShare : assetShares) {
-    ret += "{";
-    ret += std::string("assetSymbol=") + singleAssetShare.assetSymbol.val_;
-    ret += std::string(", sharePercent=") + std::to_string(singleAssetShare.sharePercent.val_);
-    ret += "},";
-  }
-  if (ret.size() > 0) {
-    ret.pop_back();
-  }
-  return ret;
+inline std::string toString(const BotConfig& botConfig) {
+  return std::format("{{botName={}, executionPeriod={}, isExecutedImmediately={}, quoteAsset={}, baseAssetShares={}}}",
+                     botConfig.botName.val_, ::toString(botConfig.executionPeriod),
+                     ::toString(botConfig.isExecutedImmediately), ::toString(botConfig.quoteAsset),
+                     ::toString(botConfig.baseAssetShares));
 }
 }  // namespace ApiGateway

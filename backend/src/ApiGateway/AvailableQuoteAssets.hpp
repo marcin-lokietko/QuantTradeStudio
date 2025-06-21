@@ -1,5 +1,6 @@
 #pragma once
 
+#include <format>
 #include <vector>
 
 #include "AssetSymbol.hpp"
@@ -15,5 +16,10 @@ struct SingleAvailableQuoteAsset {
 };
 
 using AvailableQuoteAssets = std::vector<SingleAvailableQuoteAsset>;
+
+inline std::string toString(const SingleAvailableQuoteAsset& singleAvailableQuoteAsset) {
+  return std::format("{{quoteAsset={}, baseAssetUnitPrice={}}}", singleAvailableQuoteAsset.quoteAsset.val_,
+                     singleAvailableQuoteAsset.baseAssetUnitPrice.val_);
+}
 
 }  // namespace ApiGateway

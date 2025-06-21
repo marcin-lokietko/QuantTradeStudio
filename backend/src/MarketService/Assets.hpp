@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 #include <string>
 #include <vector>
 
@@ -19,6 +20,11 @@ struct SingleAsset {
 
   bool operator==(const SingleAsset& other) const = default;
 };
+
+inline std::string toString(const SingleAsset& singleAsset) {
+  return std::format("{{assetSymbol={}, freeQuantity={}, marketId={}}}", singleAsset.assetSymbol.val_,
+                     singleAsset.freeQuantity.val_, toString(singleAsset.marketId));
+}
 
 using Assets = std::vector<SingleAsset>;
 

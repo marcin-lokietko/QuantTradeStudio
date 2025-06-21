@@ -1,5 +1,6 @@
 #pragma once
 
+#include <format>
 #include <string>
 #include <vector>
 
@@ -17,18 +18,9 @@ struct SingleAssetShareFloating {
 
 using AssetSharesFloating = std::vector<SingleAssetShareFloating>;
 
-inline std::string toString(const AssetSharesFloating& assetShares) {
-  std::string ret;
-  for (const auto& singleAssetShare : assetShares) {
-    ret += "{";
-    ret += std::string("assetSymbol=") + singleAssetShare.assetSymbol.val_;
-    ret += std::string(", share=") + std::to_string(singleAssetShare.share.val_);
-    ret += "},";
-  }
-  if (ret.size() > 0) {
-    ret.pop_back();
-  }
-  return ret;
+inline std::string toString(const SingleAssetShareFloating& singleAssetShareFloating) {
+  return std::format("{{assetSymbol={}, share={}}}", singleAssetShareFloating.assetSymbol.val_,
+                     singleAssetShareFloating.share.val_);
 }
 
 }  // namespace BotExecution::Rebalancer

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 #include <string>
 #include <vector>
 
@@ -20,5 +21,10 @@ struct SingleAsset {
 };
 
 using Assets = std::vector<SingleAsset>;
+
+inline std::string toString(const SingleAsset& singleAsset) {
+  return std::format("{{assetSymbol={}, freeQuantity={}, usdtValue={}}}", singleAsset.assetSymbol.val_,
+                     singleAsset.freeQuantity.val_, singleAsset.usdtValue.val_);
+}
 
 }  // namespace ApiGateway

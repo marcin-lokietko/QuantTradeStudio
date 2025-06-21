@@ -8,4 +8,13 @@ enum class OrderResult
   Failure
 };
 
+inline std::string toString(OrderResult orderResult) {
+  switch (orderResult) {
+    case OrderResult::Success:
+      return "Success";
+    case OrderResult::Failure:
+      return "Failure";
+  }
+  return "Invalid";
+}
 }  // namespace ApiGateway

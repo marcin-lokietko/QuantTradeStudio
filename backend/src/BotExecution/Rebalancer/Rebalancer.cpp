@@ -55,8 +55,8 @@ void Rebalancer::rebalance() {
   std::ranges::sort(actualAssetShares, sortByAssetSymbols);
   std::ranges::sort(expectedAssetShares, sortByAssetSymbols);
 
-  SPDLOG_INFO("expectedAssetShares={}", toString(expectedAssetShares));
-  SPDLOG_INFO("actualAssetShares={}", toString(actualAssetShares));
+  SPDLOG_INFO("expectedAssetShares={}", ::toString(expectedAssetShares));
+  SPDLOG_INFO("actualAssetShares={}", ::toString(actualAssetShares));
 
   AssetSharesFloating sharesToSell;
   AssetSharesFloating sharesToBuy;
@@ -79,8 +79,8 @@ void Rebalancer::rebalance() {
       sharesToBuy.emplace_back(assetSymbol, SharePercentFloating{diff});
     }
   }
-  SPDLOG_INFO("sharesToSell={}", toString(sharesToSell));
-  SPDLOG_INFO("sharesToBuy={}", toString(sharesToBuy));
+  SPDLOG_INFO("sharesToSell={}", ::toString(sharesToSell));
+  SPDLOG_INFO("sharesToBuy={}", ::toString(sharesToBuy));
 
   for (const auto& singleAssetToSell : sharesToSell) {
     const ApiGateway::TradingPairSymbol symbol{singleAssetToSell.assetSymbol.val_ + config_.quoteAsset.val_};

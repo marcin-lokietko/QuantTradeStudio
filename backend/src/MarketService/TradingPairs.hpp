@@ -1,5 +1,6 @@
 #pragma once
 
+#include <format>
 #include <vector>
 
 #include "ApiGateway/AssetSymbol.hpp"
@@ -14,6 +15,11 @@ struct SingleTradingPair {
 
   bool operator==(const SingleTradingPair& other) const = default;
 };
+
+inline std::string toString(const SingleTradingPair& singleTradingPair) {
+  return std::format("{{symbol={}, baseAsset={}, quoteAsset={}}}", singleTradingPair.symbol.val_,
+                     singleTradingPair.baseAsset.val_, singleTradingPair.quoteAsset.val_);
+}
 
 using TradingPairs = std::vector<SingleTradingPair>;
 

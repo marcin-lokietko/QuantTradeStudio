@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 #include <map>
 #include <string>
 #include <vector>
@@ -17,6 +18,10 @@ struct SingleAssetPrice {
 
   bool operator==(const SingleAssetPrice& other) const = default;
 };
+
+inline std::string toString(const SingleAssetPrice& singleAssetPrice) {
+  return std::format("{{assetPair={}, price={}}}", singleAssetPrice.assetPair.val_, singleAssetPrice.price.val_);
+}
 
 using AssetPrices = std::vector<SingleAssetPrice>;
 using AssetPricesMap = std::map<ApiGateway::TradingPairSymbol, ApiGateway::Price>;
