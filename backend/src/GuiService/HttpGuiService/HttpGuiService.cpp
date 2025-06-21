@@ -4,12 +4,14 @@
 
 #include <nlohmann/json.hpp>
 
+#include "GuiService/HealthRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/AssetSymbols.hpp"
 #include "GuiService/HttpGuiService/Conversion/Assets.hpp"
 #include "GuiService/HttpGuiService/Conversion/AvailableBaseAssetsRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssets.hpp"
 #include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssetsRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/BotConfig.hpp"
+#include "GuiService/HttpGuiService/Conversion/HealthRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/OrderRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/Orders.hpp"
 #include "GuiService/OrderRequest.hpp"
@@ -30,8 +32,15 @@ void HttpGuiService::start() {
 
   // Setup endpoints
   CROW_ROUTE(app, "/health")
-  ([]() {
+  ([](const crow::request& req) {
     SPDLOG_INFO("/health endpoint called");
+
+    std::optional<HealthRequest> healthRequest;
+    Conversion::fromQueryParams(crow::query_string(req.url_params), healthRequest);
+
+    if (healthRequest) {
+      SPDLOG_INFO("/health endpoint request message: {}", healthRequest->message);
+    }
 
     crow::response res{};
     res.add_header("Access-Control-Allow-Origin", "*");

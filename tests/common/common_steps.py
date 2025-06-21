@@ -40,8 +40,10 @@ def step_impl(context):
 def step_impl(context, num_seconds):
     sleep(num_seconds)
 
-def wait_for_backend(backend_url, timeout=60):
+def wait_for_backend(backend_url, timeout=60, message_to_backend=None):
     backend_health_check_url = f"{backend_url}/health"
+    if message_to_backend is not None:
+        backend_health_check_url += f"?message={message_to_backend}"
     for _ in range(timeout):
         try:
             response = requests.get(backend_health_check_url)

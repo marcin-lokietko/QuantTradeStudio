@@ -8,7 +8,8 @@ backend_url = "http://backend:5000"
 
 @step('Backend is available')
 def step_impl(context):
-    wait_for_backend(backend_url)
+    message = "Executing backend component test; scenario: " + context.scenario.name
+    wait_for_backend(backend_url, timeout=60, message_to_backend=message)
     requests.request('POST', backend_url + '/stopAllBots')
 
 @step('Request {method} {endpoint} is sent')
