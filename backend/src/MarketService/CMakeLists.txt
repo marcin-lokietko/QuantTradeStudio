@@ -16,9 +16,11 @@ target_include_directories(MarketService PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(MarketService PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(MarketService ${LINKER_FLAGS}
-    glog
     CURL::libcurl
-    OpenSSL::SSL
+    fmt::fmt
     OpenSSL::Crypto
+    OpenSSL::SSL
+    spdlog
+
     Http
 )

@@ -8,5 +8,6 @@ target_include_directories(Wallet PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(Wallet PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(Wallet ${LINKER_FLAGS}
-    glog
+    fmt::fmt
+    spdlog
 )

@@ -1,9 +1,9 @@
 #include "Encryption.hpp"
 
-#include <glog/logging.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
+#include <spdlog/spdlog.h>
 
 #include <fstream>
 #include <iomanip>

@@ -1,6 +1,6 @@
 #include "ApiGateway.hpp"
 
-#include <glog/logging.h>
+#include <spdlog/spdlog.h>
 
 #include <map>
 #include <ranges>
@@ -48,7 +48,7 @@ AvailableQuoteAssets ApiGateway::getAvailableQuoteAssets(const AssetSymbol& base
 
 AssetSymbols ApiGateway::getAvailableBaseAssets(const std::optional<AssetSymbol>& quoteAsset) const {
   const auto argumentAsStr = quoteAsset ? quoteAsset.value().val_ : "nullopt";
-  LOG(INFO) << "getAvailableBaseAssets quoteAsset=" << argumentAsStr;
+  SPDLOG_INFO("getAvailableBaseAssets quoteAsset={}", argumentAsStr);
   MarketService::TradingPairs tradingPairs{};
   if (quoteAsset) {
     tradingPairs = marketService_.getTradingPairsWithQuoteAsset(quoteAsset.value());

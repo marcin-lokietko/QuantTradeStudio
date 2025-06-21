@@ -1,4 +1,5 @@
-#include <glog/logging.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
 
 #include <filesystem>
 #include <fstream>
@@ -16,18 +17,28 @@
 #include "Utils/Time/Time.hpp"
 #include "Wallet/Wallet.hpp"
 
-void setupLogger(const char* programName, const Config::LogsCatalogPath& logDir) {
+std::string get_datetime_string() {
+  auto now = std::chrono::system_clock::now();
+  std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
+  std::tm tm;
+  localtime_r(&nowTime, &tm);
+
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+  return oss.str();
+}
+
+void setupLogger(const Config::LogsCatalogPath& logDir) {
   if (!std::filesystem::exists(logDir.val_)) {
     std::filesystem::create_directory(logDir.val_);
   }
-  FLAGS_log_dir = logDir.val_;
-  FLAGS_stderrthreshold = 0;
 
-  // always flush:
-  FLAGS_logbuflevel = -1;
-  FLAGS_logbufsecs = 0;
-
-  google::InitGoogleLogging(programName);
+  const std::string filename = "AlgoTrader_backend_" + get_datetime_string() + ".log";
+  auto logger = spdlog::basic_logger_mt("AlgoTrader_backend", logDir.val_.string() + "/" + filename);
+  spdlog::set_default_logger(logger);
+  spdlog::set_level(spdlog::level::trace);
+  spdlog::flush_on(spdlog::level::trace);
+  spdlog::set_pattern("[%s:%#] [%l] %v");  // Set the log pattern to include source file and line number
 }
 
 int main(int argc, char* argv[]) {
@@ -41,9 +52,9 @@ int main(int argc, char* argv[]) {
     return 2;
   }
 
-  setupLogger(argv[0], config->logsCatalogPath);
+  setupLogger(config->logsCatalogPath);
 
-  LOG(INFO) << "########## Config read; starting AlgoTrader";
+  SPDLOG_INFO("########## Config read; starting AlgoTrader");
 
   const MarketService::Binance::Encryption encryption{config->keysCatalogPath};
   const Http::Http http{};

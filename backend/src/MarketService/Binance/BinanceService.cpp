@@ -1,6 +1,6 @@
 #include "BinanceService.hpp"
 
-#include <glog/logging.h>
+#include <spdlog/spdlog.h>
 
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -31,7 +31,7 @@ ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& 
   if (jsonResponse.contains("price")) {
     return ApiGateway::Price{jsonResponse["price"]};
   } else {
-    LOG(ERROR) << "Failed to retrieve price.";
+    SPDLOG_ERROR("Failed to retrieve price");
   }
   return ApiGateway::Price{""};
 }
@@ -99,7 +99,7 @@ ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairS
   const auto response = http_.post(orderUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   if (response.statusCode != statusCodeOk) {
-    LOG(WARNING) << "makeOrder returned NOK. Msg=" << response.body.val_;
+    SPDLOG_WARN("makeOrder returned NOK. Msg=", response.body.val_);
     return ApiGateway::OrderResult::Failure;
   }
   return ApiGateway::OrderResult::Success;
@@ -109,8 +109,8 @@ ApiGateway::OrderResult BinanceService::makeMarketTypeOrderWithQuoteQuantity(
     const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
     const ApiGateway::AssetQuantity& quoteQuantity) const {
   std::string orderSideString = toString(orderSide);
-  LOG(INFO) << "makeMarketTypeOrderWithQuoteQuantity symbol=" << symbol.val_ << " orderSide=" << orderSideString
-            << " quoteQuantity=" << quoteQuantity.val_;
+  SPDLOG_INFO("makeMarketTypeOrderWithQuoteQuantity symbol={} orderSide={} quoteQuantity={}", symbol.val_,
+              orderSideString, quoteQuantity.val_);
 
   std::ranges::transform(orderSideString, orderSideString.begin(), [](unsigned char c) { return std::toupper(c); });
 
@@ -121,7 +121,7 @@ ApiGateway::OrderResult BinanceService::makeMarketTypeOrderWithQuoteQuantity(
   const auto response = http_.post(orderUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   if (response.statusCode != statusCodeOk) {
-    LOG(WARNING) << "makeMarketTypeOrderWithQuoteQuantity returned NOK. Msg=" << response.body.val_;
+    SPDLOG_WARN("makeMarketTypeOrderWithQuoteQuantity returned NOK. Msg={}", response.body.val_);
     return ApiGateway::OrderResult::Failure;
   }
   return ApiGateway::OrderResult::Success;
@@ -175,13 +175,13 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
   try {
     Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders);
   } catch (const std::exception& exc) {
-    LOG(ERROR) << "Error parsing response. Url=" << url << "Exception:" << exc.what();
+    SPDLOG_ERROR("Error parsing response. Url={} Exception={}", url, exc.what());
   }
   return orders;
 }
 
 ApiGateway::OrderResult BinanceService::cancelAllOrdersOnASymbol(const ApiGateway::TradingPairSymbol& symbol) const {
-  LOG(INFO) << "cancelAllOrdersOnASymbol symbol=" << symbol.val_;
+  SPDLOG_INFO("cancelAllOrdersOnASymbol symbol={}", symbol.val_);
 
   const std::string queryString =
       "symbol=" + symbol.val_ + "&recvWindow=5000" + "&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
@@ -192,7 +192,7 @@ ApiGateway::OrderResult BinanceService::cancelAllOrdersOnASymbol(const ApiGatewa
   const auto response = http_.del(url, "X-MBX-APIKEY: " + encryption_.getApiKey());
 
   if (response.statusCode != statusCodeOk) {
-    LOG(WARNING) << "cancelAllOrdersOnASymbol returned NOK. Msg=" << response.body.val_;
+    SPDLOG_WARN("cancelAllOrdersOnASymbol returned NOK. Msg={}", response.body.val_);
     return ApiGateway::OrderResult::Failure;
   }
   return ApiGateway::OrderResult::Success;

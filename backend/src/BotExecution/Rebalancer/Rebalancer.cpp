@@ -1,11 +1,11 @@
 #include "Rebalancer.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <algorithm>
 #include <ranges>
 #include <set>
 #include <thread>
-
-#include "glog/logging.h"
 
 namespace BotExecution::Rebalancer {
 
@@ -17,7 +17,7 @@ Rebalancer::Rebalancer(Config&& config, const MarketService::IMarketService& mar
     : config_(std::move(config)), marketService_(marketService), wallet_(wallet), time_(std::move(time)) {}
 
 void Rebalancer::run(std::stop_token st) {
-  LOG(INFO) << "Rebalancer started execution";
+  SPDLOG_INFO("Rebalancer started execution");
   const std::chrono::seconds executionPeriod(config_.executionPeriod.val_);
 
   if (!st.stop_requested() && config_.isExecutedImmediately.val_) {
@@ -29,11 +29,11 @@ void Rebalancer::run(std::stop_token st) {
       rebalance();
     }
   }
-  LOG(INFO) << "Rebalancer stopped execution";
+  SPDLOG_INFO("Rebalancer stopped execution");
 }
 
 void Rebalancer::rebalance() {
-  LOG(INFO) << "Rebalancer executes now";
+  SPDLOG_INFO("Rebalancer executes now");
 
   cancelOpenOrders();
 
@@ -41,13 +41,13 @@ void Rebalancer::rebalance() {
   const auto totalValueOfRelevantOwnedAssets = calcTotalValueOfRelevantOwnedAssets(relevantOwnedAssetValues);
 
   if (!totalValueOfRelevantOwnedAssets.has_value()) {
-    LOG(ERROR) << "Could not calculate total value of relevant owned assets";
+    SPDLOG_ERROR("Could not calculate total value of relevant owned assets");
     return;
   }
 
   auto actualAssetShares = getActualAssetShares(relevantOwnedAssetValues, totalValueOfRelevantOwnedAssets.value());
   if (actualAssetShares.size() != config_.baseAssetShares.size()) {
-    LOG(ERROR) << "Could not calculate actual asset shares";
+    SPDLOG_ERROR("Could not calculate actual asset shares");
     return;
   }
   auto expectedAssetShares = config_.baseAssetShares;
@@ -55,14 +55,14 @@ void Rebalancer::rebalance() {
   std::ranges::sort(actualAssetShares, sortByAssetSymbols);
   std::ranges::sort(expectedAssetShares, sortByAssetSymbols);
 
-  LOG(INFO) << "expectedAssetShares=" << toString(expectedAssetShares);
-  LOG(INFO) << "actualAssetShares=" << toString(actualAssetShares);
+  SPDLOG_INFO("expectedAssetShares={}", toString(expectedAssetShares));
+  SPDLOG_INFO("actualAssetShares={}", toString(actualAssetShares));
 
   AssetSharesFloating sharesToSell;
   AssetSharesFloating sharesToBuy;
   for (size_t i = 0; i < actualAssetShares.size(); ++i) {
     if (actualAssetShares[i].assetSymbol != expectedAssetShares[i].assetSymbol) {
-      LOG(ERROR) << "Expected and actual asset share base asset symbols mismatch";
+      SPDLOG_ERROR("Expected and actual asset share base asset symbols mismatch");
       return;
     }
     const auto& assetSymbol = actualAssetShares[i].assetSymbol;
@@ -79,8 +79,8 @@ void Rebalancer::rebalance() {
       sharesToBuy.emplace_back(assetSymbol, SharePercentFloating{diff});
     }
   }
-  LOG(INFO) << "sharesToSell=" << toString(sharesToSell);
-  LOG(INFO) << "sharesToBuy=" << toString(sharesToBuy);
+  SPDLOG_INFO("sharesToSell={}", toString(sharesToSell));
+  SPDLOG_INFO("sharesToBuy={}", toString(sharesToBuy));
 
   for (const auto& singleAssetToSell : sharesToSell) {
     const ApiGateway::TradingPairSymbol symbol{singleAssetToSell.assetSymbol.val_ + config_.quoteAsset.val_};
@@ -105,7 +105,7 @@ void Rebalancer::cancelOpenOrders() {
     const ApiGateway::TradingPairSymbol symbol{singleBaseAssetShare.assetSymbol.val_ + config_.quoteAsset.val_};
 
     if (openOrdersSymbols.count(symbol)) {
-      LOG(INFO) << "Cancelling orders on symbol=" << symbol.val_;
+      SPDLOG_INFO("Cancelling orders on symbol={}", symbol.val_);
       marketService_.cancelAllOrdersOnASymbol(symbol);
     }
   }
@@ -125,7 +125,7 @@ Wallet::AssetValues Rebalancer::getRelevantOwnedAssetValues() {
   if (std::ranges::any_of(relevantOwnedAssetValues, [&config_ = config_](const auto& singleAssetValue) {
         return !singleAssetValue.value.has_value() || singleAssetValue.quoteAsset != config_.quoteAsset;
       })) {
-    LOG(ERROR) << "Configuration is invalid. The quote asset is not valid for all the base assets.";
+    SPDLOG_ERROR("Configuration is invalid. The quote asset is not valid for all the base assets.");
     return {};
   }
   return {relevantOwnedAssetValues.begin(), relevantOwnedAssetValues.end()};
@@ -139,10 +139,10 @@ std::optional<double> Rebalancer::calcTotalValueOfRelevantOwnedAssets(
       totalValueOfRelevantOwnedAssets += std::stod(singleAssetValue.value.value().val_);
     }
   } catch (const std::invalid_argument& e) {
-    LOG(ERROR) << "Converting string to double failed - invalid input: " << e.what();
+    SPDLOG_ERROR("Converting string to double failed - invalid input: {}", e.what());
     return {};
   } catch (const std::out_of_range& e) {
-    LOG(ERROR) << "Converting string to double failed - out of range: " << e.what();
+    SPDLOG_ERROR("Converting string to double failed - out of range: {}", e.what());
     return {};
   }
   return totalValueOfRelevantOwnedAssets;

@@ -1,6 +1,6 @@
 #include "BotExecution.hpp"
 
-#include <glog/logging.h>
+#include <spdlog/spdlog.h>
 
 #include <memory>
 #include <variant>
@@ -18,14 +18,14 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
   std::visit(
       [&runningBots_ = runningBots_, &marketService_ = marketService_, &startBotResult = startBotResult,
        &wallet_ = wallet_](auto&& config) {
-        LOG(INFO) << "Received bot configuration. Attempting to start the bot...";
+        SPDLOG_INFO("Received bot configuration. Attempting to start the bot...");
 
         using T = std::decay_t<decltype(config)>;
 
         if constexpr (std::is_same_v<T, std::monostate>) {
-          LOG(ERROR) << "Invalid bot configuration";
+          SPDLOG_ERROR("Invalid bot configuration");
         } else if constexpr (std::is_same_v<T, Rebalancer::Config>) {
-          LOG(INFO) << "Received valid configuration for bot: Rebalancer";
+          SPDLOG_INFO("Received valid configuration for bot: Rebalancer");
 
           runningBots_.emplace_back([conf = std::move(config), &marketService_ = marketService_,
                                      &wallet_ = wallet_](std::stop_token st) mutable {
@@ -42,17 +42,17 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
 }
 
 ApiGateway::StopAllBotsResult BotExecution::stopAllBots() {
-  LOG(INFO) << "Attempting to stop all running bots";
+  SPDLOG_INFO("Attempting to stop all running bots");
 
   for (auto& workerThread : runningBots_) {
     workerThread.request_stop();
   }
-  LOG(INFO) << "All bots requeste to stop. Waiting for all bots to finish";
+  SPDLOG_INFO("All bots requeste to stop. Waiting for all bots to finish");
   for (auto& workerThread : runningBots_) {
     workerThread.join();
   }
 
-  LOG(INFO) << "All bots stopped";
+  SPDLOG_INFO("All bots stopped");
   runningBots_.clear();
   return ApiGateway::StopAllBotsResult::Success;
 }

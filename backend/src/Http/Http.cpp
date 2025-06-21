@@ -1,7 +1,7 @@
 #include "Http.hpp"
 
 #include <curl/curl.h>
-#include <glog/logging.h>
+#include <spdlog/spdlog.h>
 
 #include <cstdio>
 
@@ -32,13 +32,13 @@ std::string Http::get(const std::string& url, const std::string& header) const {
     const auto res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
-      LOG(ERROR) << "HTTP GET " << url << " FAILED, error: " << curl_easy_strerror(res);
+      SPDLOG_ERROR("HTTP GET {} FAILED, error: {}", url, curl_easy_strerror(res));
     }
 
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
-  LOG(INFO) << "HTTP GET " << url << "; request header: " << header << "; response body: " + response;
+  SPDLOG_INFO("HTTP GET {} ; request header: {}; response body: {}", url, header, response);
   return response;
 }
 
@@ -60,7 +60,7 @@ Response Http::post(const std::string& url, const std::string& header) const {
     const auto res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
-      LOG(ERROR) << "HTTP POST " << url << " FAILED, error: " << curl_easy_strerror(res);
+      SPDLOG_ERROR("HTTP POST {} FAILED, error:{}", url, curl_easy_strerror(res));
     } else {
       curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     }
@@ -68,8 +68,8 @@ Response Http::post(const std::string& url, const std::string& header) const {
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
-  LOG(INFO) << "HTTP POST " << url << "; request header: " << header << "; response code: " << httpCode
-            << "; response body: " + responseBody;
+  SPDLOG_INFO("HTTP POST {}; request header: {}; response code: {}; response body: {}", url, header, httpCode,
+              responseBody);
   return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
 }
 
@@ -91,7 +91,7 @@ Response Http::del(const std::string& url, const std::string& header) const {
 
     const auto res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      LOG(ERROR) << "HTTP DELETE " << url << " FAILED, error: " << curl_easy_strerror(res);
+      SPDLOG_ERROR("HTTP DELETE {} FAILED, error: {}", url, curl_easy_strerror(res));
     } else {
       curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     }
@@ -99,8 +99,8 @@ Response Http::del(const std::string& url, const std::string& header) const {
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
   }
-  LOG(INFO) << "HTTP DELETE " << url << "; request header: " << header << "; response code: " << httpCode
-            << "; response body: " + responseBody;
+  SPDLOG_INFO("HTTP DELETE {}; request header: {}; response code: {}; response body: {}", url, header, httpCode,
+              responseBody);
   return {HttpStatusCode{httpCode}, HttpBody{responseBody}};
 }
 

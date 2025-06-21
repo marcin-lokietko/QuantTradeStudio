@@ -14,8 +14,9 @@ target_include_directories(Http PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_options(Http PUBLIC ${COMPILE_FLAGS})
 
 target_link_libraries(Http ${LINKER_FLAGS}
-    glog
     CURL::libcurl
-    OpenSSL::SSL
+    fmt::fmt
     OpenSSL::Crypto
+    OpenSSL::SSL
+    spdlog
 )

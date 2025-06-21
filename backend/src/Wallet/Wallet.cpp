@@ -1,6 +1,6 @@
 #include "Wallet.hpp"
 
-#include <glog/logging.h>
+#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <nlohmann/json.hpp>
