@@ -4,7 +4,7 @@
 
 namespace Time {
 
-class Time : public ITime {
+class SystemTime : public ITime {
  public:
   void sleepFor(std::stop_token st, const ::std::chrono::milliseconds& duration) const override;
 

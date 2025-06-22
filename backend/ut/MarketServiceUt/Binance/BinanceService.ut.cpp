@@ -18,7 +18,7 @@ class BinanceServiceTest : public ::testing::Test {
  public:
   testing::StrictMock<EncryptionMock> encryptionMock_;
   testing::StrictMock<Http::HttpMock> HttpMock_;
-  testing::StrictMock<Time::TimeMock> timeMock_;
+  testing::StrictMock<::Time::TimeMock> timeMock_;
 
   BinanceService sut_{encryptionMock_, HttpMock_, timeMock_, dummyBinanceUrlPrefix};
 };
@@ -27,7 +27,7 @@ TEST_F(BinanceServiceTest, WhenGetServerTimeCalled_ThenHttpGetIsInvoked) {
   const std::string binanceResponse = R"({"serverTime": 1234567890})";
 
   EXPECT_CALL(HttpMock_, get(dummyBinanceUrlPrefix.val_ + "/time", "")).WillOnce(Return(binanceResponse));
-  EXPECT_EQ(binanceResponse, sut_.getServerTime());
+  EXPECT_EQ(Time{binanceResponse}, sut_.getServerTime());
 }
 
 TEST_F(BinanceServiceTest, WhenGetPriceCalled_ThenHttpGetIsInvoked) {
@@ -72,7 +72,7 @@ TEST_F(BinanceServiceTest, WhenGetKlinesCalled_ThenHttpGetIsInvoked) {
 
   KlineSequence outputSequence = sut_.getKlines(symbol, interval);
   EXPECT_EQ(1, outputSequence.size());
-  const Kline expectedKline{.closeTime = 1622552399999, .closePrice = "35500.00"};
+  const Kline expectedKline{Time{"1622552399999"}, ApiGateway::Price{"35500.00"}};
   EXPECT_EQ(expectedKline, outputSequence.at(0));
 }
 

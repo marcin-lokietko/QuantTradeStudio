@@ -11,6 +11,7 @@
 #include "AssetPrices.hpp"
 #include "Assets.hpp"
 #include "KlineSequence.hpp"
+#include "Time.hpp"
 #include "TradingPairs.hpp"
 
 namespace MarketService {
@@ -24,7 +25,7 @@ enum MakeOrderResult
 class IMarketService {
  public:
   virtual ~IMarketService() = default;
-  virtual std::string getServerTime() = 0;
+  virtual Time getServerTime() = 0;
   virtual ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) = 0;
   virtual AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& symbols) const = 0;
   virtual KlineSequence getKlines(const std::string& symbol, const std::string& interval) = 0;

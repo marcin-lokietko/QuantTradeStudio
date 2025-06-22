@@ -10,11 +10,11 @@ namespace MarketService::Binance {
 
 class BinanceService : public IMarketService {
  public:
-  BinanceService(const IEncryption& encryption, const Http::IHttp& http, const Time::ITime& time,
+  BinanceService(const IEncryption& encryption, const Http::IHttp& http, const ::Time::ITime& time,
                  const Config::BinanceUrlPrefix& binanceUrlPrefix)
       : encryption_(encryption), http_(http), time_(time), binanceUrlPrefix_(binanceUrlPrefix){};
 
-  std::string getServerTime() override;
+  Time getServerTime() override;
 
   ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) override;
 
@@ -45,7 +45,7 @@ class BinanceService : public IMarketService {
 
   const IEncryption& encryption_;
   const Http::IHttp& http_;
-  const Time::ITime& time_;
+  const ::Time::ITime& time_;
   const Config::BinanceUrlPrefix& binanceUrlPrefix_;
 };
 

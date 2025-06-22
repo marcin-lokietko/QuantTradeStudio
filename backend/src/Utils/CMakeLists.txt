@@ -1,5 +1,5 @@
 add_library(Utils STATIC
-    Time/Time.cpp
+    Time/SystemTime.cpp
 )
 
 #search for headers in root project directory

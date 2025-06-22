@@ -1,4 +1,4 @@
-#include "Utils/Time/Time.hpp"
+#include "Utils/Time/SystemTime.hpp"
 
 #include "gmock/gmock.h"
 
@@ -8,7 +8,7 @@ TEST(TimeTest, sleepForSleepsForSpecifiedDuration) {
   const std::chrono::milliseconds numMilliseconds{100};
 
   const auto start = std::chrono::steady_clock::now();
-  Time().sleepFor(std::stop_token{}, numMilliseconds);
+  SystemTime().sleepFor(std::stop_token{}, numMilliseconds);
   const auto end = std::chrono::steady_clock::now();
 
   auto actualDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

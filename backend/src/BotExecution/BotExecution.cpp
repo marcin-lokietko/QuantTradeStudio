@@ -5,7 +5,7 @@
 #include <memory>
 #include <variant>
 
-#include "Utils/Time/Time.hpp"
+#include "Utils/Time/SystemTime.hpp"
 
 namespace BotExecution {
 
@@ -29,7 +29,7 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
 
           runningBots_.emplace_back([conf = std::move(config), &marketService_ = marketService_,
                                      &wallet_ = wallet_](std::stop_token st) mutable {
-            Rebalancer::Rebalancer bot(std::move(conf), marketService_, wallet_, std::make_unique<Time::Time>());
+            Rebalancer::Rebalancer bot(std::move(conf), marketService_, wallet_, std::make_unique<Time::SystemTime>());
             bot.run(std::move(st));
           });
 

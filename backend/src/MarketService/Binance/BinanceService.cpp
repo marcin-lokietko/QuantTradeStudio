@@ -8,6 +8,7 @@
 
 #include "MarketService/Binance/Conversion/AssetPrices.hpp"
 #include "MarketService/Binance/Conversion/Assets.hpp"
+#include "MarketService/Binance/Conversion/KlineSequence.hpp"
 #include "MarketService/Binance/Conversion/Orders.hpp"
 #include "MarketService/Binance/Conversion/TradingPairs.hpp"
 #include "Utils/ToString.hpp"
@@ -19,12 +20,12 @@ constexpr Http::HttpStatusCode statusCodeOk{200};
 constexpr Http::HttpStatusCode statusCodeRequestRateLimitBroken{429};
 }  // namespace
 
-std::string BinanceService::getServerTime() {
+Time BinanceService::getServerTime() {
   SPDLOG_INFO("getServerTime called");
 
   const std::string timeUrl = binanceUrlPrefix_.val_ + "/time";
 
-  return http_.get(timeUrl, "");
+  return Time{http_.get(timeUrl, "")};
 }
 
 ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) {
@@ -62,7 +63,13 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
   const auto response = http_.get(url, "");
 
   AssetPrices assetPrices;
-  Conversion::fromJson(nlohmann::json::parse(response), assetPrices);
+  try {
+    Conversion::fromJson(nlohmann::json::parse(response), assetPrices);
+  } catch (const nlohmann::json::exception& e) {
+    SPDLOG_CRITICAL("/getPrices FAILED; could not deserialize Binance response; error: {}", e.what());
+    throw;
+  }
+
   SPDLOG_INFO("getPrices result: assetPrices={}", ::toString(assetPrices));
   return assetPrices;
 }
@@ -74,15 +81,13 @@ MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol
   const std::string klinesUrl =
       binanceUrlPrefix_.val_ + "/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
   const auto klinesString = http_.get(klinesUrl, "");
-  const auto klinesJson = nlohmann::json::parse(klinesString);
 
   MarketService::KlineSequence sequence;
-  sequence.reserve(klinesJson.size());
-
-  for (const auto& kline : klinesJson) {
-    std::string closePrice = kline[4].get<std::string>();
-    uint64_t closeTime = kline[6].get<uint64_t>();
-    sequence.push_back({.closeTime = closeTime, .closePrice = closePrice});
+  try {
+    Conversion::fromJson(nlohmann::json::parse(klinesString), sequence);
+  } catch (const nlohmann::json::exception& e) {
+    SPDLOG_CRITICAL("/getKlines FAILED; could not deserialize Binance response; error: {}", e.what());
+    throw;
   }
 
   SPDLOG_INFO("getKlines result: sequence={}", ::toString(sequence));
@@ -97,8 +102,12 @@ Assets BinanceService::getOwnedAssets() const {
   const auto accountJson = nlohmann::json::parse(accountString);
 
   Assets assets;
-  MarketService::Binance::Conversion::fromJson(accountJson.at("balances"), assets);
-
+  try {
+    MarketService::Binance::Conversion::fromJson(accountJson.at("balances"), assets);
+  } catch (const nlohmann::json::exception& e) {
+    SPDLOG_CRITICAL("/getOwnedAssets FAILED; could not deserialize Binance response; error: {}", e.what());
+    throw;
+  }
   SPDLOG_INFO("getOwnedAssets result: assets={}", ::toString(assets));
   return assets;
 }
@@ -162,8 +171,12 @@ TradingPairs BinanceService::getAllTradingPairs() const {
   const auto tradingPairsString = http_.get(url, "");
 
   TradingPairs tradingPairs;
-  Conversion::fromJson(nlohmann::json::parse(tradingPairsString), tradingPairs);
-
+  try {
+    Conversion::fromJson(nlohmann::json::parse(tradingPairsString), tradingPairs);
+  } catch (const nlohmann::json::exception& e) {
+    SPDLOG_CRITICAL("/getAllTradingPairs FAILED; could not deserialize Binance response; error: {}", e.what());
+    throw;
+  }
   SPDLOG_INFO("getAllTradingPairs result: tradingPairs={}", ::toString(tradingPairs));
   return tradingPairs;
 }
@@ -218,8 +231,9 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
   ApiGateway::Orders orders;
   try {
     Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders);
-  } catch (const std::exception& exc) {
-    SPDLOG_ERROR("Error parsing response. Url={} Exception={}", url, exc.what());
+  } catch (const nlohmann::json::exception& e) {
+    SPDLOG_CRITICAL("/getOpenOrders FAILED; could not deserialize Binance response; error: {}", e.what());
+    throw;
   }
   SPDLOG_INFO("getOpenOrders result: orders={}", ::toString(orders));
   return orders;

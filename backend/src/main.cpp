@@ -14,7 +14,7 @@
 #include "Http/Http.hpp"
 #include "MarketService/Binance/BinanceService.hpp"
 #include "MarketService/Binance/Encryption.hpp"
-#include "Utils/Time/Time.hpp"
+#include "Utils/Time/SystemTime.hpp"
 #include "Wallet/Wallet.hpp"
 
 std::string get_datetime_string() {
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 
   const MarketService::Binance::Encryption encryption{config->keysCatalogPath};
   const Http::Http http{};
-  const Time::Time time{};
+  const Time::SystemTime time{};
   MarketService::Binance::BinanceService marketService{encryption, http, time, config->binanceUrlPrefix};
   Wallet::Wallet wallet{marketService};
   BotExecution::BotExecution botExecution{marketService, wallet};

@@ -20,14 +20,22 @@
 
 namespace GuiService::HttpGuiService {
 
+namespace {
+crow::response buildEmptyResponse(std::string body = "") {
+  crow::response res{std::move(body)};
+  res.add_header("Access-Control-Allow-Origin", "*");
+  res.add_header("Content-Type", "application/json");
+  return res;
+}
+}  // namespace
+
 void HttpGuiService::start() {
-  // Configure CORS
   crow::App<crow::CORSHandler> app;
   auto& cors = app.get_middleware<crow::CORSHandler>();
 
   cors.global()
       .methods("POST"_method, "GET"_method, "OPTIONS"_method)
-      .origin("*")           // TODO - restrict to frontend’s domain
+      .origin("*")
       .allow_credentials();  // Allow credentials like cookies or Authorization header
 
   // Setup endpoints
@@ -42,21 +50,15 @@ void HttpGuiService::start() {
       SPDLOG_INFO("/health endpoint request message: {}", healthRequest->message);
     }
 
-    crow::response res{};
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
-    return res;
+    return buildEmptyResponse();
   });
 
   CROW_ROUTE(app, "/assets")
   ([&apiGateway_ = apiGateway_]() {
     SPDLOG_INFO("/assets endpoint called");
 
-    crow::response res(Conversion::toJson(apiGateway_.getOwnedAssets()).dump());
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
-
-    SPDLOG_INFO("/assets endpoint response: ");
+    auto res = buildEmptyResponse(Conversion::toJson(apiGateway_.getOwnedAssets()).dump());
+    SPDLOG_INFO("/assets endpoint response: {}", res.body);
     return res;
   });
 
@@ -64,9 +66,7 @@ void HttpGuiService::start() {
   ([&apiGateway_ = apiGateway_]() {
     SPDLOG_INFO("/openOrders endpoint called");
 
-    crow::response res(Conversion::toJson(apiGateway_.getOpenOrders()).dump());
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
+    auto res = buildEmptyResponse(Conversion::toJson(apiGateway_.getOpenOrders()).dump());
 
     SPDLOG_INFO("/openOrders endpoint response: {}", res.body);
     return res;
@@ -78,8 +78,7 @@ void HttpGuiService::start() {
   ([&apiGateway_ = apiGateway_](const crow::request& req) {
     SPDLOG_INFO("/availableQuoteAssets endpoint called");
 
-    crow::response res{};
-
+    auto res = buildEmptyResponse();
     std::optional<AvailableQuoteAssetsRequest> availableQuoteAssetsRequest;
     Conversion::fromQueryParams(crow::query_string(req.url_params), availableQuoteAssetsRequest);
 
@@ -88,9 +87,6 @@ void HttpGuiService::start() {
     } else {
       res.body = Conversion::toJson(apiGateway_.getAvailableQuoteAssets(availableQuoteAssetsRequest->baseAsset)).dump();
     }
-
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
 
     SPDLOG_INFO("/availableQuoteAssets endpoint response: {}", res.body);
     return res;
@@ -102,14 +98,11 @@ void HttpGuiService::start() {
   ([&apiGateway_ = apiGateway_](const crow::request& req) {
     SPDLOG_INFO("/availableBaseAssets endpoint called");
 
-    crow::response res{};
-
     AvailableBaseAssetsRequest availableBaseAssetsRequest;
     Conversion::fromQueryParams(crow::query_string(req.url_params), availableBaseAssetsRequest);
 
-    res.body = Conversion::toJson(apiGateway_.getAvailableBaseAssets(availableBaseAssetsRequest.quoteAsset)).dump();
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
+    auto res = buildEmptyResponse(
+        Conversion::toJson(apiGateway_.getAvailableBaseAssets(availableBaseAssetsRequest.quoteAsset)).dump());
 
     SPDLOG_INFO("/availableBaseAssets endpoint response: {}", res.body);
     return res;
@@ -119,11 +112,7 @@ void HttpGuiService::start() {
   ([&apiGateway_ = apiGateway_]() {
     SPDLOG_INFO("/quoteAssetsSuitableForRebalancing endpoint called");
 
-    crow::response res{};
-    res.body = Conversion::toJson(apiGateway_.getQuoteAssetsSuitableForRebalancing()).dump();
-
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
+    auto res = buildEmptyResponse(Conversion::toJson(apiGateway_.getQuoteAssetsSuitableForRebalancing()).dump());
 
     SPDLOG_INFO("/quoteAssetsSuitableForRebalancing endpoint response: {}", res.body);
     return res;
@@ -132,19 +121,25 @@ void HttpGuiService::start() {
   CROW_ROUTE(app, "/makeOrder").methods("POST"_method)([&apiGateway_ = apiGateway_](const crow::request& req) {
     SPDLOG_INFO("/makeOrder endpoint called");
     OrderRequest orderRequest;
-    Conversion::fromJson(nlohmann::json::parse(req.body), orderRequest);
+
+    try {
+      Conversion::fromJson(nlohmann::json::parse(req.body), orderRequest);
+    } catch (const nlohmann::json::exception& e) {
+      SPDLOG_CRITICAL("/makeOrder FAILED; could not deserialize request; error: {}", e.what());
+      auto res = buildEmptyResponse();
+      res.code = 500;
+      return res;
+    }
 
     const auto result = apiGateway_.makeOrder(orderRequest.selectedBaseAsset, orderRequest.selectedQuoteAsset,
                                               orderRequest.orderSide, orderRequest.baseAssetAmount);
 
-    crow::response res{""};
+    auto res = buildEmptyResponse();
     if (result != ApiGateway::OrderResult::Success) {
       res.code = 500;
     }
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
 
-    SPDLOG_INFO("/makeOrder endpoint response: ", res.body);
+    SPDLOG_INFO("/makeOrder endpoint response: {}", res.body);
     return res;
   });
 
@@ -152,18 +147,24 @@ void HttpGuiService::start() {
     SPDLOG_INFO("/startBot endpoint called");
 
     ApiGateway::BotConfig botConfig;
-    Conversion::fromJson(nlohmann::json::parse(req.body), botConfig);
+
+    try {
+      Conversion::fromJson(nlohmann::json::parse(req.body), botConfig);
+    } catch (const nlohmann::json::exception& e) {
+      SPDLOG_CRITICAL("/startBot FAILED; could not deserialize request; error: {}", e.what());
+      auto res = buildEmptyResponse();
+      res.code = 500;
+      return res;
+    }
 
     const auto result = apiGateway_.startBot(botConfig);
 
-    crow::response res{""};
+    auto res = buildEmptyResponse();
     if (result != ApiGateway::StartBotResult::Success) {
       res.code = 500;
     }
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
 
-    SPDLOG_INFO("/startBot endpoint response: ", res.body);
+    SPDLOG_INFO("/startBot endpoint response: {}", res.body);
     return res;
   });
 
@@ -172,12 +173,10 @@ void HttpGuiService::start() {
 
     const auto result = apiGateway_.stopAllBots();
 
-    crow::response res{""};
+    auto res = buildEmptyResponse();
     if (result != ApiGateway::StopAllBotsResult::Success) {
       res.code = 500;
     }
-    res.add_header("Access-Control-Allow-Origin", "*");
-    res.add_header("Content-Type", "application/json");
 
     SPDLOG_INFO("/stopAllBots endpoint response: {}; status code: {}", res.body, res.code);
     return res;

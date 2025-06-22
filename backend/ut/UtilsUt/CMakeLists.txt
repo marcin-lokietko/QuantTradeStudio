@@ -1,6 +1,6 @@
 add_library(UtilsUt STATIC
     StrongType.ut.cpp
-    Time.ut.cpp
+    SystemTime.ut.cpp
 )
 
 #search for headers in root project directory

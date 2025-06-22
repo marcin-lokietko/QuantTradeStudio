@@ -1,4 +1,4 @@
-#include "Time.hpp"
+#include "SystemTime.hpp"
 
 #include <chrono>
 #include <condition_variable>
@@ -7,7 +7,7 @@
 
 namespace Time {
 
-void Time::sleepFor(std::stop_token st, const ::std::chrono::milliseconds& duration) const {
+void SystemTime::sleepFor(std::stop_token st, const ::std::chrono::milliseconds& duration) const {
   std::mutex mtx;
   std::condition_variable_any cv;
   std::unique_lock lock(mtx);
@@ -25,7 +25,7 @@ void Time::sleepFor(std::stop_token st, const ::std::chrono::milliseconds& durat
   }
 }
 
-time_t Time::getTimeSinceEpoch() const {
+time_t SystemTime::getTimeSinceEpoch() const {
   return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) * 1000;
 }
 

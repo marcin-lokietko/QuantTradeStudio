@@ -4,11 +4,15 @@
 #include <string>
 #include <vector>
 
+#include "ApiGateway/Price.hpp"
+#include "Time.hpp"
+#include "Utils/StrongType.hpp"
+
 namespace MarketService {
 
 struct Kline {
-  uint64_t closeTime{};
-  std::string closePrice{};
+  Time closeTime{};
+  ApiGateway::Price closePrice{};
 
   bool operator==(const Kline& other) const = default;
 };
