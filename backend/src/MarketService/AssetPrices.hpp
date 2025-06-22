@@ -20,7 +20,7 @@ struct SingleAssetPrice {
 };
 
 inline std::string toString(const SingleAssetPrice& singleAssetPrice) {
-  return std::format("{{assetPair={}, price={}}}", singleAssetPrice.assetPair.val_, singleAssetPrice.price.val_);
+  return std::format("{{assetPair={}, price={}}}", toString(singleAssetPrice.assetPair), singleAssetPrice.price.val_);
 }
 
 using AssetPrices = std::vector<SingleAssetPrice>;

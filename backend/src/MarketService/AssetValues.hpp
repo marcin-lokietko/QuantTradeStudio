@@ -5,8 +5,9 @@
 
 #include "ApiGateway/AssetSymbol.hpp"
 #include "ApiGateway/Value.hpp"
+#include "Utils/ToString.hpp"
 
-namespace Wallet {
+namespace MarketService {
 
 struct SingleAssetValue {
   ApiGateway::AssetSymbol baseSymbol{};
@@ -14,6 +15,11 @@ struct SingleAssetValue {
   std::optional<ApiGateway::Value> value{};
 };
 
+inline std::string toString(const SingleAssetValue& singleAssetValue) {
+  return std::format("{{baseSymbol={}, quoteAsset={}, value={}}}", singleAssetValue.baseSymbol,
+                     singleAssetValue.quoteAsset, singleAssetValue.value);
+}
+
 using AssetValues = std::vector<SingleAssetValue>;
 
-}  // namespace Wallet
+}  // namespace MarketService

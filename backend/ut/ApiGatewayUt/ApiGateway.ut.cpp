@@ -1,10 +1,9 @@
-#include "ApiGateway/ApiGateway.hpp"
-
 #include <ranges>
 
+#include "ApiGateway/ApiGateway.hpp"
+#include "GeneratedMocks/BotBacktesterMock.hpp"
 #include "GeneratedMocks/BotExecutionMock.hpp"
 #include "GeneratedMocks/MarketServiceMock.hpp"
-#include "GeneratedMocks/WalletMock.hpp"
 #include "gmock/gmock.h"
 
 namespace ApiGateway {
@@ -15,23 +14,31 @@ using MarketService::TradingPairs;
 using testing::_;
 using testing::Return;
 
+const TradingPairSymbol btcUsdtTradingPair{AssetSymbol{"BTC"}, AssetSymbol{"USDT"}};
+const TradingPairSymbol ethUsdtTradingPair{AssetSymbol{"ETH"}, AssetSymbol{"USDT"}};
+const TradingPairSymbol btcEurTradingPair{AssetSymbol{"BTC"}, AssetSymbol{"EUR"}};
+const TradingPairSymbol ethEurTradingPair{AssetSymbol{"ETH"}, AssetSymbol{"EUR"}};
+const TradingPairSymbol btcPlnTradingPair{AssetSymbol{"BTC"}, AssetSymbol{"PLN"}};
+const TradingPairSymbol ethPlnTradingPair{AssetSymbol{"ETH"}, AssetSymbol{"PLN"}};
+const TradingPairSymbol ltcPlnTradingPair{AssetSymbol{"LTC"}, AssetSymbol{"PLN"}};
+
 class ApiGatewayTest : public ::testing::Test {
  public:
   testing::StrictMock<MarketService::MarketServiceMock> marketServiceMock_;
-  testing::StrictMock<Wallet::WalletMock> walletMock_;
   testing::StrictMock<BotExecution::BotExecutionMock> botExecution_;
+  testing::StrictMock<BotBacktester::BotBacktesterMock> botBacktester_;
 
-  ApiGateway sut_{marketServiceMock_, walletMock_, botExecution_};
+  ApiGateway sut_{marketServiceMock_, botExecution_, botBacktester_};
 };
 
-TEST_F(ApiGatewayTest, WhenGetOwnedAssetsCalled_ThenCallDelegatedToWallet) {
-  Assets assets{SingleAsset{
-                    AssetSymbol{"BTC"},
-                    AssetQuantity{"1"},
-                    Value{"80000"},
-                },
-                SingleAsset{AssetSymbol{"ETH"}, AssetQuantity{"1"}, Value{"2000"}}};
-  EXPECT_CALL(walletMock_, getOwnedAssets()).WillOnce(Return(assets));
+TEST_F(ApiGatewayTest, WhenGetOwnedAssetsCalled_ThenCallDelegatedToMarketService) {
+  AssetValues assets{SingleAssetValue{
+                         AssetSymbol{"BTC"},
+                         AssetQuantity{"1"},
+                         Value{"80000"},
+                     },
+                     SingleAssetValue{AssetSymbol{"ETH"}, AssetQuantity{"1"}, Value{"2000"}}};
+  EXPECT_CALL(marketServiceMock_, getOwnedAssetsQuantityAndValue()).WillOnce(Return(assets));
   EXPECT_EQ(assets, sut_.getOwnedAssets());
 }
 
@@ -40,7 +47,7 @@ TEST_F(ApiGatewayTest, WhenMakeOrderCalled_ThenCallDelegatedToMarketService) {
   const AssetSymbol quote{"USDT"};
   const OrderSide side = OrderSide::Buy;
   const AssetQuantity qty{"1.0"};
-  const TradingPairSymbol pair{"BTCUSDT"};
+  const TradingPairSymbol pair{base, quote};
   const Price price{"10000"};
   const OrderResult expectedResult = OrderResult::Success;
 
@@ -50,9 +57,9 @@ TEST_F(ApiGatewayTest, WhenMakeOrderCalled_ThenCallDelegatedToMarketService) {
 }
 
 TEST_F(ApiGatewayTest, WhenGetOpenOrdersCalled_ThenCallDelegatedToMarketService) {
-  Orders openOrders{SingleOrder{TradingPairSymbol{"BTCUSDT"}, OrderId{1}, Price{"10000"}, AssetQuantity{"0.1"},
+  Orders openOrders{SingleOrder{btcUsdtTradingPair, OrderId{1}, Price{"10000"}, AssetQuantity{"0.1"},
                                 AssetQuantity{"0.05"}, OrderSide::Buy},
-                    SingleOrder{TradingPairSymbol{"ETHUSDT"}, OrderId{2}, Price{"2000"}, AssetQuantity{"0.5"},
+                    SingleOrder{ethUsdtTradingPair, OrderId{2}, Price{"2000"}, AssetQuantity{"0.5"},
                                 AssetQuantity{"0.25"}, OrderSide::Sell}};
 
   EXPECT_CALL(marketServiceMock_, getOpenOrders()).WillOnce(Return(openOrders));
@@ -61,12 +68,11 @@ TEST_F(ApiGatewayTest, WhenGetOpenOrdersCalled_ThenCallDelegatedToMarketService)
 
 TEST_F(ApiGatewayTest, WhenGetAvailableQuoteAssetsCalled_ThenTradingPairsWithGivenBaseAssetAreReturnedWithPrices) {
   const AssetSymbol base{"BTC"};
-  const MarketService::TradingPairs tradingPairs = {{TradingPairSymbol{"BTCUSDT"}, base, AssetSymbol{"USDT"}},
-                                                    {TradingPairSymbol{"BTCEUR"}, base, AssetSymbol{"EUR"}}};
+  const MarketService::TradingPairs tradingPairs = {btcUsdtTradingPair, btcEurTradingPair};
 
-  const std::vector<TradingPairSymbol> symbols = {TradingPairSymbol{"BTCUSDT"}, TradingPairSymbol{"BTCEUR"}};
-  MarketService::AssetPrices assetPrices = {SingleAssetPrice{TradingPairSymbol{"BTCUSDT"}, Price{"100000"}},
-                                            SingleAssetPrice{TradingPairSymbol{"BTCEUR"}, Price{"90000"}}};
+  const std::vector<TradingPairSymbol> symbols = {btcUsdtTradingPair, btcEurTradingPair};
+  MarketService::AssetPrices assetPrices = {SingleAssetPrice{btcUsdtTradingPair, Price{"100000"}},
+                                            SingleAssetPrice{btcEurTradingPair, Price{"90000"}}};
 
   EXPECT_CALL(marketServiceMock_, getTradingPairsWithBaseAsset(base)).WillOnce(Return(tradingPairs));
   EXPECT_CALL(marketServiceMock_, getPrices(symbols)).WillOnce(Return(assetPrices));
@@ -80,8 +86,7 @@ TEST_F(ApiGatewayTest, WhenGetAvailableQuoteAssetsCalled_ThenTradingPairsWithGiv
 
 TEST_F(ApiGatewayTest, WhenGetAvailableBaseAssetsCalledWithQuoteAsset_ThenCorrespondingBaseAssetsAreReturned) {
   const AssetSymbol quote{"USDT"};
-  TradingPairs tradingPairs = {{TradingPairSymbol{"BTCUSDT"}, AssetSymbol{"BTC"}, quote},
-                               {TradingPairSymbol{"ETHUSDT"}, AssetSymbol{"ETH"}, quote}};
+  TradingPairs tradingPairs = {btcUsdtTradingPair, ethUsdtTradingPair};
   EXPECT_CALL(marketServiceMock_, getTradingPairsWithQuoteAsset(quote)).WillOnce(Return(tradingPairs));
 
   auto result = sut_.getAvailableBaseAssets(quote);
@@ -90,8 +95,7 @@ TEST_F(ApiGatewayTest, WhenGetAvailableBaseAssetsCalledWithQuoteAsset_ThenCorres
 }
 
 TEST_F(ApiGatewayTest, WhenGetAvailableBaseAssetsCalledWithoutQuoteAsset_ThenAllBaseAssetsAreReturned) {
-  TradingPairs tradingPairs = {{TradingPairSymbol{"BTCUSDT"}, AssetSymbol{"BTC"}, AssetSymbol{"USDT"}},
-                               {TradingPairSymbol{"ETHEUR"}, AssetSymbol{"ETH"}, AssetSymbol{"EUR"}}};
+  TradingPairs tradingPairs = {btcUsdtTradingPair, ethEurTradingPair};
   EXPECT_CALL(marketServiceMock_, getAllTradingPairs()).WillOnce(Return(tradingPairs));
 
   auto result = sut_.getAvailableBaseAssets(std::nullopt);
@@ -100,13 +104,8 @@ TEST_F(ApiGatewayTest, WhenGetAvailableBaseAssetsCalledWithoutQuoteAsset_ThenAll
 }
 
 TEST_F(ApiGatewayTest, WhenGetQuoteAssetsSuitableForRebalancingCalled_ThenAssetsWithAtLeastTwoPairsAreReturned) {
-  MarketService::TradingPairs tradingPairs = {
-      {.symbol = TradingPairSymbol{"BTCEUR"}, .baseAsset = AssetSymbol{"BTC"}, .quoteAsset = AssetSymbol{"EUR"}},
-      {.symbol = TradingPairSymbol{"BTCUSDT"}, .baseAsset = AssetSymbol{"BTC"}, .quoteAsset = AssetSymbol{"USDT"}},
-      {.symbol = TradingPairSymbol{"ETHUSDT"}, .baseAsset = AssetSymbol{"ETH"}, .quoteAsset = AssetSymbol{"USDT"}},
-      {.symbol = TradingPairSymbol{"BTCPLN"}, .baseAsset = AssetSymbol{"BTC"}, .quoteAsset = AssetSymbol{"PLN"}},
-      {.symbol = TradingPairSymbol{"ETHPLN"}, .baseAsset = AssetSymbol{"ETH"}, .quoteAsset = AssetSymbol{"PLN"}},
-      {.symbol = TradingPairSymbol{"LTCPLN"}, .baseAsset = AssetSymbol{"LTC"}, .quoteAsset = AssetSymbol{"PLN"}}};
+  MarketService::TradingPairs tradingPairs = {btcEurTradingPair, btcUsdtTradingPair, ethUsdtTradingPair,
+                                              btcPlnTradingPair, ethPlnTradingPair,  ltcPlnTradingPair};
   EXPECT_CALL(marketServiceMock_, getAllTradingPairs()).WillOnce(Return(tradingPairs));
   auto result = sut_.getQuoteAssetsSuitableForRebalancing();
 

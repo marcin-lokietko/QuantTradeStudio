@@ -40,15 +40,15 @@ for inputArg in "$@"
 do
     if [ $inputArg = "production" ]; then
         cmake -S${BACKEND_DIR} -B${BUILD_PRODUCTION_PATH} -DbuildType=production -DbuildUT:BOOL=${BUILD_UT}
-        cmake --build ${BUILD_PRODUCTION_PATH} -- -j3
+        cmake --build ${BUILD_PRODUCTION_PATH} -- -j$(nproc)
     elif [ $inputArg = "debug" ]; then
         cmake -S${BACKEND_DIR} -B${BUILD_DEBUG_PATH} -DbuildType=debug -DbuildUT:BOOL=${BUILD_UT}
-        cmake --build ${BUILD_DEBUG_PATH} -- -j3
+        cmake --build ${BUILD_DEBUG_PATH} -- -j$(nproc)
     elif [ $inputArg = "sanitizer" ]; then
         cmake -S${BACKEND_DIR} -B${BUILD_SANITIZER_PATH} -DbuildType=sanitizer -DbuildUT:BOOL=OFF
-        cmake --build ${BUILD_SANITIZER_PATH} -- -j3
+        cmake --build ${BUILD_SANITIZER_PATH} -- -j$(nproc)
     elif [ $inputArg = "profiler" ]; then
         cmake -S${BACKEND_DIR} -B${BUILD_PROFILER_PATH} -DbuildType=profiler -DbuildUT:BOOL=OFF
-        cmake --build ${BUILD_PROFILER_PATH} -- -j3
+        cmake --build ${BUILD_PROFILER_PATH} -- -j$(nproc)
     fi
 done

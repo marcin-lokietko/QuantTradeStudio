@@ -17,19 +17,19 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
 
   std::visit(
       [&runningBots_ = runningBots_, &marketService_ = marketService_, &startBotResult = startBotResult,
-       &wallet_ = wallet_](auto&& config) {
+       &systemTime = systemTime_](auto&& config) {
         SPDLOG_INFO("Received bot configuration. Attempting to start the bot...");
 
         using T = std::decay_t<decltype(config)>;
 
         if constexpr (std::is_same_v<T, std::monostate>) {
           SPDLOG_ERROR("Invalid bot configuration");
-        } else if constexpr (std::is_same_v<T, Rebalancer::Config>) {
+        } else if constexpr (std::is_same_v<T, BotAlgorithms::Rebalancer::Config>) {
           SPDLOG_INFO("Received valid configuration for bot: Rebalancer");
 
           runningBots_.emplace_back([conf = std::move(config), &marketService_ = marketService_,
-                                     &wallet_ = wallet_](std::stop_token st) mutable {
-            Rebalancer::Rebalancer bot(std::move(conf), marketService_, wallet_, std::make_unique<Time::SystemTime>());
+                                     &systemTime = systemTime](std::stop_token st) mutable {
+            BotAlgorithms::Rebalancer::Rebalancer bot(std::move(conf), marketService_, systemTime);
             bot.run(std::move(st));
           });
 

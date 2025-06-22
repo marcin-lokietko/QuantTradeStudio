@@ -3,18 +3,17 @@
 #include <thread>
 #include <vector>
 
-#include "ConfigExtractor.hpp"
+#include "BotAlgorithms/ConfigExtractor.hpp"
+#include "BotAlgorithms/Rebalancer/Rebalancer.hpp"
 #include "IBotExecution.hpp"
 #include "MarketService/IMarketService.hpp"
-#include "Rebalancer/Rebalancer.hpp"
-#include "Wallet/IWallet.hpp"
+#include "Utils/Time/SystemTime.hpp"
 
 namespace BotExecution {
 
 class BotExecution : public IBotExecution {
  public:
-  BotExecution(const MarketService::IMarketService& marketService, const Wallet::IWallet& wallet)
-      : marketService_(marketService), wallet_(wallet) {}
+  BotExecution(const MarketService::IMarketService& marketService) : marketService_(marketService) {}
 
   ApiGateway::StartBotResult startBot(const ApiGateway::BotConfig& botConfig) override;
 
@@ -22,8 +21,8 @@ class BotExecution : public IBotExecution {
 
  private:
   const MarketService::IMarketService& marketService_;
-  const Wallet::IWallet& wallet_;
-  const ConfigExtractor configExtractor_{};
+  Time::SystemTime systemTime_;
+  const BotAlgorithms::ConfigExtractor configExtractor_{};
   std::vector<std::jthread> runningBots_{};
 };
 

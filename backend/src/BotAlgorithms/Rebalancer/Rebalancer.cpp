@@ -1,5 +1,3 @@
-#include "Rebalancer.hpp"
-
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -7,14 +5,15 @@
 #include <set>
 #include <thread>
 
-namespace BotExecution::Rebalancer {
+#include "Rebalancer.hpp"
+
+namespace BotAlgorithms::Rebalancer {
 
 // small transactions are inefficient due to transaction fees
 constexpr ApiGateway::SharePercent maxAcceptableShareDeviation{1};
 
-Rebalancer::Rebalancer(Config&& config, const MarketService::IMarketService& marketService,
-                       const Wallet::IWallet& wallet, std::unique_ptr<Time::ITime> time)
-    : config_(std::move(config)), marketService_(marketService), wallet_(wallet), time_(std::move(time)) {}
+Rebalancer::Rebalancer(Config&& config, const MarketService::IMarketService& marketService, const Time::ITime& time)
+    : config_(std::move(config)), marketService_(marketService), time_(time) {}
 
 void Rebalancer::run(std::stop_token st) {
   SPDLOG_INFO("Rebalancer started execution");
@@ -24,7 +23,7 @@ void Rebalancer::run(std::stop_token st) {
     rebalance();
   }
   while (!st.stop_requested()) {
-    time_->sleepFor(st, executionPeriod);
+    time_.sleepFor(st, executionPeriod);
     if (!st.stop_requested()) {
       rebalance();
     }
@@ -83,13 +82,13 @@ void Rebalancer::rebalance() {
   SPDLOG_INFO("sharesToBuy={}", ::toString(sharesToBuy));
 
   for (const auto& singleAssetToSell : sharesToSell) {
-    const ApiGateway::TradingPairSymbol symbol{singleAssetToSell.assetSymbol.val_ + config_.quoteAsset.val_};
+    const ApiGateway::TradingPairSymbol symbol{singleAssetToSell.assetSymbol, config_.quoteAsset};
     const ApiGateway::AssetQuantity quoteQuantity{
         std::to_string(totalValueOfRelevantOwnedAssets.value() * singleAssetToSell.share.val_)};
     marketService_.makeMarketTypeOrderWithQuoteQuantity(symbol, ApiGateway::OrderSide::Sell, quoteQuantity);
   }
   for (const auto& singleAssetToBuy : sharesToBuy) {
-    const ApiGateway::TradingPairSymbol symbol{singleAssetToBuy.assetSymbol.val_ + config_.quoteAsset.val_};
+    const ApiGateway::TradingPairSymbol symbol{singleAssetToBuy.assetSymbol, config_.quoteAsset};
     const ApiGateway::AssetQuantity quoteQuantity{
         std::to_string(totalValueOfRelevantOwnedAssets.value() * singleAssetToBuy.share.val_)};
     marketService_.makeMarketTypeOrderWithQuoteQuantity(symbol, ApiGateway::OrderSide::Buy, quoteQuantity);
@@ -102,21 +101,21 @@ void Rebalancer::cancelOpenOrders() {
   std::set<ApiGateway::TradingPairSymbol> openOrdersSymbols{openOrders.begin(), openOrders.end()};
 
   for (const auto& singleBaseAssetShare : config_.baseAssetShares) {
-    const ApiGateway::TradingPairSymbol symbol{singleBaseAssetShare.assetSymbol.val_ + config_.quoteAsset.val_};
+    const ApiGateway::TradingPairSymbol symbol{singleBaseAssetShare.assetSymbol, config_.quoteAsset};
 
     if (openOrdersSymbols.count(symbol)) {
-      SPDLOG_INFO("Cancelling orders on symbol={}", symbol.val_);
+      SPDLOG_INFO("Cancelling orders on symbol={}", toString(symbol));
       marketService_.cancelAllOrdersOnASymbol(symbol);
     }
   }
 }
 
-Wallet::AssetValues Rebalancer::getRelevantOwnedAssetValues() {
+MarketService::AssetValues Rebalancer::getRelevantOwnedAssetValues() {
   const auto configuredBaseAssets = config_.baseAssetShares | std::views::transform([](const auto& singleAssetShare) {
                                       return singleAssetShare.assetSymbol;
                                     });
 
-  const auto ownedAssetValues = wallet_.getOwnedAssetValues(config_.quoteAsset);
+  const auto ownedAssetValues = marketService_.getOwnedAssetValues(config_.quoteAsset);
   auto relevantOwnedAssetValues =
       ownedAssetValues | std::views::filter([&configuredBaseAssets](const auto& singleAssetValue) {
         return std::ranges::find(configuredBaseAssets, singleAssetValue.baseSymbol) != configuredBaseAssets.end();
@@ -132,7 +131,7 @@ Wallet::AssetValues Rebalancer::getRelevantOwnedAssetValues() {
 }
 
 std::optional<double> Rebalancer::calcTotalValueOfRelevantOwnedAssets(
-    const Wallet::AssetValues& relevantOwnedAssetValues) {
+    const MarketService::AssetValues& relevantOwnedAssetValues) {
   double totalValueOfRelevantOwnedAssets = 0;
   try {
     for (const auto& singleAssetValue : relevantOwnedAssetValues) {
@@ -148,7 +147,7 @@ std::optional<double> Rebalancer::calcTotalValueOfRelevantOwnedAssets(
   return totalValueOfRelevantOwnedAssets;
 }
 
-AssetSharesFloating Rebalancer::getActualAssetShares(const Wallet::AssetValues& relevantOwnedAssetValues,
+AssetSharesFloating Rebalancer::getActualAssetShares(const MarketService::AssetValues& relevantOwnedAssetValues,
                                                      const double totalValueOfRelevantOwnedAssets) {
   AssetSharesFloating assetShares;
   for (const auto& singleAssetValue : relevantOwnedAssetValues) {
@@ -158,4 +157,4 @@ AssetSharesFloating Rebalancer::getActualAssetShares(const Wallet::AssetValues& 
   return assetShares;
 }
 
-}  // namespace BotExecution::Rebalancer
+}  // namespace BotAlgorithms::Rebalancer

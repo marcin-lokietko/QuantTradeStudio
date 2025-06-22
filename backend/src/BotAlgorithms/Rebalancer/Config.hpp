@@ -6,7 +6,7 @@
 #include "ApiGateway/BotConfig.hpp"
 #include "Utils/StrongType.hpp"
 
-namespace BotExecution::Rebalancer {
+namespace BotAlgorithms::Rebalancer {
 
 struct Config {
   ApiGateway::ExecutionPeriod executionPeriod{};
@@ -28,4 +28,4 @@ inline bool isValid(const Config& config) {
   return config.executionPeriod.val_ > 0 && sumShares == 100;
 }
 
-}  // namespace BotExecution::Rebalancer
+}  // namespace BotAlgorithms::Rebalancer

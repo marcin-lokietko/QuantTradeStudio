@@ -1,11 +1,10 @@
-#include "ApiGateway.hpp"
-
 #include <spdlog/spdlog.h>
 
 #include <map>
 #include <ranges>
 #include <set>
 
+#include "ApiGateway.hpp"
 #include "MarketService/TradingPairs.hpp"
 #include "Price.hpp"
 #include "TradingPairSymbol.hpp"
@@ -13,14 +12,14 @@
 
 namespace ApiGateway {
 
-ApiGateway::ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet,
-                       BotExecution::IBotExecution& botExecution)
-    : marketService_(marketService), wallet_(wallet), botExecution_(botExecution){};
+ApiGateway::ApiGateway(MarketService::IMarketService& marketService, BotExecution::IBotExecution& botExecution,
+                       BotBacktester::IBotBacktester& botBacktester)
+    : marketService_(marketService), botExecution_(botExecution), botBacktester_(botBacktester){};
 
-Assets ApiGateway::getOwnedAssets() const {
+AssetValues ApiGateway::getOwnedAssets() const {
   SPDLOG_INFO("getOwnedAssets called");
 
-  const auto ownedAssets = wallet_.getOwnedAssets();
+  const auto ownedAssets = marketService_.getOwnedAssetsQuantityAndValue();
 
   SPDLOG_INFO("getOwnedAssets result: ownedAssets={}", ::toString(ownedAssets));
   return ownedAssets;
@@ -28,9 +27,9 @@ Assets ApiGateway::getOwnedAssets() const {
 
 OrderResult ApiGateway::makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,
                                   const OrderSide& orderSide, const AssetQuantity& baseAssetAmount) const {
-  const TradingPairSymbol tradingPairSymbol{selectedBaseAsset.val_ + selectedQuoteAsset.val_};
+  const TradingPairSymbol tradingPairSymbol{selectedBaseAsset, selectedQuoteAsset};
 
-  SPDLOG_INFO("getOwnedAssets called: tradingPair={}; orderSide={}; baseAssetAmount={}", tradingPairSymbol,
+  SPDLOG_INFO("getOwnedAssets called: tradingPair={}; orderSide={}; baseAssetAmount={}", toString(tradingPairSymbol),
               toString(orderSide), baseAssetAmount);
 
   const auto price = marketService_.getPrice(tradingPairSymbol);
@@ -53,17 +52,11 @@ AvailableQuoteAssets ApiGateway::getAvailableQuoteAssets(const AssetSymbol& base
   SPDLOG_INFO("getAvailableQuoteAssets called: baseAsset={}", baseAsset);
 
   const auto tradingPairs = marketService_.getTradingPairsWithBaseAsset(baseAsset);
-
-  std::vector<TradingPairSymbol> tradingPairSymbols;
-  for (const auto& singleTradingPair : tradingPairs) {
-    tradingPairSymbols.push_back(singleTradingPair.symbol);
-  }
-  const auto tradingPairSymbolToPriceMap = asMap(marketService_.getPrices(tradingPairSymbols));
+  const auto tradingPairSymbolToPriceMap = asMap(marketService_.getPrices(tradingPairs));
 
   AvailableQuoteAssets availableQuoteAssets{};
   for (const auto& singleTradingPair : tradingPairs) {
-    availableQuoteAssets.emplace_back(singleTradingPair.quoteAsset,
-                                      tradingPairSymbolToPriceMap.at(singleTradingPair.symbol));
+    availableQuoteAssets.emplace_back(singleTradingPair.quoteAsset, tradingPairSymbolToPriceMap.at(singleTradingPair));
   }
   SPDLOG_INFO("getAvailableQuoteAssets result: availableQuoteAssets={}", ::toString(availableQuoteAssets));
   return availableQuoteAssets;

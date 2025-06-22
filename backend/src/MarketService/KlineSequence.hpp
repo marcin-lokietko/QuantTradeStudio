@@ -11,14 +11,20 @@
 namespace MarketService {
 
 struct Kline {
-  Time closeTime{};
+  std::chrono::system_clock::time_point openTime{};
+  std::chrono::system_clock::time_point closeTime{};
+  ApiGateway::Price openPrice{};
   ApiGateway::Price closePrice{};
+  ApiGateway::Price lowPrice{};
+  ApiGateway::Price highPrice{};
 
   bool operator==(const Kline& other) const = default;
 };
 
 inline std::string toString(const Kline& kline) {
-  return std::format("{{closeTime={}, closePrice={}}}", kline.closeTime, kline.closePrice);
+  return std::format("{{openTime={}, closeTime={}, openPrice={}, closePrice={}, lowPrice={}, highPrice={}}}",
+                     kline.openTime, kline.closeTime, kline.openPrice, kline.closePrice, kline.lowPrice,
+                     kline.highPrice);
 }
 
 using KlineSequence = std::vector<Kline>;

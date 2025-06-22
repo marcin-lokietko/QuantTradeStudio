@@ -1,6 +1,10 @@
 #pragma once
 
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -54,4 +58,16 @@ inline std::string toString(const std::optional<T>& optional) {
     return "std::nullopt";
   }
   return toString(optional.value());
+}
+
+inline std::string toString(std::time_t time) {
+  const std::tm localTm = *std::localtime(&time);
+  std::ostringstream oss;
+  oss << std::put_time(&localTm, "%Y-%m-%d %H:%M:%S");
+  return oss.str();
+}
+
+inline std::string toString(const std::chrono::system_clock::time_point& tp) {
+  const std::time_t time = std::chrono::system_clock::to_time_t(tp);
+  return toString(time);
 }

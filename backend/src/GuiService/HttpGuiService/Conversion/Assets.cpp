@@ -3,7 +3,7 @@
 namespace GuiService::HttpGuiService::Conversion {
 
 namespace {
-nlohmann::json toJson(const ApiGateway::SingleAsset& singleAsset) {
+nlohmann::json toJson(const ApiGateway::SingleAssetValue& singleAsset) {
   nlohmann::json j;
   j = nlohmann::json{{"assetSymbol", singleAsset.assetSymbol.val_},
                      {"freeQuantity", singleAsset.freeQuantity.val_},
@@ -12,7 +12,7 @@ nlohmann::json toJson(const ApiGateway::SingleAsset& singleAsset) {
 }
 }  // namespace
 
-nlohmann::json toJson(const ApiGateway::Assets& assets) {
+nlohmann::json toJson(const ApiGateway::AssetValues& assets) {
   nlohmann::json j = nlohmann::json::array();
   for (const auto& singleAsset : assets) {
     j.push_back(toJson(singleAsset));

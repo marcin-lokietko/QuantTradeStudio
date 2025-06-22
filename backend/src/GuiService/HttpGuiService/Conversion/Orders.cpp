@@ -5,7 +5,7 @@ namespace GuiService::HttpGuiService::Conversion {
 namespace {
 nlohmann::json toJson(const ApiGateway::SingleOrder& singleOrder) {
   nlohmann::json j;
-  j = nlohmann::json{{"assetPair", singleOrder.assetPair.val_},
+  j = nlohmann::json{{"assetPair", toString(singleOrder.assetPair)},
                      {"orderId", singleOrder.orderId.val_},
                      {"price", singleOrder.price.val_},
                      {"origQuantity", singleOrder.origQuantity.val_},

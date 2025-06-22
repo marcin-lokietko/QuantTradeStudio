@@ -2,7 +2,7 @@
 
 #include "AssetSymbol.hpp"
 #include "AssetSymbols.hpp"
-#include "Assets.hpp"
+#include "AssetValues.hpp"
 #include "AvailableQuoteAssets.hpp"
 #include "BotConfig.hpp"
 #include "OrderResult.hpp"
@@ -16,7 +16,7 @@ class IApiGateway {
  public:
   virtual ~IApiGateway() = default;
 
-  virtual Assets getOwnedAssets() const = 0;
+  virtual AssetValues getOwnedAssets() const = 0;
 
   virtual OrderResult makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,
                                 const OrderSide& orderSide, const AssetQuantity& baseAssetAmount) const = 0;

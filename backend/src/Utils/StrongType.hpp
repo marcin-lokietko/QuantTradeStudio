@@ -19,6 +19,7 @@ struct StrongType : public Mixins... {
   explicit constexpr StrongType(T val) : val_(std::move(val)) {}
 
   bool operator<(const WrapperType& other) const { return val_ < other.val_; }
+  bool operator>=(const WrapperType& other) const { return val_ >= other.val_; }
   bool operator==(const WrapperType& other) const { return val_ == other.val_; }
   bool operator!=(const WrapperType& other) const { return val_ != other.val_; }
 
@@ -30,12 +31,17 @@ struct StrongType : public Mixins... {
 };
 
 // Those functions enable std::format (and thus spdlog with std::format backend) support for StrongType and
-// std::optional<StrongType> by just delegating to ::toString functions
+// std::optional<StrongType> by just delegating to ::toString functions (or formarring the underlying type directly if
+// it is arithmetic).
 template <typename T, typename UniqueTag, typename... Mixins>
 struct std::formatter<StrongType<T, UniqueTag, Mixins...>> : std::formatter<T> {
   template <typename FormatContext>
   auto format(const StrongType<T, UniqueTag, Mixins...>& val, FormatContext& ctx) const {
-    return std::formatter<T>::format(::toString(val), ctx);
+    if constexpr (std::is_arithmetic_v<T>) {
+      return std::formatter<T>::format(val.val_, ctx);
+    } else {
+      return std::formatter<std::string>::format(::toString(val), ctx);
+    }
   }
 };
 
@@ -43,7 +49,7 @@ template <typename T, typename UniqueTag, typename... Mixins>
 struct std::formatter<std::optional<StrongType<T, UniqueTag, Mixins...>>> : std::formatter<std::string> {
   template <typename FormatContext>
   auto format(const std::optional<StrongType<T, UniqueTag, Mixins...>>& val, FormatContext& ctx) const {
-    return std::formatter<T>::format(::toString(val), ctx);
+    return std::formatter<std::string>::format(::toString(val), ctx);
   }
 };
 

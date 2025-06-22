@@ -8,6 +8,11 @@ message(STATUS "GTest version: ${GTest_VERSION}")
 # Generate common mocks
 include(GenerateMock.cmake)
 
+run_python_script(BotBacktesterMock
+    ${CMAKE_SOURCE_DIR}/src/BotBacktester/IBotBacktester.hpp
+    ${CMAKE_SOURCE_DIR}/ut/GeneratedMocks/BotBacktesterMock.hpp
+)
+
 run_python_script(BotExecutionMock
     ${CMAKE_SOURCE_DIR}/src/BotExecution/IBotExecution.hpp
     ${CMAKE_SOURCE_DIR}/ut/GeneratedMocks/BotExecutionMock.hpp
@@ -16,6 +21,11 @@ run_python_script(BotExecutionMock
 run_python_script(EncryptionMock
     ${CMAKE_SOURCE_DIR}/src/MarketService/Binance/IEncryption.hpp
     ${CMAKE_SOURCE_DIR}/ut/GeneratedMocks/EncryptionMock.hpp
+)
+
+run_python_script(HistoricalMarketDataProviderMock
+    ${CMAKE_SOURCE_DIR}/src/MarketService/IHistoricalMarketDataProvider.hpp
+    ${CMAKE_SOURCE_DIR}/ut/GeneratedMocks/HistoricalMarketDataProviderMock.hpp
 )
 
 run_python_script(HttpMock
@@ -33,19 +43,13 @@ run_python_script(TimeMock
     ${CMAKE_SOURCE_DIR}/ut/GeneratedMocks/TimeMock.hpp
 )
 
-run_python_script(WalletMock
-    ${CMAKE_SOURCE_DIR}/src/Wallet/IWallet.hpp
-    ${CMAKE_SOURCE_DIR}/ut/GeneratedMocks/WalletMock.hpp
-)
-
 # Add test components
 add_subdirectory(ApiGatewayUt)
-add_subdirectory(BotExecutionUt)
+add_subdirectory(BotAlgorithmsUt)
 add_subdirectory(ConfigUt)
 add_subdirectory(GuiServiceUt)
 add_subdirectory(MarketServiceUt)
 add_subdirectory(UtilsUt)
-add_subdirectory(WalletUt)
 
 # Add main test executable
 add_executable(UnitTests main.cpp)
@@ -63,11 +67,10 @@ target_link_libraries(UnitTests PRIVATE ${LINKER_FLAGS}
 
     "-Wl,--whole-archive"
     ApiGatewayUt
-    BotExecutionUt
+    BotAlgorithmsUt
     ConfigUt
     GuiServiceUt
     MarketServiceUt
     UtilsUt
-    WalletUt
     "-Wl,--no-whole-archive"
 )

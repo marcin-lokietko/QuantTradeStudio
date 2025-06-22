@@ -7,7 +7,7 @@
 #include "ApiGateway/AssetSymbol.hpp"
 #include "Utils/StrongType.hpp"
 
-namespace BotExecution::Rebalancer {
+namespace BotAlgorithms::Rebalancer {
 
 DEFINE_STRONG_TYPE(SharePercentFloating, double);
 
@@ -23,4 +23,4 @@ inline std::string toString(const SingleAssetShareFloating& singleAssetShareFloa
                      singleAssetShareFloating.share.val_);
 }
 
-}  // namespace BotExecution::Rebalancer
+}  // namespace BotAlgorithms::Rebalancer

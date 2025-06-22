@@ -1,6 +1,6 @@
 #pragma once
 
-namespace MarketService {
+namespace ApiGateway {
 
 enum class MarketId
 {
@@ -19,4 +19,4 @@ inline std::string toString(const MarketId& marketId) {
   }
 }
 
-}  // namespace MarketService
+}  // namespace ApiGateway

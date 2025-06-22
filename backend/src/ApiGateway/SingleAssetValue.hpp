@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <format>
 #include <string>
-#include <vector>
 
 #include "AssetQuantity.hpp"
 #include "AssetSymbol.hpp"
@@ -12,17 +11,17 @@
 
 namespace ApiGateway {
 
-struct SingleAsset {
+struct SingleAssetValue {
   AssetSymbol assetSymbol{};
   AssetQuantity freeQuantity{};
   Value usdtValue{};
 
-  bool operator==(const SingleAsset& other) const = default;
+  // TODO - should include an AssetSymbol in which the value is expressed
+
+  bool operator==(const SingleAssetValue& other) const = default;
 };
 
-using Assets = std::vector<SingleAsset>;
-
-inline std::string toString(const SingleAsset& singleAsset) {
+inline std::string toString(const SingleAssetValue& singleAsset) {
   return std::format("{{assetSymbol={}, freeQuantity={}, usdtValue={}}}", singleAsset.assetSymbol.val_,
                      singleAsset.freeQuantity.val_, singleAsset.usdtValue.val_);
 }

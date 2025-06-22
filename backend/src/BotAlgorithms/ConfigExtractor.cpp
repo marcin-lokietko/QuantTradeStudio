@@ -1,6 +1,6 @@
 #include "ConfigExtractor.hpp"
 
-namespace BotExecution {
+namespace BotAlgorithms {
 
 ConfigExtractor::ExtractedConfig ConfigExtractor::getConfig(const ApiGateway::BotConfig& botConfig) const {
   if (botConfig.botName == ApiGateway::BotName{"Rebalancer"}) {
@@ -8,9 +8,8 @@ ConfigExtractor::ExtractedConfig ConfigExtractor::getConfig(const ApiGateway::Bo
                                        botConfig.isExecutedImmediately.has_value() &&
                                        botConfig.quoteAsset.has_value() && botConfig.baseAssetShares.has_value();
     if (areMandatoryFieldsSet) {
-      BotExecution::Rebalancer::Config config{botConfig.executionPeriod.value(),
-                                              botConfig.isExecutedImmediately.value(), botConfig.quoteAsset.value(),
-                                              botConfig.baseAssetShares.value()};
+      Rebalancer::Config config{botConfig.executionPeriod.value(), botConfig.isExecutedImmediately.value(),
+                                botConfig.quoteAsset.value(), botConfig.baseAssetShares.value()};
       if (isValid(config)) {
         return config;
       }
@@ -20,4 +19,4 @@ ConfigExtractor::ExtractedConfig ConfigExtractor::getConfig(const ApiGateway::Bo
   return {};
 }
 
-}  // namespace BotExecution
+}  // namespace BotAlgorithms

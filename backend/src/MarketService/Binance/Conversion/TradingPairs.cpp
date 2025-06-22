@@ -7,9 +7,9 @@ void fromJson(const nlohmann::json& j, MarketService::TradingPairs& tradingPairs
   tradingPairs.reserve(j.size());
 
   for (const auto& singlePrice : j.at("symbols")) {
-    tradingPairs.push_back({.symbol = ApiGateway::TradingPairSymbol{singlePrice.at("symbol").get<std::string>()},
-                            .baseAsset = ApiGateway::AssetSymbol{singlePrice.at("baseAsset").get<std::string>()},
-                            .quoteAsset = ApiGateway::AssetSymbol{singlePrice.at("quoteAsset").get<std::string>()}});
+    tradingPairs.push_back(
+        ApiGateway::TradingPairSymbol{ApiGateway::AssetSymbol{singlePrice.at("baseAsset").get<std::string>()},
+                                      ApiGateway::AssetSymbol{singlePrice.at("quoteAsset").get<std::string>()}});
   }
 }
 

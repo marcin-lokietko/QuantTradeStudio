@@ -1,18 +1,18 @@
 #pragma once
 
+#include "BotBacktester/IBotBacktester.hpp"
 #include "BotExecution/IBotExecution.hpp"
 #include "IApiGateway.hpp"
 #include "MarketService/IMarketService.hpp"
-#include "Wallet/IWallet.hpp"
 
 namespace ApiGateway {
 
 class ApiGateway : public IApiGateway {
  public:
-  ApiGateway(MarketService::IMarketService& marketService, Wallet::IWallet& wallet,
-             BotExecution::IBotExecution& botExecution);
+  ApiGateway(MarketService::IMarketService& marketService, BotExecution::IBotExecution& botExecution,
+             BotBacktester::IBotBacktester& botBacktester);
 
-  Assets getOwnedAssets() const override;
+  AssetValues getOwnedAssets() const override;
 
   OrderResult makeOrder(const AssetSymbol& selectedBaseAsset, const AssetSymbol& selectedQuoteAsset,
                         const OrderSide& orderSide, const AssetQuantity& baseAssetAmount) const override;
@@ -31,8 +31,8 @@ class ApiGateway : public IApiGateway {
 
  public:
   MarketService::IMarketService& marketService_;
-  Wallet::IWallet& wallet_;
   BotExecution::IBotExecution& botExecution_;
+  BotBacktester::IBotBacktester& botBacktester_;
 };
 
 }  // namespace ApiGateway

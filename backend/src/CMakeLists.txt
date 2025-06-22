@@ -11,13 +11,14 @@ find_package(spdlog REQUIRED)
 
 #Add components
 add_subdirectory(ApiGateway)
+add_subdirectory(BotAlgorithms)
+add_subdirectory(BotBacktester)
 add_subdirectory(BotExecution)
 add_subdirectory(Config)
 add_subdirectory(GuiService)
 add_subdirectory(Http)
 add_subdirectory(MarketService)
 add_subdirectory(Utils)
-add_subdirectory(Wallet)
 
 #declare the target
 add_executable(${EXECUTABLE_NAME}
@@ -36,10 +37,11 @@ target_link_libraries(${EXECUTABLE_NAME} ${LINKER_FLAGS}
     spdlog
 
     ApiGateway
+    BotAlgorithms
+    BotBacktester
     BotExecution
     Config
     GuiService
     Http
     MarketService
-    Wallet
 )

@@ -2,15 +2,16 @@
 
 #include <string>
 
+#include "ApiGateway/AssetQuantities.hpp"
 #include "ApiGateway/AssetQuantity.hpp"
 #include "ApiGateway/AssetSymbol.hpp"
+#include "ApiGateway/AssetValues.hpp"
 #include "ApiGateway/OrderResult.hpp"
 #include "ApiGateway/Orders.hpp"
 #include "ApiGateway/Price.hpp"
 #include "ApiGateway/TradingPairSymbol.hpp"
 #include "AssetPrices.hpp"
-#include "Assets.hpp"
-#include "KlineSequence.hpp"
+#include "AssetValues.hpp"
 #include "Time.hpp"
 #include "TradingPairs.hpp"
 
@@ -28,8 +29,10 @@ class IMarketService {
   virtual Time getServerTime() = 0;
   virtual ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) = 0;
   virtual AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& symbols) const = 0;
-  virtual KlineSequence getKlines(const std::string& symbol, const std::string& interval) = 0;
-  virtual Assets getOwnedAssets() const = 0;
+
+  virtual ApiGateway::AssetQuantities getOwnedAssetsQuantity() const = 0;
+  virtual ApiGateway::AssetValues getOwnedAssetsQuantityAndValue() const = 0;
+  virtual AssetValues getOwnedAssetValues(const ApiGateway::AssetSymbol& quoteAsset) const = 0;
 
   virtual ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol,
                                             const ApiGateway::OrderSide& orderSide,

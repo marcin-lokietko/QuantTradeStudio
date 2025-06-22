@@ -1,13 +1,12 @@
-#include "BinanceService.hpp"
-
 #include <spdlog/spdlog.h>
 
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <ranges>
 
+#include "BinanceService.hpp"
 #include "MarketService/Binance/Conversion/AssetPrices.hpp"
-#include "MarketService/Binance/Conversion/Assets.hpp"
+#include "MarketService/Binance/Conversion/AssetQuantities.hpp"
 #include "MarketService/Binance/Conversion/KlineSequence.hpp"
 #include "MarketService/Binance/Conversion/Orders.hpp"
 #include "MarketService/Binance/Conversion/TradingPairs.hpp"
@@ -29,9 +28,9 @@ Time BinanceService::getServerTime() {
 }
 
 ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) {
-  SPDLOG_INFO("getPrice called: tradingPairSymbol={}", tradingPairSymbol);
+  SPDLOG_INFO("getPrice called: tradingPairSymbol={}", toString(tradingPairSymbol));
 
-  std::string url = binanceUrlPrefix_.val_ + "/ticker/price?symbol=" + tradingPairSymbol.val_;
+  std::string url = binanceUrlPrefix_.val_ + "/ticker/price?symbol=" + toString(tradingPairSymbol);
   const auto response = http_.get(url, "");
 
   const auto jsonResponse = nlohmann::json::parse(response);
@@ -55,7 +54,7 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
       symbolsString += ",";
     }
     symbolsString += '"';
-    symbolsString += singleSymbol.val_;
+    symbolsString += toString(singleSymbol);
     symbolsString += '"';
   }
   symbolsString += "]";
@@ -64,9 +63,9 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
 
   AssetPrices assetPrices;
   try {
-    Conversion::fromJson(nlohmann::json::parse(response), assetPrices);
+    Conversion::fromJson(nlohmann::json::parse(response), assetPrices, *tradingPairSymbolDecoder_);
   } catch (const nlohmann::json::exception& e) {
-    SPDLOG_CRITICAL("/getPrices FAILED; could not deserialize Binance response; error: {}", e.what());
+    SPDLOG_CRITICAL("getPrices FAILED; could not deserialize Binance response; error: {}", e.what());
     throw;
   }
 
@@ -74,19 +73,35 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
   return assetPrices;
 }
 
-// e.g. symbol="BTCUSDT", interval="1h"
-MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol, const std::string& interval) {
-  SPDLOG_INFO("getKlines called: symbol={} interval={}", symbol, interval);
+MarketService::KlineSequence BinanceService::getKlines(const ApiGateway::TradingPairSymbol& symbol,
+                                                       const KlineInterval interval,
+                                                       const std::chrono::system_clock::time_point startTime,
+                                                       const std::chrono::system_clock::time_point endTime) const {
+  SPDLOG_INFO("getKlines called: symbol={} interval={} startTime={} endTime={}", toString(symbol), toString(interval),
+              startTime, endTime);
 
-  const std::string klinesUrl =
-      binanceUrlPrefix_.val_ + "/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000";
-  const auto klinesString = http_.get(klinesUrl, "");
+  const auto startTimeMilliseconds =
+      std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count();
+  const auto endTimeMilliseconds =
+      std::chrono::duration_cast<std::chrono::milliseconds>(endTime.time_since_epoch()).count();
+
+  // The Binance /api/v3/klines endpoint sometimes returns klines starting after the specified startTime or ending
+  // before endTime (i.e. it's exclusive). For it to be inclusive, it's needed to subtract 1 interval from the
+  // startTime and add 1 interval to the endTime.
+  const auto startTimeMillisecondsAdjusted = startTimeMilliseconds - toMilliseconds(interval).count();
+  const auto endTimeMillisecondsAdjusted = endTimeMilliseconds + toMilliseconds(interval).count();
+
+  const std::string klinesUrl = binanceUrlPrefix_.val_ + "/klines?symbol=" + toString(symbol) +
+                                "&interval=" + toString(interval) +
+                                "&startTime=" + std::to_string(startTimeMillisecondsAdjusted) +
+                                "&endTime=" + std::to_string(endTimeMillisecondsAdjusted) + "&limit=1000";
+  const auto response = http_.get(klinesUrl, "");
 
   MarketService::KlineSequence sequence;
   try {
-    Conversion::fromJson(nlohmann::json::parse(klinesString), sequence);
+    Conversion::fromJson(nlohmann::json::parse(response), sequence);
   } catch (const nlohmann::json::exception& e) {
-    SPDLOG_CRITICAL("/getKlines FAILED; could not deserialize Binance response; error: {}", e.what());
+    SPDLOG_CRITICAL("getKlines FAILED; could not deserialize Binance response; error: {}", e.what());
     throw;
   }
 
@@ -94,35 +109,74 @@ MarketService::KlineSequence BinanceService::getKlines(const std::string& symbol
   return sequence;
 }
 
-Assets BinanceService::getOwnedAssets() const {
-  SPDLOG_INFO("getOwnedAssets called");
+ApiGateway::AssetQuantities BinanceService::getOwnedAssetsQuantity() const {
+  SPDLOG_INFO("getOwnedAssetsQuantity called");
 
   const auto accountUrl = getAccountUrl();
   const auto accountString = http_.get(accountUrl, "X-MBX-APIKEY: " + encryption_.getApiKey());
   const auto accountJson = nlohmann::json::parse(accountString);
 
-  Assets assets;
+  ApiGateway::AssetQuantities assets;
   try {
     MarketService::Binance::Conversion::fromJson(accountJson.at("balances"), assets);
   } catch (const nlohmann::json::exception& e) {
-    SPDLOG_CRITICAL("/getOwnedAssets FAILED; could not deserialize Binance response; error: {}", e.what());
+    SPDLOG_CRITICAL("getOwnedAssetsQuantity FAILED; could not deserialize Binance response; error: {}", e.what());
     throw;
   }
-  SPDLOG_INFO("getOwnedAssets result: assets={}", ::toString(assets));
+  SPDLOG_INFO("getOwnedAssetsQuantity result: assets={}", ::toString(assets));
   return assets;
+}
+
+ApiGateway::AssetValues BinanceService::getOwnedAssetsQuantityAndValue() const {
+  const auto symbolToPriceMap = getSymbolToPriceMap(ApiGateway::AssetSymbol{"USDT"});
+  const auto marketOwnedAssets = getOwnedAssetsQuantity();
+
+  ApiGateway::AssetValues userAssets;
+  for (const auto& singleMarketAsset : marketOwnedAssets) {
+    ApiGateway::SingleAssetValue singleAsset{
+        .assetSymbol = ApiGateway::AssetSymbol{singleMarketAsset.assetSymbol.val_},
+        .freeQuantity = ApiGateway::AssetQuantity{singleMarketAsset.freeQuantity.val_},
+        .usdtValue = ApiGateway::Value{""}};
+    if (const auto it = symbolToPriceMap.find(
+            ApiGateway::TradingPairSymbol{singleAsset.assetSymbol, ApiGateway::AssetSymbol{"USDT"}});
+        it != symbolToPriceMap.end()) {
+      double usdtValueDouble = std::stod(singleAsset.freeQuantity.val_) * std::stod(it->second.val_);
+      singleAsset.usdtValue = ApiGateway::Value{std::to_string(usdtValueDouble)};
+    }
+    userAssets.push_back(singleAsset);
+  }
+  return userAssets;
+}
+
+AssetValues BinanceService::getOwnedAssetValues(const ApiGateway::AssetSymbol& quoteAsset) const {
+  const auto symbolToPriceMap = getSymbolToPriceMap(quoteAsset);
+  const auto marketOwnedAssets = getOwnedAssetsQuantity();
+
+  AssetValues assetValues;
+  for (const auto& singleMarketAsset : marketOwnedAssets) {
+    SingleAssetValue singleAssetValue{.baseSymbol = singleMarketAsset.assetSymbol, .quoteAsset = quoteAsset};
+    if (const auto it = symbolToPriceMap.find(
+            ApiGateway::TradingPairSymbol{singleMarketAsset.assetSymbol, ApiGateway::AssetSymbol{"USDT"}});
+        it != symbolToPriceMap.end()) {
+      double usdtValueDouble = std::stod(singleMarketAsset.freeQuantity.val_) * std::stod(it->second.val_);
+      singleAssetValue.value = ApiGateway::Value{std::to_string(usdtValueDouble)};
+    }
+    assetValues.push_back(singleAssetValue);
+  }
+  return assetValues;
 }
 
 ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairSymbol& symbol,
                                                   const ApiGateway::OrderSide& orderSide,
                                                   const ApiGateway::AssetQuantity& quantity,
                                                   const ApiGateway::Price& price) {
-  SPDLOG_INFO("makeOrder called: symbol={} orderSide={} quantity={} price={}", symbol, toString(orderSide), quantity,
-              price);
+  SPDLOG_INFO("makeOrder called: symbol={} orderSide={} quantity={} price={}", toString(symbol), toString(orderSide),
+              quantity, price);
 
   std::string orderSideString = toString(orderSide);
   std::ranges::transform(orderSideString, orderSideString.begin(), [](unsigned char c) { return std::toupper(c); });
 
-  const std::string queryString = "symbol=" + symbol.val_ + "&side=" + orderSideString +
+  const std::string queryString = "symbol=" + toString(symbol) + "&side=" + orderSideString +
                                   "&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ + "&price=" + price.val_ +
                                   "&recvWindow=5000&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
 
@@ -142,13 +196,13 @@ ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairS
 ApiGateway::OrderResult BinanceService::makeMarketTypeOrderWithQuoteQuantity(
     const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
     const ApiGateway::AssetQuantity& quoteQuantity) const {
-  SPDLOG_INFO("makeMarketTypeOrderWithQuoteQuantity called: symbol={} orderSide={} quoteQuantity={}", symbol,
+  SPDLOG_INFO("makeMarketTypeOrderWithQuoteQuantity called: symbol={} orderSide={} quoteQuantity={}", toString(symbol),
               toString(orderSide), quoteQuantity);
 
   std::string orderSideString = toString(orderSide);
   std::ranges::transform(orderSideString, orderSideString.begin(), [](unsigned char c) { return std::toupper(c); });
 
-  const std::string queryString = "symbol=" + symbol.val_ + "&side=" + orderSideString +
+  const std::string queryString = "symbol=" + toString(symbol) + "&side=" + orderSideString +
                                   "&type=MARKET&quoteOrderQty=" + quoteQuantity.val_ +
                                   "&recvWindow=5000&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
   const auto orderUrl = getOrderUrl(queryString);
@@ -174,7 +228,7 @@ TradingPairs BinanceService::getAllTradingPairs() const {
   try {
     Conversion::fromJson(nlohmann::json::parse(tradingPairsString), tradingPairs);
   } catch (const nlohmann::json::exception& e) {
-    SPDLOG_CRITICAL("/getAllTradingPairs FAILED; could not deserialize Binance response; error: {}", e.what());
+    SPDLOG_CRITICAL("getAllTradingPairs FAILED; could not deserialize Binance response; error: {}", e.what());
     throw;
   }
   SPDLOG_INFO("getAllTradingPairs result: tradingPairs={}", ::toString(tradingPairs));
@@ -230,9 +284,9 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
 
   ApiGateway::Orders orders;
   try {
-    Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders);
+    Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders, *tradingPairSymbolDecoder_);
   } catch (const nlohmann::json::exception& e) {
-    SPDLOG_CRITICAL("/getOpenOrders FAILED; could not deserialize Binance response; error: {}", e.what());
+    SPDLOG_CRITICAL("getOpenOrders FAILED; could not deserialize Binance response; error: {}", e.what());
     throw;
   }
   SPDLOG_INFO("getOpenOrders result: orders={}", ::toString(orders));
@@ -240,10 +294,10 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
 }
 
 ApiGateway::OrderResult BinanceService::cancelAllOrdersOnASymbol(const ApiGateway::TradingPairSymbol& symbol) const {
-  SPDLOG_INFO("cancelAllOrdersOnASymbol called: symbol={}", symbol);
+  SPDLOG_INFO("cancelAllOrdersOnASymbol called: symbol={}", toString(symbol));
 
   const std::string queryString =
-      "symbol=" + symbol.val_ + "&recvWindow=5000" + "&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
+      "symbol=" + toString(symbol) + "&recvWindow=5000" + "&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
   const std::string signature = encryption_.generateSignature(queryString);
   const std::string signedQuery = queryString + "&signature=" + signature;
   const std::string url = binanceUrlPrefix_.val_ + "/openOrders" + "?" + signedQuery;
@@ -261,4 +315,8 @@ ApiGateway::OrderResult BinanceService::cancelAllOrdersOnASymbol(const ApiGatewa
   return result;
 }
 
+MarketService::AssetPricesMap BinanceService::getSymbolToPriceMap(const ApiGateway::AssetSymbol& quoteAsset) const {
+  std::vector<ApiGateway::TradingPairSymbol> supportedTradingPairs = getTradingPairsWithQuoteAsset(quoteAsset);
+  return asMap(getPrices(supportedTradingPairs));
+}
 }  // namespace MarketService::Binance
