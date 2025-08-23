@@ -18,7 +18,8 @@ class BotBacktester : public IBotBacktester {
   BotBacktester(const MarketService::IHistoricalMarketDataProvider& historicalMarketDataProvider)
       : historicalMarketDataProvider_(historicalMarketDataProvider) {}
 
-  void testBot(const ApiGateway::BotConfig& botConfig, const ApiGateway::BacktesterConfig& backtesterConfig) override;
+  ApiGateway::BacktestResults testBot(const ApiGateway::BotConfig& botConfig,
+                                      const ApiGateway::BacktestConfig& backtestConfig) override;
 
  private:
   void stopAllBots();
@@ -34,7 +35,7 @@ class BotBacktester : public IBotBacktester {
   std::unique_ptr<std::jthread> runningBot_{};
   std::unique_ptr<Evaluator::Evaluator> evaluator_{};
 
-  ApiGateway::BacktesterConfig backtesterConfig_{};
+  ApiGateway::BacktestConfig backtestConfig_{};
   std::promise<void> simulationEndPromise_;
 };
 

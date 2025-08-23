@@ -4,6 +4,8 @@
 #include "AssetSymbols.hpp"
 #include "AssetValues.hpp"
 #include "AvailableQuoteAssets.hpp"
+#include "BacktestConfig.hpp"
+#include "BacktestResults.hpp"
 #include "BotConfig.hpp"
 #include "OrderResult.hpp"
 #include "Orders.hpp"
@@ -32,6 +34,8 @@ class IApiGateway {
   virtual StartBotResult startBot(const BotConfig& botConfig) const = 0;
 
   virtual StopAllBotsResult stopAllBots() const = 0;
+
+  virtual BacktestResults testBot(const BotConfig& botConfig, const BacktestConfig& backtestConfig) const = 0;
 };
 
 }  // namespace ApiGateway

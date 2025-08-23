@@ -1,5 +1,3 @@
-#include "HttpGuiService.hpp"
-
 #include <spdlog/spdlog.h>
 
 #include <nlohmann/json.hpp>
@@ -10,11 +8,14 @@
 #include "GuiService/HttpGuiService/Conversion/AvailableBaseAssetsRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssets.hpp"
 #include "GuiService/HttpGuiService/Conversion/AvailableQuoteAssetsRequest.hpp"
+#include "GuiService/HttpGuiService/Conversion/BacktestConfig.hpp"
+#include "GuiService/HttpGuiService/Conversion/BacktestResults.hpp"
 #include "GuiService/HttpGuiService/Conversion/BotConfig.hpp"
 #include "GuiService/HttpGuiService/Conversion/HealthRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/OrderRequest.hpp"
 #include "GuiService/HttpGuiService/Conversion/Orders.hpp"
 #include "GuiService/OrderRequest.hpp"
+#include "HttpGuiService.hpp"
 #include "crow.h"
 #include "crow/middlewares/cors.h"
 
@@ -179,6 +180,45 @@ void HttpGuiService::start() {
     }
 
     SPDLOG_INFO("/stopAllBots endpoint response: {}; status code: {}", res.body, res.code);
+    return res;
+  });
+
+  CROW_ROUTE(app, "/testBot").methods("POST"_method)([&apiGateway_ = apiGateway_](const crow::request& req) {
+    SPDLOG_INFO("/testBot endpoint called");
+
+    ApiGateway::BotConfig botConfig;
+    ApiGateway::BacktestConfig backtestConfig;
+
+    try {
+      Conversion::fromJson(nlohmann::json::parse(req.body), botConfig);
+      Conversion::fromJson(nlohmann::json::parse(req.body), backtestConfig);
+    } catch (const nlohmann::json::exception& e) {
+      SPDLOG_CRITICAL("/testBot FAILED; could not deserialize request; error: {}", e.what());
+      auto res = buildEmptyResponse();
+      res.code = 500;
+      return res;
+    }
+
+    // const ApiGateway::BotConfig botConfig{
+    //     ApiGateway::BotName{"Rebalancer"}, std::make_optional<ApiGateway::ExecutionPeriod>(60),
+    //     std::make_optional<ApiGateway::IsExecutedImmediately>(true),
+    //     std::make_optional<ApiGateway::AssetSymbol>("USDT"),
+    //     ApiGateway::AssetShares{
+    //         ApiGateway::SingleAssetShare{ApiGateway::AssetSymbol{"BTC"}, ApiGateway::SharePercent{80}},
+    //         ApiGateway::SingleAssetShare{ApiGateway::AssetSymbol{"ETH"}, ApiGateway::SharePercent{20}}}};
+
+    // using namespace std::chrono;
+
+    // const ApiGateway::BacktestConfig backtestConfig{
+    //     ApiGateway::TransactionFeePercent{0.001},
+    //     ApiGateway::AssetQuantities{{ApiGateway::AssetSymbol{"BTC"}, ApiGateway::AssetQuantity{"0.1"}},
+    //                                 {ApiGateway::AssetSymbol{"ETH"}, ApiGateway::AssetQuantity{"1.0"}},
+    //                                 {ApiGateway::AssetSymbol{"USDT"}, ApiGateway::AssetQuantity{"10000.5"}}},
+    //     std::chrono::system_clock::time_point{sys_days{2025y / August / 10d} + 12h},
+    //     std::chrono::system_clock::time_point{sys_days{2025y / August / 10d} + 13h}};
+
+    auto res = buildEmptyResponse(Conversion::toJson(apiGateway_.testBot(botConfig, backtestConfig)).dump());
+    SPDLOG_INFO("/testBot endpoint response: {}", res.body);
     return res;
   });
 

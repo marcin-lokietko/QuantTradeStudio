@@ -29,6 +29,8 @@ class ApiGateway : public IApiGateway {
 
   StopAllBotsResult stopAllBots() const override;
 
+  BacktestResults testBot(const BotConfig& botConfig, const BacktestConfig& backtestConfig) const override;
+
  public:
   MarketService::IMarketService& marketService_;
   BotExecution::IBotExecution& botExecution_;

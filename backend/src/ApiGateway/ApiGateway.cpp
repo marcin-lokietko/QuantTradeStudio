@@ -122,4 +122,8 @@ StopAllBotsResult ApiGateway::stopAllBots() const {
   return result;
 }
 
+BacktestResults ApiGateway::testBot(const BotConfig& botConfig, const BacktestConfig& backtestConfig) const {
+  return botBacktester_.testBot(botConfig, backtestConfig);
+}
+
 }  // namespace ApiGateway

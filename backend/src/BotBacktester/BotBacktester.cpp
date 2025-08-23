@@ -7,14 +7,14 @@
 
 namespace BotBacktester {
 
-void BotBacktester::testBot(const ApiGateway::BotConfig& botConfig,
-                            const ApiGateway::BacktesterConfig& backtesterConfig) {
+ApiGateway::BacktestResults BotBacktester::testBot(const ApiGateway::BotConfig& botConfig,
+                                                   const ApiGateway::BacktestConfig& backtestConfig) {
   stopAllBots();
   simulationEndPromise_ = std::promise<void>();
-  backtesterConfig_ = backtesterConfig;
+  backtestConfig_ = backtestConfig;
 
-  systemTimeSimulator_ = std::make_unique<Simulators::SystemTimeSimulator>(backtesterConfig_.simulationStart,
-                                                                           backtesterConfig_.simulationEnd);
+  systemTimeSimulator_ =
+      std::make_unique<Simulators::SystemTimeSimulator>(backtestConfig_.simulationStart, backtestConfig_.simulationEnd);
   // 4. accept input parameters from FE and send evaluation result to FE
   // 5. Manual, UT, CT, E2E test everything and fix all the bugs
   // 6. Refactor everything
@@ -43,12 +43,12 @@ void BotBacktester::testBot(const ApiGateway::BotConfig& botConfig,
         } else if constexpr (std::is_same_v<T, BotAlgorithms::Rebalancer::Config>) {
           SPDLOG_INFO("Received valid configuration for bot: Rebalancer");
 
-          auto klineSequenceMap = buildKlineSequenceMap(config, this->backtesterConfig_.simulationStart,
-                                                        this->backtesterConfig_.simulationEnd);
+          auto klineSequenceMap =
+              buildKlineSequenceMap(config, this->backtestConfig_.simulationStart, this->backtestConfig_.simulationEnd);
 
           this->marketServiceSimulator_ = std::make_unique<Simulators::MarketServiceSimulator>(
-              klineSequenceMap, *this->systemTimeSimulator_, this->backtesterConfig_.transactionFeePercent,
-              this->backtesterConfig_.initialOwnedAssets);
+              klineSequenceMap, *this->systemTimeSimulator_, this->backtestConfig_.transactionFeePercent,
+              this->backtestConfig_.initialOwnedAssets);
 
           this->evaluator_ = std::make_unique<Evaluator::Evaluator>(std::move(klineSequenceMap));
 
@@ -68,7 +68,7 @@ void BotBacktester::testBot(const ApiGateway::BotConfig& botConfig,
   stopAllBots();
 
   auto ownedAssetsHistory = marketServiceSimulator_->getOwnedAssetsHistory();
-  auto backtestResults = this->evaluator_->evaluate(std::move(ownedAssetsHistory));
+  return this->evaluator_->evaluate(std::move(ownedAssetsHistory));
 }
 
 void BotBacktester::stopAllBots() {

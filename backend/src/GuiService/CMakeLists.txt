@@ -4,6 +4,8 @@ add_library(GuiService STATIC
   HttpGuiService/Conversion/AvailableBaseAssetsRequest.cpp
   HttpGuiService/Conversion/AvailableQuoteAssets.cpp
   HttpGuiService/Conversion/AvailableQuoteAssetsRequest.cpp
+  HttpGuiService/Conversion/BacktestConfig.cpp
+  HttpGuiService/Conversion/BacktestResults.cpp
   HttpGuiService/Conversion/BotConfig.cpp
   HttpGuiService/Conversion/HealthRequest.cpp
   HttpGuiService/Conversion/OrderRequest.cpp

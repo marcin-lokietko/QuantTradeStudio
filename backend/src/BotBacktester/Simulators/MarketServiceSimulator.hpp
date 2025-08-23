@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-#include "ApiGateway/BacktesterConfig.hpp"
+#include "ApiGateway/BacktestConfig.hpp"
 #include "BotBacktester/BotAssetsHistory.hpp"
 #include "MarketService/IMarketService.hpp"
 #include "MarketService/KlineSequence.hpp"
