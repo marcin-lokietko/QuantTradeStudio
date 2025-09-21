@@ -15,10 +15,6 @@ ApiGateway::BacktestResults BotBacktester::testBot(const ApiGateway::BotConfig& 
 
   systemTimeSimulator_ =
       std::make_unique<Simulators::SystemTimeSimulator>(backtestConfig_.simulationStart, backtestConfig_.simulationEnd);
-  // 4. accept input parameters from FE and send evaluation result to FE
-  // 5. Manual, UT, CT, E2E test everything and fix all the bugs
-  // 6. Refactor everything
-  // 7. add support for paging in getKlines (for large>1k time ranges)
 
   systemTimeSimulator_->registerSimulationEndCallback([this]() {
     // Note, that stopAllBots() cannot be called directly from the callback, because the

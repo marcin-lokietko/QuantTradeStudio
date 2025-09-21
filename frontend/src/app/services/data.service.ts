@@ -163,6 +163,29 @@ export class DataService {
     }
   }
 
+  async testBot(botConfig: any, backtestConfig: any): Promise<RequestResult> {
+    console.log('DataService.botConfig, params:', JSON.stringify(botConfig), 'DataService.backtestConfig:', JSON.stringify(backtestConfig));
+
+    try {
+      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/testBot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Headers': '*',
+        },
+        body: JSON.stringify({ ...botConfig, ...backtestConfig }),
+      });
+      if (!response.ok) {
+        return RequestResult.Fail;
+      }
+      console.info('POST /testBot success:');
+      return RequestResult.Success;
+    } catch (error) {
+      console.error('POST /testBot error:', error);
+      return RequestResult.Fail;
+    }
+  }
+
   async getQuoteAssetsSuitableForRebalancing(): Promise<string[] | undefined> {
     console.log('DataService.getQuoteAssetsSuitableForRebalancing');
     try {

@@ -3,19 +3,19 @@
   <mat-dialog-content></mat-dialog-content>
   <mat-form-field appearance="fill">
     <mat-label>Asset symbol</mat-label>
-    <mat-select [(ngModel)]="selectedAsset" data-testid="add-asset-share-dialog-base-asset">
-      <mat-option *ngFor="let asset of availableAssets" [attr.data-testid]="'add-asset-share-dialog-base-asset-' + asset" [value]="asset">
+    <mat-select [(ngModel)]="selectedAsset" data-testid="add-asset-and-number-dialog-base-asset">
+      <mat-option *ngFor="let asset of assets" [attr.data-testid]="'add-asset-and-number-dialog-base-asset-' + asset" [value]="asset">
         {{ asset }}
       </mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field appearance="fill">
     <mat-label>{{ inputFieldLabel }}</mat-label>
-    <input matInput [(ngModel)]="assetShare" data-testid="add-asset-share-dialog-asset-share" placeholder="0" />
+    <input matInput [(ngModel)]="assetShare" data-testid="add-asset-and-number-dialog-asset-share" placeholder="0" />
   </mat-form-field>
   <div class="action-buttons-wrapper">
     <mat-dialog-actions class="action-buttons">
-      <button mat-button data-testid="add-asset-share-dialog-confirm-button" (click)="closeWithResult()">Confirm</button>
+      <button mat-button data-testid="add-asset-and-number-dialog-confirm-button" (click)="closeWithResult()">Confirm</button>
       <button mat-button (click)="cancel()">Cancel</button>
     </mat-dialog-actions>
   </div>

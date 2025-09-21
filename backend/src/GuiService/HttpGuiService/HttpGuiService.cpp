@@ -199,24 +199,6 @@ void HttpGuiService::start() {
       return res;
     }
 
-    // const ApiGateway::BotConfig botConfig{
-    //     ApiGateway::BotName{"Rebalancer"}, std::make_optional<ApiGateway::ExecutionPeriod>(60),
-    //     std::make_optional<ApiGateway::IsExecutedImmediately>(true),
-    //     std::make_optional<ApiGateway::AssetSymbol>("USDT"),
-    //     ApiGateway::AssetShares{
-    //         ApiGateway::SingleAssetShare{ApiGateway::AssetSymbol{"BTC"}, ApiGateway::SharePercent{80}},
-    //         ApiGateway::SingleAssetShare{ApiGateway::AssetSymbol{"ETH"}, ApiGateway::SharePercent{20}}}};
-
-    // using namespace std::chrono;
-
-    // const ApiGateway::BacktestConfig backtestConfig{
-    //     ApiGateway::TransactionFeePercent{0.001},
-    //     ApiGateway::AssetQuantities{{ApiGateway::AssetSymbol{"BTC"}, ApiGateway::AssetQuantity{"0.1"}},
-    //                                 {ApiGateway::AssetSymbol{"ETH"}, ApiGateway::AssetQuantity{"1.0"}},
-    //                                 {ApiGateway::AssetSymbol{"USDT"}, ApiGateway::AssetQuantity{"10000.5"}}},
-    //     std::chrono::system_clock::time_point{sys_days{2025y / August / 10d} + 12h},
-    //     std::chrono::system_clock::time_point{sys_days{2025y / August / 10d} + 13h}};
-
     auto res = buildEmptyResponse(Conversion::toJson(apiGateway_.testBot(botConfig, backtestConfig)).dump());
     SPDLOG_INFO("/testBot endpoint response: {}", res.body);
     return res;

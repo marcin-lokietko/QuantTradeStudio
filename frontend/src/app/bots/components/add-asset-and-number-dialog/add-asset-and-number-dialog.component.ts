@@ -29,13 +29,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatRadioModule,
     MatSelectModule,
   ],
-  templateUrl: './add-asset-share-dialog.component.html',
-  styleUrls: ['./add-asset-share-dialog.component.scss'],
+  templateUrl: './add-asset-and-number-dialog.component.html',
+  styleUrls: ['./add-asset-and-number-dialog.component.scss'],
 })
-export class AddAssetShareDialog {
+export class AddAssetAndNumberDialog {
   public title = '';
   public inputFieldLabel = '';
-  public availableAssets: string[] = [];
+  public assets: string[] = [];
   public selectedAsset = '';
   public assetShare: number | undefined = undefined;
 
@@ -47,7 +47,7 @@ export class AddAssetShareDialog {
 
   ngOnInit(): void {
     this.title = this.data.title;
-    this.availableAssets = this.data.availableAssets;
+    this.assets = this.data.assets;
     this.inputFieldLabel = this.data.inputFieldLabel;
   }
 

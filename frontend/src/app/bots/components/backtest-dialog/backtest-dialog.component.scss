@@ -1,0 +1,57 @@
+mat-form-field {
+  width: 100%;
+  margin: 0;
+}
+
+.mat-mdc-dialog-title {
+  padding-bottom: 0;
+}
+
+.radio-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .radio-group {
+    display: flex;
+    gap: 16vw;
+  }
+
+  margin-bottom: 3vh;
+}
+
+.action-buttons-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .action-buttons {
+    display: flex;
+    gap: 10vw;
+  }
+}
+
+.spinner {
+  margin-left: 4vw;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.timestamp-display {
+  margin-top: 16px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+}
+
+h3 {
+  margin-top: 24px;
+  margin-bottom: 8px;
+}

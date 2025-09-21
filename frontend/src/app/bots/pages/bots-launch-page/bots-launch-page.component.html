@@ -65,6 +65,15 @@
       <button *ngIf="isConfigValid" class="launch-button" data-testid="bots-launch-page-launch-bot-button" mat-button (click)="startBot()">
         Launch bot
       </button>
+      <button
+        *ngIf="isConfigValid"
+        class="launch-button"
+        data-testid="bots-launch-page-open-backtest-dialog-button"
+        mat-button
+        (click)="openBacktestDialog()"
+      >
+        Backtest
+      </button>
     </div>
   </div>
 </div>

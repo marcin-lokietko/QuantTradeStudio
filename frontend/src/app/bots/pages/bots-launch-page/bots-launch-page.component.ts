@@ -2,7 +2,8 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { AddAssetShareDialog } from '@app/bots/components/add-asset-share-dialog/add-asset-share-dialog.component';
+import { AddAssetAndNumberDialog } from '@app/bots/components/add-asset-and-number-dialog/add-asset-and-number-dialog.component';
+import { BacktestDialog } from '@app/bots/components/backtest-dialog/backtest-dialog.component';
 import { DataService, RequestResult } from '@app/services/data.service';
 import { NotificationService } from '@app/services/notification.service';
 import { NotificationSeverity } from '@app/shared/components/notification/notification-severity-enum';
@@ -118,12 +119,12 @@ export class BotsLaunchPage {
   }
 
   public addBaseAsset(): void {
-    const dialogRef = this.dialog.open(AddAssetShareDialog, {
+    const dialogRef = this.dialog.open(AddAssetAndNumberDialog, {
       width: '60vw',
       data: {
         title: 'Add base asset share',
         inputFieldLabel: 'Base asset share',
-        availableAssets: this.availableBaseAssets.filter((elem: string) => {
+        assets: this.availableBaseAssets.filter((elem: string) => {
           return (
             this.selectedBaseAssetsConfig.findIndex((config) => {
               return config.assetSymbol === elem;
@@ -188,12 +189,40 @@ export class BotsLaunchPage {
       baseAssetShares: this.selectedBaseAssetsConfig,
     };
 
-    this.dataService.startBot(botParams).then((result) => {
+    this.dataService.startBot(this.buildBotParams()).then((result) => {
       if (result === RequestResult.Success) {
         console.log('Bot started successfully');
       } else if (result === RequestResult.Fail) {
         this.notificationService.show('Failed to launch the bot', 3000, NotificationSeverity.Error);
       }
     });
+  }
+
+  public openBacktestDialog(): void {
+    const botParams = this.buildBotParams();
+    let availableInitialAssets = botParams.baseAssetShares.map((config) => config.assetSymbol);
+    availableInitialAssets.push(botParams.quoteAsset);
+
+    const dialogRef = this.dialog.open(BacktestDialog, {
+      width: '60vw',
+      data: {
+        botParams,
+        availableInitialAssets,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('Dialog closed with result:', result);
+    });
+  }
+
+  private buildBotParams() {
+    return {
+      botName: this.selectedBot,
+      executionPeriod: Number(this.executionPeriodInput),
+      isExecutedImmediately: this.isExecutedImmediately,
+      quoteAsset: this.selectedQuoteAsset,
+      baseAssetShares: this.selectedBaseAssetsConfig,
+    };
   }
 }

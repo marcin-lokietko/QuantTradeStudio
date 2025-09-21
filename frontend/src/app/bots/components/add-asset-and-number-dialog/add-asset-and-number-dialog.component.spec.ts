@@ -11,17 +11,17 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { ChangeDetectorRef } from '@angular/core';
-import { AddAssetShareDialog } from './add-asset-share-dialog.component';
+import { AddAssetAndNumberDialog } from './add-asset-and-number-dialog.component';
 
-describe('AddAssetShareDialog', () => {
-  let component: AddAssetShareDialog;
-  let fixture: ComponentFixture<AddAssetShareDialog>;
+describe('AddAssetAndNumberDialog', () => {
+  let component: AddAssetAndNumberDialog;
+  let fixture: ComponentFixture<AddAssetAndNumberDialog>;
 
-  let mockDialogRef: jasmine.SpyObj<MatDialogRef<AddAssetShareDialog>>;
+  let mockDialogRef: jasmine.SpyObj<MatDialogRef<AddAssetAndNumberDialog>>;
 
   const mockDialogData = {
     title: 'Add Asset',
-    availableAssets: ['BTC', 'ETH'],
+    assets: ['BTC', 'ETH'],
     inputFieldLabel: 'Share (%)',
   };
 
@@ -31,7 +31,7 @@ describe('AddAssetShareDialog', () => {
     await TestBed.configureTestingModule({
       declarations: [],
       imports: [
-        AddAssetShareDialog,
+        AddAssetAndNumberDialog,
         MatButtonModule,
         MatDialogModule,
         MatFormFieldModule,
@@ -51,7 +51,7 @@ describe('AddAssetShareDialog', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AddAssetShareDialog);
+    fixture = TestBed.createComponent(AddAssetAndNumberDialog);
     component = fixture.componentInstance;
   });
 
@@ -62,7 +62,7 @@ describe('AddAssetShareDialog', () => {
   it('should initialize fields from dialog data on ngOnInit', () => {
     component.ngOnInit();
     expect(component.title).toBe(mockDialogData.title);
-    expect(component.availableAssets).toEqual(mockDialogData.availableAssets);
+    expect(component.assets).toEqual(mockDialogData.assets);
     expect(component.inputFieldLabel).toBe(mockDialogData.inputFieldLabel);
   });
 
