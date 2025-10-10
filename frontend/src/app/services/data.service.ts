@@ -26,6 +26,21 @@ export interface AvailableQuoteAsset {
   quoteAsset: string;
 }
 
+export interface AssetQuantitiesAndValuesHistoryItem {
+  timestamp: number;
+  assets: Balance[];
+}
+
+export interface BacktestResults {
+  assetHistoryIfHeld: AssetQuantitiesAndValuesHistoryItem[];
+  botAssetHistory: AssetQuantitiesAndValuesHistoryItem[];
+  totalProfitOrLossInAbsolute: string;
+  totalProfitOrLossInAbsoluteIfHeld: string;
+  totalProfitOrLossInPercent: number;
+  totalProfitOrLossInPercentIfHeld: number;
+  absoluteAsset: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -163,7 +178,7 @@ export class DataService {
     }
   }
 
-  async testBot(botConfig: any, backtestConfig: any): Promise<RequestResult> {
+  async testBot(botConfig: any, backtestConfig: any): Promise<BacktestResults | undefined> {
     console.log('DataService.botConfig, params:', JSON.stringify(botConfig), 'DataService.backtestConfig:', JSON.stringify(backtestConfig));
 
     try {
@@ -176,13 +191,16 @@ export class DataService {
         body: JSON.stringify({ ...botConfig, ...backtestConfig }),
       });
       if (!response.ok) {
-        return RequestResult.Fail;
+        return undefined;
       }
+      const data = await response.json();
+      console.log('POST /testBot response:', JSON.stringify(data));
+
       console.info('POST /testBot success:');
-      return RequestResult.Success;
+      return data as BacktestResults;
     } catch (error) {
       console.error('POST /testBot error:', error);
-      return RequestResult.Fail;
+      return undefined;
     }
   }
 

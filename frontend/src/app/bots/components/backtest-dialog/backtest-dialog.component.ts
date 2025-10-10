@@ -14,7 +14,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { DataService, RequestResult } from '@app/services/data.service';
+import { BacktestResults, DataService, RequestResult } from '@app/services/data.service';
 import { NotificationSeverity } from '@app/shared/components/notification/notification-severity-enum';
 import { NotificationService } from '@app/services/notification.service';
 import { MatTableDataSource } from '@angular/material/table';
@@ -70,6 +70,8 @@ export class BacktestDialog {
 
   public availableInitialAssets: string[] = [];
 
+  public backtestResults: BacktestResults | undefined;
+
   dataSource = new MatTableDataSource(this.initialOwnedAssets);
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -109,12 +111,14 @@ export class BacktestDialog {
   }
 
   public launchBacktest() {
+    this.backtestResults = undefined;
     this.dataService.testBot(this.botParams, this.getBacktestConfig()).then((result) => {
-      if (result === RequestResult.Success) {
-        console.log('Backtest started successfully');
-      } else if (result === RequestResult.Fail) {
+      if (!result) {
         this.notificationService.show('Failed to launch the backtest', 3000, NotificationSeverity.Error);
+        return;
       }
+      this.backtestResults = result;
+      console.log('Backtest results:', this.backtestResults);
     });
   }
 
