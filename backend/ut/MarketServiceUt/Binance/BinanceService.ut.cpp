@@ -29,18 +29,22 @@ const std::string binanceTradingPairsResponse = R"({
 
 class BinanceServiceTest : public ::testing::Test {
  public:
+  BinanceServiceTest() {
+    EXPECT_CALL(HttpMock_, get(tradingPairsUrl, "")).WillRepeatedly(Return(binanceTradingPairsResponse));
+  }
+
   testing::StrictMock<EncryptionMock> encryptionMock_;
   testing::StrictMock<Http::HttpMock> HttpMock_;
   testing::StrictMock<::Time::TimeMock> timeMock_;
 
-  BinanceService sut_{encryptionMock_, HttpMock_, timeMock_, dummyBinanceUrlPrefix};
+  BinanceService MakeSut() { return BinanceService{encryptionMock_, HttpMock_, timeMock_, dummyBinanceUrlPrefix}; }
 };
 
 TEST_F(BinanceServiceTest, WhenGetServerTimeCalled_ThenHttpGetIsInvoked) {
   const std::string binanceResponse = R"({"serverTime": 1234567890})";
 
   EXPECT_CALL(HttpMock_, get(dummyBinanceUrlPrefix.val_ + "/time", "")).WillOnce(Return(binanceResponse));
-  EXPECT_EQ(Time{binanceResponse}, sut_.getServerTime());
+  EXPECT_EQ(Time{binanceResponse}, MakeSut().getServerTime());
 }
 
 TEST_F(BinanceServiceTest, WhenGetPriceCalled_ThenHttpGetIsInvoked) {
@@ -49,7 +53,7 @@ TEST_F(BinanceServiceTest, WhenGetPriceCalled_ThenHttpGetIsInvoked) {
   EXPECT_CALL(HttpMock_, get(dummyBinanceUrlPrefix.val_ + "/ticker/price?symbol=BTCUSDT", ""))
       .WillOnce(Return(binanceResponse));
 
-  ApiGateway::Price outputPrice = sut_.getPrice(btcUsdtTradingPair);
+  ApiGateway::Price outputPrice = MakeSut().getPrice(btcUsdtTradingPair);
   EXPECT_EQ(ApiGateway::Price{"50000"}, outputPrice);
 }
 
@@ -61,7 +65,7 @@ TEST_F(BinanceServiceTest, WhenGetPricesCalled_ThenHttpGetIsInvoked) {
   EXPECT_CALL(HttpMock_, get(dummyBinanceUrlPrefix.val_ + "/ticker/price?symbols=[\"BTCUSDT\",\"ETHUSDT\"]", ""))
       .WillOnce(Return(binanceResponse));
 
-  const AssetPrices outputPrices = sut_.getPrices(tradingPairSymbols);
+  const AssetPrices outputPrices = MakeSut().getPrices(tradingPairSymbols);
   EXPECT_EQ(2, outputPrices.size());
   EXPECT_TRUE(std::ranges::is_permutation(
       outputPrices, std::vector{SingleAssetPrice{btcUsdtTradingPair, ApiGateway::Price{"50000"}},
@@ -69,28 +73,35 @@ TEST_F(BinanceServiceTest, WhenGetPricesCalled_ThenHttpGetIsInvoked) {
 }
 
 TEST_F(BinanceServiceTest, WhenGetKlinesCalled_ThenHttpGetIsInvoked) {
-  // const ApiGateway::TradingPairSymbol symbol{"BTCUSDT"};
-  // const auto interval = KlineInterval::OneHour;
-  // const std::string klinesUrl = dummyBinanceUrlPrefix.val_ + "/klines?symbol=BTCUSDT&interval=1h&limit=1000";
+  const ApiGateway::TradingPairSymbol symbol{AssetSymbol{"BTC"}, AssetSymbol{"USDT"}};
+  const auto interval = KlineInterval::OneHour;
+  const std::string klinesUrl =
+      dummyBinanceUrlPrefix.val_ +
+      "/klines?symbol=BTCUSDT&interval=1h&startTime=1622545200000&endTime=1622555999999&limit=1000";
 
-  // const std::string binanceResponse = R"([
-  //       [1622548800000, "35000.00", "36000.00", "34000.00", "35500.00", "1000.00", 1622552399999, "35500000.00", 100,
-  //       "500.00", "3550000.00", "0"]
-  //   ])";
+  const std::string binanceResponse = R"([
+        [1622548800000, "35000.00", "36000.00", "34000.00", "35500.00", "1000.00", 1622552399999, "35500000.00", 100,
+        "500.00", "3550000.00", "0"]
+    ])";
 
-  // EXPECT_CALL(HttpMock_, get(klinesUrl, "")).WillOnce(Return(binanceResponse));
+  EXPECT_CALL(HttpMock_, get(klinesUrl, "")).WillOnce(Return(binanceResponse));
 
-  // KlineSequence outputSequence = sut_.getKlines(symbol, interval);
-  // EXPECT_EQ(1, outputSequence.size());
-  // const Kline expectedKline{
-  //     .openTime = Time{"1622548800000"},
-  //     .closeTime = Time{"1622552399999"},
-  //     .openPrice = ApiGateway::Price{"35000.00"},
-  //     .closePrice = ApiGateway::Price{"35500.00"},
-  //     .lowPrice = ApiGateway::Price{"34000.00"},
-  //     .highPrice = ApiGateway::Price{"36000.00"},
-  // };
-  // EXPECT_EQ(expectedKline, outputSequence.at(0));
+  const std::chrono::system_clock::time_point startTime =
+      std::chrono::system_clock::time_point(std::chrono::milliseconds{1622548800000});
+  const std::chrono::system_clock::time_point endTime =
+      std::chrono::system_clock::time_point(std::chrono::milliseconds{1622552399999});
+
+  KlineSequence outputSequence = MakeSut().getKlines(symbol, interval, startTime, endTime);
+  EXPECT_EQ(1, outputSequence.size());
+  const Kline expectedKline{
+      .openTime = startTime,
+      .closeTime = endTime,
+      .openPrice = ApiGateway::Price{"35000.00"},
+      .closePrice = ApiGateway::Price{"35500.00"},
+      .lowPrice = ApiGateway::Price{"34000.00"},
+      .highPrice = ApiGateway::Price{"36000.00"},
+  };
+  EXPECT_EQ(expectedKline, outputSequence.at(0));
 }
 
 TEST_F(BinanceServiceTest, WhenGetOwnedAssetsQuantityCalled_ThenHttpGetIsInvoked) {
@@ -103,7 +114,7 @@ TEST_F(BinanceServiceTest, WhenGetOwnedAssetsQuantityCalled_ThenHttpGetIsInvoked
 
   EXPECT_CALL(HttpMock_, get(accountUrl, "X-MBX-APIKEY: dummy_api_key")).WillOnce(Return(binanceResponse));
 
-  ApiGateway::AssetQuantities outputAssets = sut_.getOwnedAssetsQuantity();
+  ApiGateway::AssetQuantities outputAssets = MakeSut().getOwnedAssetsQuantity();
   EXPECT_EQ(2, outputAssets.size());
   EXPECT_TRUE(std::ranges::is_permutation(
       outputAssets,
@@ -123,14 +134,12 @@ TEST_F(BinanceServiceTest, WhengetOwnedAssetsQuantityAndValueCalled_ThenReturnsA
 
   EXPECT_CALL(HttpMock_, get(accountUrl, "X-MBX-APIKEY: dummy_api_key")).WillOnce(Return(binanceResponse));
 
-  EXPECT_CALL(HttpMock_, get(tradingPairsUrl, "")).WillOnce(Return(binanceTradingPairsResponse));
-
   const std::string binanceGetPricesResponse =
       R"([{"symbol": "BTCUSDT", "price": "50000"}, {"symbol": "ETHUSDT", "price": "4000"}])";
   EXPECT_CALL(HttpMock_, get(dummyBinanceUrlPrefix.val_ + "/ticker/price?symbols=[\"BTCUSDT\",\"ETHUSDT\"]", ""))
       .WillOnce(Return(binanceGetPricesResponse));
 
-  auto result = sut_.getOwnedAssetsQuantityAndValue();
+  auto result = MakeSut().getOwnedAssetsQuantityAndValue();
 
   ASSERT_EQ(result.size(), 2);
   EXPECT_EQ(result[0].assetSymbol, ApiGateway::AssetSymbol{"BTC"});
@@ -153,14 +162,12 @@ TEST_F(BinanceServiceTest, WhenGetOwnedAssetValuesCalled_ThenReturnsAssetValuesW
 
   EXPECT_CALL(HttpMock_, get(accountUrl, "X-MBX-APIKEY: dummy_api_key")).WillOnce(Return(binanceResponse));
 
-  EXPECT_CALL(HttpMock_, get(tradingPairsUrl, "")).WillOnce(Return(binanceTradingPairsResponse));
-
   const std::string binanceGetPricesResponse =
       R"([{"symbol": "BTCUSDT", "price": "50000"}, {"symbol": "ETHUSDT", "price": "4000"}])";
   EXPECT_CALL(HttpMock_, get(dummyBinanceUrlPrefix.val_ + "/ticker/price?symbols=[\"BTCUSDT\",\"ETHUSDT\"]", ""))
       .WillOnce(Return(binanceGetPricesResponse));
 
-  auto result = sut_.getOwnedAssetValues(quoteAsset);
+  auto result = MakeSut().getOwnedAssetValues(quoteAsset);
 
   ASSERT_EQ(result.size(), 2);
   EXPECT_EQ(result[0].baseSymbol, ApiGateway::AssetSymbol{"BTC"});
@@ -185,8 +192,8 @@ TEST_F(BinanceServiceTest, WhenMakeOrderCalled_ThenHttpPostIsInvoked) {
   EXPECT_CALL(HttpMock_, post(orderUrl, "X-MBX-APIKEY: dummy_api_key"))
       .WillOnce(Return(Http::Response{Http::HttpStatusCode{200}, Http::HttpBody{binanceResponse}}));
 
-  ApiGateway::OrderResult result = sut_.makeOrder(btcUsdtTradingPair, ApiGateway::OrderSide::Buy,
-                                                  ApiGateway::AssetQuantity{"0.01"}, ApiGateway::Price{"50000"});
+  ApiGateway::OrderResult result = MakeSut().makeOrder(btcUsdtTradingPair, ApiGateway::OrderSide::Buy,
+                                                       ApiGateway::AssetQuantity{"0.01"}, ApiGateway::Price{"50000"});
   EXPECT_EQ(ApiGateway::OrderResult::Success, result);
 }
 
@@ -203,32 +210,26 @@ TEST_F(BinanceServiceTest, WhenMakeMarketTypeOrderWithQuoteQuantityCalled_ThenHt
   EXPECT_CALL(HttpMock_, post(orderUrl, "X-MBX-APIKEY: dummy_api_key"))
       .WillOnce(Return(Http::Response{Http::HttpStatusCode{200}, Http::HttpBody{binanceResponse}}));
 
-  ApiGateway::OrderResult result = sut_.makeMarketTypeOrderWithQuoteQuantity(
+  ApiGateway::OrderResult result = MakeSut().makeMarketTypeOrderWithQuoteQuantity(
       btcUsdtTradingPair, ApiGateway::OrderSide::Buy, ApiGateway::AssetQuantity{"1000"});
   EXPECT_EQ(ApiGateway::OrderResult::Success, result);
 }
 
 TEST_F(BinanceServiceTest, WhenGetAllTradingPairsCalled_ThenHttpGetIsInvoked) {
-  EXPECT_CALL(HttpMock_, get(tradingPairsUrl, "")).WillOnce(Return(binanceTradingPairsResponse));
-
-  TradingPairs outputPairs = sut_.getAllTradingPairs();
+  TradingPairs outputPairs = MakeSut().getAllTradingPairs();
   EXPECT_EQ(3, outputPairs.size());
   EXPECT_TRUE(std::ranges::is_permutation(outputPairs,
                                           TradingPairs{btcUsdtTradingPair, ethUsdtTradingPair, ethEurTradingPair}));
 }
 
 TEST_F(BinanceServiceTest, WhenGetTradingPairsWithQuoteAssetCalled_ThenHttpGetIsInvoked) {
-  EXPECT_CALL(HttpMock_, get(tradingPairsUrl, "")).WillOnce(Return(binanceTradingPairsResponse));
-
-  TradingPairs outputPairs = sut_.getTradingPairsWithQuoteAsset(ApiGateway::AssetSymbol{"USDT"});
+  TradingPairs outputPairs = MakeSut().getTradingPairsWithQuoteAsset(ApiGateway::AssetSymbol{"USDT"});
   EXPECT_EQ(2, outputPairs.size());
   EXPECT_TRUE(std::ranges::is_permutation(outputPairs, TradingPairs{btcUsdtTradingPair, ethUsdtTradingPair}));
 }
 
 TEST_F(BinanceServiceTest, WhenGetTradingPairsWithBaseAssetCalled_ThenHttpGetIsInvoked) {
-  EXPECT_CALL(HttpMock_, get(tradingPairsUrl, "")).WillOnce(Return(binanceTradingPairsResponse));
-
-  TradingPairs outputPairs = sut_.getTradingPairsWithBaseAsset(ApiGateway::AssetSymbol{"ETH"});
+  TradingPairs outputPairs = MakeSut().getTradingPairsWithBaseAsset(ApiGateway::AssetSymbol{"ETH"});
   EXPECT_EQ(2, outputPairs.size());
   EXPECT_TRUE(std::ranges::is_permutation(outputPairs, TradingPairs{ethUsdtTradingPair, ethEurTradingPair}));
 }
@@ -247,7 +248,7 @@ TEST_F(BinanceServiceTest, WhenGetOpenOrdersCalled_ThenHttpGetIsInvoked) {
 
   EXPECT_CALL(HttpMock_, get(accountUrl, "X-MBX-APIKEY: dummy_api_key")).WillOnce(Return(binanceResponse));
 
-  ApiGateway::Orders outputOrders = sut_.getOpenOrders();
+  ApiGateway::Orders outputOrders = MakeSut().getOpenOrders();
   EXPECT_EQ(2, outputOrders.size());
   EXPECT_TRUE(std::ranges::is_permutation(
       outputOrders,
@@ -271,7 +272,7 @@ TEST_F(BinanceServiceTest, WhenCancelAllOrdersOnASymbolCalled_ThenHttpDeleteIsIn
   EXPECT_CALL(HttpMock_, del(orderUrl, "X-MBX-APIKEY: dummy_api_key"))
       .WillOnce(Return(Http::Response{Http::HttpStatusCode{200}, Http::HttpBody{binanceResponse}}));
 
-  ApiGateway::OrderResult result = sut_.cancelAllOrdersOnASymbol(btcUsdtTradingPair);
+  ApiGateway::OrderResult result = MakeSut().cancelAllOrdersOnASymbol(btcUsdtTradingPair);
   EXPECT_EQ(ApiGateway::OrderResult::Success, result);
 }
 
