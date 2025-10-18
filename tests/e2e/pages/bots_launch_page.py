@@ -24,15 +24,15 @@ class BotsLaunchPage:
     def add_base_asset(self, base_asset, base_asset_share):
         self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="bots-launch-page-add-base-asset-button"]', is_fallback_to_js_click=True)
 
-        self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="add-asset-share-dialog-base-asset"]')
-        list_element_id = "add-asset-share-dialog-base-asset-" + base_asset
+        self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="add-asset-and-number-dialog-base-asset"]')
+        list_element_id = "add-asset-and-number-dialog-base-asset-" + base_asset
         self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, f'[data-testid="{list_element_id}"]')
 
-        base_asset_share_input = self.waiting_webdriver.find_element(By.CSS_SELECTOR, '[data-testid="add-asset-share-dialog-asset-share"]')
+        base_asset_share_input = self.waiting_webdriver.find_element(By.CSS_SELECTOR, '[data-testid="add-asset-and-number-dialog-asset-share"]')
         base_asset_share_input.clear()
         base_asset_share_input.send_keys(base_asset_share)
 
-        self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="add-asset-share-dialog-confirm-button"]')
+        self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="add-asset-and-number-dialog-confirm-button"]')
 
     def click_launch_bot_button(self):
         self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="bots-launch-page-launch-bot-button"]')

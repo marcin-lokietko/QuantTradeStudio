@@ -20,6 +20,7 @@ services:
       - ../../tests:/algo-trader/tests
     ports:
       - "5000:5000"
+    user: "${USER_ID}:${GROUP_ID}"
     working_dir: /
     command: bash -c "/algo-trader/build/debug/src/AlgoTrader /algo-trader/tests/e2e/configuration.json"
   selenium:
@@ -38,6 +39,6 @@ services:
     environment:
       PYTHONPATH: "/algo-trader"
     working_dir: /
-    command: bash -c "cd /algo-trader/tests/e2e && behave ${TEST_ARGUMENTS}"
+    command: bash -c "cd /algo-trader/tests/e2e && behave --no-color ${TEST_ARGUMENTS}"
     stdin_open: true
     tty: true

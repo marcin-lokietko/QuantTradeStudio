@@ -27,5 +27,6 @@ services:
       - ../../config:/algo-trader/config
     ports:
       - "5000:5000"
+    user: "${USER_ID}:${GROUP_ID}"
     working_dir: /
     command: bash -c "/algo-trader/build/debug/src/AlgoTrader /algo-trader/config/dockerDevelConfig.json"
