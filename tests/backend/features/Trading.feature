@@ -2,16 +2,17 @@ Feature: Trading
 
 
 Scenario: Invoking /assets returns owned assets
-    Given Backend is available
-    And MarketService mock is running with default configuration
+    Given MarketService mock is running with default configuration
+    And Backend is available
     When Request GET /assets is sent
     Then Response for GET /assets was received with status code "200" and body "[{"assetSymbol":"BTC","freeQuantity":"1.234","usdtValue":"98720.000000"},{"assetSymbol":"ETH","freeQuantity":"123.4","usdtValue":"246800.000000"}]"
 
 
 Scenario Outline: Invoking /openOrders returns active orders
-    Given Backend is available
-    And MarketService mock is running
+    Given MarketService mock is running
+    And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"},{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCEUR","baseAsset":"BTC","quoteAsset":"EUR"},{"symbol":"ETHEUR","baseAsset":"ETH","quoteAsset":"EUR"}]}"
     And MarketService mock expects invocations on GET /openOrders and will return "<market_service_open_orders>"
+    And Backend is available
     When Request GET /openOrders is sent
     Then Response for GET /openOrders was received with status code "200" and body "<algo_trader_open_orders>"
     Examples:
@@ -22,8 +23,8 @@ Scenario Outline: Invoking /openOrders returns active orders
 
 
 Scenario Outline: Invoking /makeOrder places order via market service
-    Given Backend is available
-    And MarketService mock is running with default configuration
+    Given MarketService mock is running with default configuration
+    And Backend is available
     When Request POST /makeOrder is sent with body "{"selectedBaseAsset":"<sent_base_asset>","selectedQuoteAsset":"<sent_quote_asset>","orderSide":"<sent_side>","baseAssetAmount":"<amount>"}"
     Then MarketService method POST of endpoint /order has been invoked with query params "{"symbol":"<expected_trading_pair>","side":"<expected_side>","type":"LIMIT","timeInForce":"GTC","quantity":"<amount>","price":"","recvWindow":"5000"}"
     Examples:

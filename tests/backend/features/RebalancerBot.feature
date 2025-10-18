@@ -8,10 +8,10 @@ Feature: Rebalancer Bot
 # With the expected value proportion of BTC/ETH= 9/1, the expected wallet is:
 #  1. 34 552 USDT in ETH => need to sell ETH worth 246 800 - 34 552 = 212248 USDT
 #  2. need to buy BTC worth 212248 USDT
-Scenario: asasas Single rebalancing of 2 assets
-    Given Backend is available
-    And MarketService mock is running with default configuration
+Scenario: Single rebalancing of 2 assets
+    Given MarketService mock is running with default configuration
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
+    And Backend is available
     When Request POST /startBot is sent with body "{"botName":"Rebalancer","executionPeriod":10,"isExecutedImmediately":true,"quoteAsset":"USDT","baseAssetShares":[{"assetSymbol":"ETH","expectedShare":10},{"assetSymbol":"BTC","expectedShare":90}]}"
     Then Response for POST /startBot was received with status code "200" and no body
     And System runs for 5 sec
@@ -30,15 +30,15 @@ Scenario: asasas Single rebalancing of 2 assets
 #  1. 56 000 USDT in ETH   => need to sell 44 000 USDT
 #  2. 84 000 USDT in SOL   => need to sell 16 000 USDT
 #  3. 140 000 USDT in BTC  => need to buy 60 000 USDT
-Scenario: asasas Single rebalancing of 3 assets
-    Given Backend is available
-    And MarketService mock is running
+Scenario: Single rebalancing of 3 assets
+    Given MarketService mock is running
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     And MarketService mock expects invocations on POST /order and will return empty response
     And MarketService mock expects invocations on GET /ticker/price and will return "[{"price":"80000","symbol":"BTCUSDT"},{"price":"100","symbol":"SOLUSDT"},{"price":"2000","symbol":"ETHUSDT"},{"price":"70000","symbol":"BTCEUR"},{"price":"1500","symbol":"ETHEUR"}]"
-    And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"SOLUSDT","baseAsset":"SOL","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"}]}"
+    And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"SOLUSDT","baseAsset":"SOL","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"},{"symbol":"BTCEUR","baseAsset":"BTC","quoteAsset":"EUR"},{"symbol":"ETHEUR","baseAsset":"ETH","quoteAsset":"EUR"}]}"
     And MarketService mock expects invocations on GET /openOrders and will return "[{"symbol":"ETHUSDT","orderId":2,"price":"2000","origQty":"2","executedQty":"1","side":"SELL"}]"
     And MarketService mock expects invocations on GET /account and will return "{"balances":[{"free":"1","asset":"BTC"},{"free":"1000","asset":"SOL"},{"free":"50","asset":"ETH"}]}"
+    And Backend is available
     When Request POST /startBot is sent with body "{"botName":"Rebalancer","executionPeriod":10,"isExecutedImmediately":true,"quoteAsset":"USDT","baseAssetShares":[{"assetSymbol":"ETH","expectedShare":20},{"assetSymbol":"SOL","expectedShare":30},{"assetSymbol":"BTC","expectedShare":50}]}"
     Then Response for POST /startBot was received with status code "200" and no body
     And System runs for 5 sec
@@ -56,15 +56,15 @@ Scenario: asasas Single rebalancing of 3 assets
 # With the expected value proportion of ETH/BTC= 6/4, the expected wallet is:
 #  1. 108 000 USDT in ETH   => need to buy 8 000 USDT
 #  2. 72 000 USDT in BTC    => need to sell 8 000 USDT
-Scenario: asasas Two rebalances of 2 assets
-    Given Backend is available
-    And MarketService mock is running
+Scenario: Two rebalances of 2 assets
+    Given MarketService mock is running
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     And MarketService mock expects invocations on POST /order and will return empty response
     And MarketService mock expects invocations on GET /ticker/price and will return "[{"price":"80000","symbol":"BTCUSDT"},{"price":"2000","symbol":"ETHUSDT"}]"
     And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"}]}"
     And MarketService mock expects invocations on GET /openOrders and will return "[{"symbol":"ETHUSDT","orderId":2,"price":"2000","origQty":"2","executedQty":"1","side":"SELL"}]"
     And MarketService mock expects invocations on GET /account and will return "{"balances":[{"free":"1","asset":"BTC"},{"free":"50","asset":"ETH"}]}"
+    And Backend is available
     When Request POST /startBot is sent with body "{"botName":"Rebalancer","executionPeriod":10,"isExecutedImmediately":true,"quoteAsset":"USDT","baseAssetShares":[{"assetSymbol":"ETH","expectedShare":60},{"assetSymbol":"BTC","expectedShare":40}]}"
     Then Response for POST /startBot was received with status code "200" and no body
     And System runs for 5 sec

@@ -5,7 +5,6 @@
 #include "MarketService/Binance/IEncryption.hpp"
 #include "MarketService/IHistoricalMarketDataProvider.hpp"
 #include "MarketService/IMarketService.hpp"
-#include "MarketService/TradingPairSymbolDecoder.hpp"
 #include "Utils/Time/ITime.hpp"
 
 namespace MarketService::Binance {
@@ -14,9 +13,7 @@ class BinanceService : public IMarketService, public IHistoricalMarketDataProvid
  public:
   BinanceService(const IEncryption& encryption, const Http::IHttp& http, const ::Time::ITime& time,
                  const Config::BinanceUrlPrefix& binanceUrlPrefix)
-      : encryption_(encryption), http_(http), time_(time), binanceUrlPrefix_(binanceUrlPrefix) {
-    tradingPairSymbolDecoder_ = std::make_unique<TradingPairSymbolDecoder>(getAllTradingPairs());
-  }
+      : encryption_(encryption), http_(http), time_(time), binanceUrlPrefix_(binanceUrlPrefix) {}
 
   Time getServerTime() override;
 
@@ -58,7 +55,6 @@ class BinanceService : public IMarketService, public IHistoricalMarketDataProvid
   const Http::IHttp& http_;
   const ::Time::ITime& time_;
   const Config::BinanceUrlPrefix& binanceUrlPrefix_;
-  std::unique_ptr<TradingPairSymbolDecoder> tradingPairSymbolDecoder_{};
 };
 
 }  // namespace MarketService::Binance

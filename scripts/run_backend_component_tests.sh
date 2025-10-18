@@ -4,7 +4,9 @@ set -e
 . $(dirname $(realpath -s $0))/.common.sh
 . ${SCRIPTS_PATH}/.clear_containers.sh
 
-# E.g. to run one scenario: run_backend_component_tests.sh "--name \"My scenario name\""
+# E.g. to run one scenario:
+# ./scripts/run_backend_component_tests.sh "--name='^Invoking /health returns OK status code$'"
+# The ^ and $ anchors tell Behave to match the exact scenario name, not just a substring.
 if [ -n "$1" ]; then
   export TEST_ARGUMENTS=$1
   echo "Backend CT arguments were provided: $TEST_ARGUMENTS"
@@ -15,7 +17,7 @@ fi
 export BACKEND_CMD="/algo-trader/build/debug/src/AlgoTrader /algo-trader/tests/backend/configuration.json" 
 docker compose --file ${SCRIPTS_PATH}/run_backend_component_tests/docker-compose.yml up -d --build
 TEST_CONTAINER_ID=$(docker ps -aqf "name=run_backend_component_tests-backend-tests-1")
-docker logs --follow ${TEST_CONTAINER_ID}
+docker logs --follow ${TEST_CONTAINER_ID} | tee ${LOGS_DIR}/backend_tests/behave_output.log
 
 # Check the exit code of the test container
 TEST_EXIT_CODE=$(docker inspect ${TEST_CONTAINER_ID} --format='{{.State.ExitCode}}')

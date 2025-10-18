@@ -24,6 +24,6 @@ services:
     environment:
       PYTHONPATH: "/algo-trader"
     working_dir: /
-    command: bash -c "cd /algo-trader/tests/backend && behave ${TEST_ARGUMENTS}"
+    command: bash -c "cd /algo-trader/tests/backend && behave --no-color ${TEST_ARGUMENTS}"
     stdin_open: true
     tty: true

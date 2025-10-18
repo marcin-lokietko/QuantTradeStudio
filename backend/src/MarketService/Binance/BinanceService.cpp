@@ -10,6 +10,7 @@
 #include "MarketService/Binance/Conversion/KlineSequence.hpp"
 #include "MarketService/Binance/Conversion/Orders.hpp"
 #include "MarketService/Binance/Conversion/TradingPairs.hpp"
+#include "MarketService/TradingPairSymbolDecoder.hpp"
 #include "Utils/ToString.hpp"
 
 namespace MarketService::Binance {
@@ -63,7 +64,7 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
 
   AssetPrices assetPrices;
   try {
-    Conversion::fromJson(nlohmann::json::parse(response), assetPrices, *tradingPairSymbolDecoder_);
+    Conversion::fromJson(nlohmann::json::parse(response), assetPrices, TradingPairSymbolDecoder(getAllTradingPairs()));
   } catch (const nlohmann::json::exception& e) {
     SPDLOG_CRITICAL("getPrices FAILED; could not deserialize Binance response; error: {}", e.what());
     throw;
@@ -284,7 +285,8 @@ ApiGateway::Orders BinanceService::getOpenOrders() const {
 
   ApiGateway::Orders orders;
   try {
-    Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders, *tradingPairSymbolDecoder_);
+    Conversion::fromJson(nlohmann::json::parse(openOrdersString), orders,
+                         TradingPairSymbolDecoder(getAllTradingPairs()));
   } catch (const nlohmann::json::exception& e) {
     SPDLOG_CRITICAL("getOpenOrders FAILED; could not deserialize Binance response; error: {}", e.what());
     throw;
