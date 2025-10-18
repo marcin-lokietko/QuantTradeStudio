@@ -1,10 +1,11 @@
+#include "BinanceService.hpp"
+
 #include <spdlog/spdlog.h>
 
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <ranges>
 
-#include "BinanceService.hpp"
 #include "MarketService/Binance/Conversion/AssetPrices.hpp"
 #include "MarketService/Binance/Conversion/AssetQuantities.hpp"
 #include "MarketService/Binance/Conversion/KlineSequence.hpp"

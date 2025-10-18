@@ -1,4 +1,5 @@
 #include "BotAlgorithms/Rebalancer/Rebalancer.hpp"
+
 #include "GeneratedMocks/MarketServiceMock.hpp"
 #include "GeneratedMocks/TimeMock.hpp"
 #include "gmock/gmock.h"

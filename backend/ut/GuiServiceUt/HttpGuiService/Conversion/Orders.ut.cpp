@@ -1,4 +1,5 @@
 #include "GuiService/HttpGuiService/Conversion/Orders.hpp"
+
 #include "gmock/gmock.h"
 
 namespace GuiService::HttpGuiService::Conversion {

@@ -1,4 +1,5 @@
 #include "GuiService/HttpGuiService/Conversion/Assets.hpp"
+
 #include "gmock/gmock.h"
 
 namespace GuiService::HttpGuiService::Conversion {

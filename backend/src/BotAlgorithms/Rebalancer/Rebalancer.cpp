@@ -1,11 +1,11 @@
+#include "Rebalancer.hpp"
+
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <ranges>
 #include <set>
 #include <thread>
-
-#include "Rebalancer.hpp"
 
 namespace BotAlgorithms::Rebalancer {
 

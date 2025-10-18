@@ -1,9 +1,10 @@
+#include "BotBacktester.hpp"
+
 #include <spdlog/spdlog.h>
 
 #include <variant>
 
 #include "BotAlgorithms/Rebalancer/Rebalancer.hpp"
-#include "BotBacktester.hpp"
 
 namespace BotBacktester {
 

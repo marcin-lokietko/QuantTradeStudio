@@ -1,6 +1,7 @@
+#include "ApiGateway/ApiGateway.hpp"
+
 #include <ranges>
 
-#include "ApiGateway/ApiGateway.hpp"
 #include "GeneratedMocks/BotBacktesterMock.hpp"
 #include "GeneratedMocks/BotExecutionMock.hpp"
 #include "GeneratedMocks/MarketServiceMock.hpp"

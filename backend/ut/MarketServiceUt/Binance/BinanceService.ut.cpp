@@ -1,9 +1,10 @@
+#include "MarketService/Binance/BinanceService.hpp"
+
 #include <ranges>
 
 #include "GeneratedMocks/EncryptionMock.hpp"
 #include "GeneratedMocks/HttpMock.hpp"
 #include "GeneratedMocks/TimeMock.hpp"
-#include "MarketService/Binance/BinanceService.hpp"
 #include "gmock/gmock.h"
 
 namespace MarketService::Binance {

@@ -1,10 +1,11 @@
+#include "ApiGateway.hpp"
+
 #include <spdlog/spdlog.h>
 
 #include <map>
 #include <ranges>
 #include <set>
 
-#include "ApiGateway.hpp"
 #include "MarketService/TradingPairs.hpp"
 #include "Price.hpp"
 #include "TradingPairSymbol.hpp"
