@@ -1,6 +1,9 @@
 #pragma once
 
+#include <map>
+
 #include "ApiGateway/BacktestResults.hpp"
+#include "ApiGateway/TradingPairSymbol.hpp"
 #include "BotBacktester/BotAssetsHistory.hpp"
 #include "MarketService/KlineSequence.hpp"
 #include "spdlog/spdlog.h"
