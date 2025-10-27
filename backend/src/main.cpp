@@ -34,8 +34,17 @@ void setupLogger(const Config::LogsCatalogPath& logDir) {
     std::filesystem::create_directory(logDir.val_);
   }
 
-  const std::string filename = "AlgoTrader_backend_" + getDatetimeString() + ".log";
-  auto logger = spdlog::basic_logger_mt("AlgoTrader_backend", logDir.val_.string() + "/" + filename);
+  const std::string filenameLatest = "AlgoTrader_backend_latest.log";
+  const std::string filenameWithTime = "AlgoTrader_backend_" + getDatetimeString() + ".log";
+
+  const auto fileSinkLatest =
+      std::make_shared<spdlog::sinks::basic_file_sink_mt>(logDir.val_.string() + "/" + filenameLatest, true);
+  const auto fileSinkWithTime =
+      std::make_shared<spdlog::sinks::basic_file_sink_mt>(logDir.val_.string() + "/" + filenameWithTime, true);
+
+  const std::vector<spdlog::sink_ptr> sinks{fileSinkLatest, fileSinkWithTime};
+  const auto logger = std::make_shared<spdlog::logger>("AlgoTrader_backend", sinks.begin(), sinks.end());
+
   spdlog::set_default_logger(logger);
   spdlog::set_level(spdlog::level::trace);
   spdlog::flush_on(spdlog::level::trace);

@@ -31,11 +31,17 @@ def valudate_response(context, method, endpoint, status_code, body_as_string):
     actual_response = context.responses.get_last_response(method, endpoint)
     assert actual_response is not None, f"No response found for {method} {endpoint}"
     assert actual_response.status_code == status_code, f"Actual status code: {actual_response.status_code}; expected: {status_code}"
-    assert actual_response.text == body_as_string, f"Actual body: {actual_response.text}; expected: {body_as_string}"
+    assert actual_response.text == body_as_string, f"Actual body: {actual_response.text}\nexpected: {body_as_string}"
 
 @step('Response for {method} {endpoint} was received with status code "{status_code:d}" and body "{body_as_string}"')
 def step_impl(context, method, endpoint, status_code, body_as_string):
     valudate_response(context, method, endpoint, status_code, body_as_string)
+
+# This version is the step supported when the response body is multi-line:
+@step('Response for {method} {endpoint} was received with status code "{status_code:d}" and body')
+def step_impl(context, method, endpoint, status_code):
+    body_as_string_without_pretty_print = body_as_string = json.dumps(json.loads(context.text), separators=(',', ':'))
+    valudate_response(context, method, endpoint, status_code, body_as_string_without_pretty_print)
 
 # This step is used when the response body is expected to be empty - Behave does not support "" param as an empty string
 @step('Response for {method} {endpoint} was received with status code "{status_code:d}" and no body')

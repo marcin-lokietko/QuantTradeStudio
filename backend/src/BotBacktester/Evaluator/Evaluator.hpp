@@ -108,6 +108,10 @@ class Evaluator {
 
   void fillAssetsValues(ApiGateway::AssetQuantitiesAndValuesHistory::value_type& historyEntry, size_t klineIndex) {
     for (auto& singleAssetValue : historyEntry.second) {
+      if (singleAssetValue.assetSymbol == ApiGateway::AssetSymbol{"USDT"}) {
+        singleAssetValue.usdtValue = ApiGateway::Value{singleAssetValue.freeQuantity.val_};
+        continue;
+      }
       const auto& tradingPairSymbol =
           ApiGateway::TradingPairSymbol{singleAssetValue.assetSymbol, ApiGateway::AssetSymbol{"USDT"}};
       const auto it = klines_.find(tradingPairSymbol);

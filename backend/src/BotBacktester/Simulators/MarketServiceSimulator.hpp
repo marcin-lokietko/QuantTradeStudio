@@ -74,8 +74,12 @@ class MarketServiceSimulator : public MarketService::IMarketService {
     MarketService::AssetValues assetValues;
 
     for (const auto& [ownedAssetSymbol, ownedAssetQuantity, _] : ownedAssets_) {
-      const ApiGateway::TradingPairSymbol tradingPairSymbol{ownedAssetSymbol, quoteAsset};
+      if (ownedAssetSymbol == quoteAsset) {
+        assetValues.emplace_back(ownedAssetSymbol, quoteAsset, ApiGateway::Value{ownedAssetQuantity.val_});
+        continue;
+      }
 
+      const ApiGateway::TradingPairSymbol tradingPairSymbol{ownedAssetSymbol, quoteAsset};
       const auto oneUnitValue = getOneUnitValue(tradingPairSymbol);
       if (oneUnitValue) {
         const double totalValue = oneUnitValue.value() * std::stod(ownedAssetQuantity.val_);
@@ -114,38 +118,46 @@ class MarketServiceSimulator : public MarketService::IMarketService {
     ApiGateway::SingleAssetQuantity& ownedBaseAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.baseAsset);
     ApiGateway::SingleAssetQuantity& ownedQuoteAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.quoteAsset);
 
-    auto result = ApiGateway::OrderResult::Failure;
-    if (orderSide == ApiGateway::OrderSide::Buy &&
-        std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) > quoteQuantityDouble) {
+    if (orderSide == ApiGateway::OrderSide::Buy) {
+      if (std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) < quoteQuantityDouble) {
+        SPDLOG_WARN(
+            "Simulated BUY order cannot be fulfilled due to insufficient funds: tradingPairSymbol={}, "
+            "quoteQuantity={}, free quote quantity={}",
+            toString(tradingPairSymbol), quoteQuantity, ownedQuoteAssetQuantity.freeQuantity);
+        return ApiGateway::OrderResult::Failure;
+      }
       ownedQuoteAssetQuantity.freeQuantity.val_ =
           std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) - quoteQuantityDouble);
 
       // Binance charges the fee in the asset you receive when buying/selling
-      const double newBaseQuantityBeforeFee = std::stod(ownedBaseAssetQuantity.freeQuantity.val_) + baseQuantity;
-      const double newBaseQuantity = newBaseQuantityBeforeFee * (1.0 - transactionFeePercent_.val_);
-      ownedBaseAssetQuantity.freeQuantity.val_ = std::to_string(newBaseQuantity);
-      result = ApiGateway::OrderResult::Success;
-    } else if (orderSide == ApiGateway::OrderSide::Sell &&
-               std::stod(ownedBaseAssetQuantity.freeQuantity.val_) > baseQuantity) {
+      const auto baseQuantityAfterFee =
+          (baseQuantity * (100.0 - transactionFeePercent_.val_)) / 100.0;
+      ownedBaseAssetQuantity.freeQuantity.val_ =
+          std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) + baseQuantityAfterFee);
+    } else if (orderSide == ApiGateway::OrderSide::Sell) {
+      if (std::stod(ownedBaseAssetQuantity.freeQuantity.val_) < baseQuantity) {
+        SPDLOG_WARN(
+            "Simulated SELL order cannot be fulfilled due to insufficient funds: tradingPairSymbol={}, "
+            "baseQuantity={}, free base quantity={}",
+            toString(tradingPairSymbol), baseQuantity, ownedBaseAssetQuantity.freeQuantity);
+        return ApiGateway::OrderResult::Failure;
+      }
       ownedBaseAssetQuantity.freeQuantity.val_ =
           std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) - baseQuantity);
 
-      const double newQuoteQuantityBeforeFee =
-          std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) + quoteQuantityDouble;
-      const double newQuoteQuantity = newQuoteQuantityBeforeFee * (1.0 - transactionFeePercent_.val_);
-      ownedQuoteAssetQuantity.freeQuantity.val_ = std::to_string(newQuoteQuantity);
-      result = ApiGateway::OrderResult::Success;
+      const auto quoteQuantityDoubleAfterFee =
+          (quoteQuantityDouble * (100.0 - transactionFeePercent_.val_)) / 100.0;
+      ownedQuoteAssetQuantity.freeQuantity.val_ =
+          std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) + quoteQuantityDoubleAfterFee);
     }
 
-    if (result == ApiGateway::OrderResult::Success) {
-      updateOwnedAssets();
-    }
+    updateOwnedAssets();
 
     SPDLOG_INFO(
-        "Simulating makeMarketTypeOrderWithQuoteQuantity(tradingPairSymbol={}, orderSide={}, quoteQuantity={}); "
-        "returning={}",
-        toString(tradingPairSymbol), toString(orderSide), quoteQuantity, toString(result));
-    return result;
+        "Successfully simulating makeMarketTypeOrderWithQuoteQuantity(tradingPairSymbol={}, orderSide={}, "
+        "quoteQuantity={})",
+        toString(tradingPairSymbol), toString(orderSide), quoteQuantity);
+    return ApiGateway::OrderResult::Success;
   }
 
   MarketService::TradingPairs getAllTradingPairs() const override {

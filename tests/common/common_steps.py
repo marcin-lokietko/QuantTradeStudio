@@ -2,16 +2,35 @@ import requests
 import json
 from time import sleep
 from behave import step
-from tests.common.market_service_mock import MarketServiceMock, set_default_config
+from tests.common.market_service_mock import MarketServiceMock, FixedResponse, ResponseDependingOnRequest, set_default_config
 
 @step('MarketService mock expects invocations on {method} {endpoint} and will return empty response')
 def step_impl(context, method, endpoint):
-    context.market_service_mock.set_endpoint(endpoint, method)
+    context.market_service_mock.set_endpoint(endpoint, method, FixedResponse(response_body=None, status_code=200))
 
 @step('MarketService mock expects invocations on {method} {endpoint} and will return "{response_body_as_string}"')
 def step_impl(context, method, endpoint, response_body_as_string):
     response_body_as_object = json.loads(response_body_as_string)
-    context.market_service_mock.set_endpoint(endpoint, method, response_body_as_object)
+    context.market_service_mock.set_endpoint(endpoint, method, FixedResponse(response_body=response_body_as_object))
+
+@step('MarketService mock expects invocations on {method} {endpoint} and will return responses as defined in file "{request_to_response_file_path}"')
+def step_impl(context, method, endpoint, request_to_response_file_path):
+    response = ResponseDependingOnRequest()
+
+    with open("/algo-trader/tests/mockedResponses/" + request_to_response_file_path, 'r') as file:
+        lines = [line.strip() for line in file if line.strip()]
+
+        for i in range(0, len(lines), 4):
+            if i + 3 >= len(lines):
+                raise ValueError("Incomplete request-response mapping in the file. Each mapping must have 4 lines.")
+
+            query_dict_str = lines[i]
+            request_body_str = lines[i + 1]
+            response_body_str = lines[i + 2]
+            status_code_str = lines[i + 3]
+            response.add_response_for_request(json.loads(query_dict_str), json.loads(request_body_str), json.loads(response_body_str), int(status_code_str))
+
+    context.market_service_mock.set_endpoint(endpoint, method, response)
 
 @step('MarketService method {method} of endpoint {endpoint} has been invoked with query params "{expected_query_string_as_dict}"')
 def step_impl(context, method, endpoint, expected_query_string_as_dict):
