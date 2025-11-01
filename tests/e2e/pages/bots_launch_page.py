@@ -36,3 +36,6 @@ class BotsLaunchPage:
 
     def click_launch_bot_button(self):
         self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="bots-launch-page-launch-bot-button"]')
+
+    def click_open_bot_backtest_dialog_button(self):
+        self.waiting_webdriver.click_when_clickable(By.CSS_SELECTOR, '[data-testid="bots-launch-page-open-backtest-dialog-button"]')

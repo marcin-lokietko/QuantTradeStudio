@@ -130,8 +130,7 @@ class MarketServiceSimulator : public MarketService::IMarketService {
           std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) - quoteQuantityDouble);
 
       // Binance charges the fee in the asset you receive when buying/selling
-      const auto baseQuantityAfterFee =
-          (baseQuantity * (100.0 - transactionFeePercent_.val_)) / 100.0;
+      const auto baseQuantityAfterFee = (baseQuantity * (100.0 - transactionFeePercent_.val_)) / 100.0;
       ownedBaseAssetQuantity.freeQuantity.val_ =
           std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) + baseQuantityAfterFee);
     } else if (orderSide == ApiGateway::OrderSide::Sell) {
@@ -145,8 +144,7 @@ class MarketServiceSimulator : public MarketService::IMarketService {
       ownedBaseAssetQuantity.freeQuantity.val_ =
           std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) - baseQuantity);
 
-      const auto quoteQuantityDoubleAfterFee =
-          (quoteQuantityDouble * (100.0 - transactionFeePercent_.val_)) / 100.0;
+      const auto quoteQuantityDoubleAfterFee = (quoteQuantityDouble * (100.0 - transactionFeePercent_.val_)) / 100.0;
       ownedQuoteAssetQuantity.freeQuantity.val_ =
           std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) + quoteQuantityDoubleAfterFee);
     }

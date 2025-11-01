@@ -34,7 +34,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedInitialOwnedAssetsTableColumns"></tr>
       </table>
       <div class="add-asset-button-wrapper">
-        <button class="add-asset-button" data-testid="backtest_dialog-add-asset-button" mat-button (click)="addAsset()">Add asset</button>
+        <button class="add-asset-button" data-testid="backtest-dialog-add-asset-button" mat-button (click)="addAsset()">Add asset</button>
       </div>
     </div>
 
@@ -42,28 +42,52 @@
     <div class="form-row">
       <mat-form-field appearance="fill">
         <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="startDatePicker" [(ngModel)]="simulationStartDate" (dateChange)="updateUnixTimestamps()" />
+        <input
+          data-testid="backtest-dialog-start-date"
+          matInput
+          [matDatepicker]="startDatePicker"
+          [(ngModel)]="simulationStartDate"
+          (dateChange)="updateUnixTimestamps()"
+        />
         <mat-datepicker-toggle matIconSuffix [for]="startDatePicker"></mat-datepicker-toggle>
         <mat-datepicker #startDatePicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
         <mat-label>Start Time (HH:MM)</mat-label>
-        <input matInput type="time" [(ngModel)]="simulationStartTime" (change)="updateUnixTimestamps()" />
+        <input
+          data-testid="backtest-dialog-start-time"
+          matInput
+          type="time"
+          [(ngModel)]="simulationStartTime"
+          (change)="updateUnixTimestamps()"
+        />
       </mat-form-field>
     </div>
 
     <div class="form-row">
       <mat-form-field appearance="fill">
         <mat-label>End Date</mat-label>
-        <input matInput [matDatepicker]="endDatePicker" [(ngModel)]="simulationEndDate" (dateChange)="updateUnixTimestamps()" />
+        <input
+          data-testid="backtest-dialog-end-date"
+          matInput
+          [matDatepicker]="endDatePicker"
+          [(ngModel)]="simulationEndDate"
+          (dateChange)="updateUnixTimestamps()"
+        />
         <mat-datepicker-toggle matIconSuffix [for]="endDatePicker"></mat-datepicker-toggle>
         <mat-datepicker #endDatePicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
         <mat-label>End Time (HH:MM)</mat-label>
-        <input matInput type="time" [(ngModel)]="simulationEndTime" (change)="updateUnixTimestamps()" />
+        <input
+          data-testid="backtest-dialog-end-time"
+          matInput
+          type="time"
+          [(ngModel)]="simulationEndTime"
+          (change)="updateUnixTimestamps()"
+        />
       </mat-form-field>
     </div>
 
@@ -75,13 +99,17 @@
 
   <div class="backtest-results" *ngIf="backtestResults">
     <h3>Results:</h3>
-    <p>Total Profit or Loss (if held): {{ backtestResults.totalProfitOrLossInAbsoluteIfHeld | number: '1.2-2' }}</p>
-    <p>Total Profit or Loss (with trades): {{ backtestResults.totalProfitOrLossInAbsolute | number: '1.2-2' }}</p>
+    <p data-testid="backtest-results-total-profit-if-held">
+      Total Profit or Loss (if held): {{ backtestResults.totalProfitOrLossInAbsoluteIfHeld | number: '1.2-2' }}
+    </p>
+    <p data-testid="backtest-results-total-profit-with-trades">
+      Total Profit or Loss (with trades): {{ backtestResults.totalProfitOrLossInAbsolute | number: '1.2-2' }}
+    </p>
   </div>
 
   <div class="action-buttons-wrapper">
     <mat-dialog-actions class="action-buttons">
-      <button *ngIf="isConfigValid" mat-button data-testid="backtest-dialog-confirm-button" (click)="launchBacktest()">
+      <button *ngIf="isConfigValid" mat-button data-testid="backtest-dialog-launch-button" (click)="launchBacktest()">
         Launch backtest
       </button>
       <button mat-button (click)="cancel()">Cancel</button>

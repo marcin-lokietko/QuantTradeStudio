@@ -9,6 +9,7 @@ from tests.e2e.pages.assets_page import AssetsPage
 from tests.e2e.pages.orders_page import OrdersPage
 from tests.e2e.pages.bots_launch_page import BotsLaunchPage
 from tests.e2e.pages.make_order_dialog import MakeOrderDialog
+from tests.e2e.pages.backtest_dialog import BacktestDialog
 from tests.common import common_steps
 
 backend_url = "http://backend:5000"
@@ -43,6 +44,7 @@ def setup_pages(context):
     context.orders_page = OrdersPage(context.webdriver)
     context.bots_launch_page = BotsLaunchPage(context.webdriver)
     context.make_order_dialog = MakeOrderDialog(context.webdriver)
+    context.backtest_dialog = BacktestDialog(context.webdriver)
 
 @step('AlgoTrader is running')
 def step_impl(context):
@@ -109,7 +111,7 @@ def step_impl(context):
 def step_impl(context, bot_name):
     context.bots_launch_page.select_bot(bot_name.lower())
 
-@step('Rebalancer bot configuration is filled with execution period "{execution_period}", quote asset "{quote_asset}", base assets [{base_assets}] with shares [{base_assets_shares}] and confirmed')
+@step('Rebalancer bot configuration is filled with execution period "{execution_period}", quote asset "{quote_asset}", base assets [{base_assets}] with shares [{base_assets_shares}]')
 def step_impl(context, execution_period, quote_asset, base_assets, base_assets_shares):
     context.bots_launch_page.set_execution_period(execution_period)
     context.bots_launch_page.toggle_is_executed_immediately()
@@ -123,5 +125,44 @@ def step_impl(context, execution_period, quote_asset, base_assets, base_assets_s
             single_base_asset_share.strip().replace('"', '').replace("'", "")
         )
 
+@step('Bot launch button is clicked')
+def step_impl(context):
     context.bots_launch_page.click_launch_bot_button()
 
+@step('Open bot backtest dialog button is clicked')
+def step_impl(context):
+    context.bots_launch_page.click_open_bot_backtest_dialog_button()
+
+@step('Backtest configuration is filled with transaction fee percent "{fee_percent}", owned assets [{owned_assets}] with amounts [{owned_assets_amounts}] respectively, simulation start date "{start_date}", start time "{start_time}", simulation end date "{end_date}", end time "{end_time}')
+def step_impl(context, fee_percent, owned_assets, owned_assets_amounts, start_date, start_time, end_date, end_time):
+    context.backtest_dialog.set_fee_percent(fee_percent)
+
+    owned_assets = owned_assets.split(',')
+    owned_assets_amounts = owned_assets_amounts.split(',')
+
+    for single_owned_asset, single_owned_asset_amount in zip(owned_assets, owned_assets_amounts):
+        context.backtest_dialog.add_owned_asset(
+            single_owned_asset.strip().replace('"', '').replace("'", ""),
+            single_owned_asset_amount.strip().replace('"', '').replace("'", "")
+        )
+
+    context.backtest_dialog.set_simulation_start_date(start_date)
+    context.backtest_dialog.set_simulation_start_time(start_time)
+
+    context.backtest_dialog.set_simulation_end_date(end_date)
+    context.backtest_dialog.set_simulation_end_time(end_time)
+
+
+@step('Launch backtest button is clicked')
+def step_impl(context):
+    context.backtest_dialog.click_launch_backtest_button()
+
+@step('Total profit if held "{total_profit_if_held}" is shown')
+def step_impl(context, total_profit_if_held):
+    results = context.backtest_dialog.get_backtest_results()
+    assert results['total_profit_if_held'] == total_profit_if_held, f'actual total profit: {results["total_profit_if_held"]}'
+
+@step('Total profit "{total_profit_with_trades}" is shown')
+def step_impl(context, total_profit_with_trades):
+    results = context.backtest_dialog.get_backtest_results()
+    assert results['total_profit_with_trades'] == total_profit_with_trades, f'actual total profit: {results["total_profit_with_trades"]}'

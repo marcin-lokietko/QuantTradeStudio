@@ -22,10 +22,18 @@ def after_step(context, step):
 
     step_num = str(context.step_index).zfill(2)
     file_path = context.screens_dir + "/" + scenario_name
-    file_name = f"{step_num}__{step_name}.png"
+    # max filename length on Unix is 255 characters (including the extension)
+
+    unit_max_filename_length = 255
+    file_extension = ".png"
+    max_filename_length_without_extension = unit_max_filename_length - len(file_extension)
+    file_name = f"{step_num}__{step_name}"
+    if len(file_name) > max_filename_length_without_extension:
+        file_name = file_name[:max_filename_length_without_extension]
+    file_name_with_extension = file_name + file_extension
 
     os.makedirs(file_path, exist_ok=True)
-    context.webdriver.save_screenshot(file_path + "/" + file_name)
+    context.webdriver.save_screenshot(file_path + "/" + file_name_with_extension)
 
 def after_scenario(context, scenario):
     with open("/algo-trader/logs/e2e_tests/browser_logs.txt", "w") as f:
