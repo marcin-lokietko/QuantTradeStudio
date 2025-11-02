@@ -32,7 +32,10 @@ class SystemTimeSimulator : public Time::ITime {
     (void)st;
     if (currentTime_ >= simulationEnd_) {
       SPDLOG_INFO("Simulation end reached at {}", ::toString(simulationEnd_));
-      endCallback_();
+      if (endCallback_) {
+        endCallback_();
+        endCallback_ = []() {};
+      }
       return;
     }
     currentTime_ += duration;
@@ -54,7 +57,7 @@ class SystemTimeSimulator : public Time::ITime {
  private:
   mutable TimePoint currentTime_;
   const TimePoint simulationEnd_;
-  std::function<void()> endCallback_;
+  mutable std::function<void()> endCallback_;
 };
 
 }  // namespace BotBacktester::Simulators

@@ -20,9 +20,11 @@ void Rebalancer::run(std::stop_token st) {
   const std::chrono::seconds executionPeriod(config_.executionPeriod.val_);
 
   if (!st.stop_requested() && config_.isExecutedImmediately.val_) {
+    SPDLOG_INFO("Rebalancer starts immediate execution");
     rebalance();
   }
   while (!st.stop_requested()) {
+    SPDLOG_INFO("Rebalancer sleeping for {}", executionPeriod.count());
     time_.sleepFor(st, executionPeriod);
     if (!st.stop_requested()) {
       rebalance();
