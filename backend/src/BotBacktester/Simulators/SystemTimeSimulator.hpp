@@ -30,7 +30,9 @@ class SystemTimeSimulator : public Time::ITime {
 
   void sleepFor(std::stop_token st, const std::chrono::milliseconds& duration) const override {
     (void)st;
-    if (currentTime_ >= simulationEnd_) {
+    currentTime_ += duration;
+
+    if (currentTime_ > simulationEnd_) {
       SPDLOG_INFO("Simulation end reached at {}", ::toString(simulationEnd_));
       if (endCallback_) {
         endCallback_();
@@ -38,7 +40,6 @@ class SystemTimeSimulator : public Time::ITime {
       }
       return;
     }
-    currentTime_ += duration;
     SPDLOG_INFO("Simulated sleepFor(duration={} ms), current simulation time: {}", duration.count(),
                 ::toString(currentTime_));
   }

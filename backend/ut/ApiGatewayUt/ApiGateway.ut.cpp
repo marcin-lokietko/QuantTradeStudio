@@ -1,7 +1,6 @@
-#include "ApiGateway/ApiGateway.hpp"
-
 #include <ranges>
 
+#include "ApiGateway/ApiGateway.hpp"
 #include "GeneratedMocks/BotBacktesterMock.hpp"
 #include "GeneratedMocks/BotExecutionMock.hpp"
 #include "GeneratedMocks/MarketServiceMock.hpp"
@@ -124,6 +123,16 @@ TEST_F(ApiGatewayTest, WhenStartBotCalled_ThenCallDelegatedToMarketService) {
 TEST_F(ApiGatewayTest, WhenStopAllBotsCalled_ThenCallDelegatedToMarketService) {
   EXPECT_CALL(botExecution_, stopAllBots()).WillOnce(Return(StopAllBotsResult::Success));
   EXPECT_EQ(StopAllBotsResult::Success, sut_.stopAllBots());
+}
+
+TEST_F(ApiGatewayTest, WhenTestBotCalled_ThenCallDelegatedToBotBacktester) {
+  BacktestResults results;
+  results.totalProfitOrLossInAbsolute = AssetQuantity{"1000"};
+  EXPECT_CALL(botBacktester_, testBot(_, _)).WillOnce(Return(results));
+
+  const BotConfig botConfig;
+  const BacktestConfig backtestConfig;
+  EXPECT_EQ(results, sut_.testBot(botConfig, backtestConfig));
 }
 
 }  // namespace ApiGateway

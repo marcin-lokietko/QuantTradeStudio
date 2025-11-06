@@ -46,6 +46,7 @@ run_python_script(TimeMock
 # Add test components
 add_subdirectory(ApiGatewayUt)
 add_subdirectory(BotAlgorithmsUt)
+add_subdirectory(BotBacktesterUt)
 add_subdirectory(ConfigUt)
 add_subdirectory(GuiServiceUt)
 add_subdirectory(MarketServiceUt)
@@ -68,6 +69,7 @@ target_link_libraries(UnitTests PRIVATE ${LINKER_FLAGS}
     "-Wl,--whole-archive"
     ApiGatewayUt
     BotAlgorithmsUt
+    BotBacktesterUt
     ConfigUt
     GuiServiceUt
     MarketServiceUt

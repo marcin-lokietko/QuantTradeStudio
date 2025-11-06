@@ -22,17 +22,6 @@ class MarketServiceSimulatorException : public std::exception {
   std::string message_;
 };
 
-inline long stringToLong(const std::string& str) {
-  try {
-    return std::stol(str);
-  } catch (const std::invalid_argument& e) {
-    throw MarketServiceSimulatorException(
-        std::format("Converting string to long failed - invalid input: {}", e.what()));
-  } catch (const std::out_of_range& e) {
-    throw MarketServiceSimulatorException(std::format("Converting string to long failed - out of range: {}", e.what()));
-  }
-}
-
 class MarketServiceSimulator : public MarketService::IMarketService {
  public:
   MarketServiceSimulator(std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> klines,

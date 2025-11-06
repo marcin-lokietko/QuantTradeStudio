@@ -13,6 +13,8 @@ struct SingleAssetValue {
   ApiGateway::AssetSymbol baseSymbol{};
   ApiGateway::AssetSymbol quoteAsset{};
   std::optional<ApiGateway::Value> value{};
+
+  bool operator==(const SingleAssetValue& other) const = default;
 };
 
 inline std::string toString(const SingleAssetValue& singleAssetValue) {
