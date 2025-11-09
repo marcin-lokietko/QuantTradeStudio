@@ -1,4 +1,5 @@
 #include "BotBacktester/Evaluator/Evaluator.hpp"
+
 #include "gmock/gmock.h"
 
 namespace BotBacktester::Evaluator {

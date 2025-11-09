@@ -1,4 +1,5 @@
 #include "BotBacktester/Simulators/MarketServiceSimulator.hpp"
+
 #include "BotBacktester/Simulators/SystemTimeSimulator.hpp"
 #include "gmock/gmock.h"
 

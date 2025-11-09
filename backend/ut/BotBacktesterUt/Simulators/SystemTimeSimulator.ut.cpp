@@ -1,6 +1,7 @@
+#include "BotBacktester/Simulators/SystemTimeSimulator.hpp"
+
 #include <chrono>
 
-#include "BotBacktester/Simulators/SystemTimeSimulator.hpp"
 #include "gmock/gmock.h"
 
 namespace BotBacktester::Simulators {
