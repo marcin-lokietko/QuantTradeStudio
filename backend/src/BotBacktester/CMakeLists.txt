@@ -1,5 +1,8 @@
 add_library(BotBacktester STATIC
     BotBacktester.cpp
+    Evaluator/Evaluator.cpp
+    Simulators/MarketServiceSimulator.cpp
+    Simulators/SystemTimeSimulator.cpp
 )
 
 #search for headers in root project directory

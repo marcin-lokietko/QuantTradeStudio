@@ -1,8 +1,8 @@
 #pragma once
 
+#include <functional>
+
 #include "Utils/Time/ITime.hpp"
-#include "Utils/ToString.hpp"
-#include "spdlog/spdlog.h"
 
 namespace BotBacktester::Simulators {
 
@@ -22,37 +22,13 @@ class SystemTimeSimulator : public Time::ITime {
  public:
   using TimePoint = std::chrono::system_clock::time_point;
 
-  SystemTimeSimulator(TimePoint simulationStart, TimePoint simulationEnd)
-      : currentTime_(simulationStart), simulationEnd_(simulationEnd) {
-    SPDLOG_INFO("SystemTimeSimulator initialized with start time: {}, end time: {}", ::toString(simulationStart),
-                ::toString(simulationEnd));
-  }
+  SystemTimeSimulator(TimePoint simulationStart, TimePoint simulationEnd);
 
-  void sleepFor(std::stop_token st, const std::chrono::milliseconds& duration) const override {
-    (void)st;
-    if (currentTime_ >= simulationEnd_) {
-      SPDLOG_INFO("Simulation end reached at {}", ::toString(simulationEnd_));
-      if (endCallback_) {
-        endCallback_();
-        endCallback_ = []() {};
-      }
-      return;
-    }
-    currentTime_ += duration;
-    SPDLOG_INFO("Simulated sleepFor(duration={} ms), current simulation time: {}", duration.count(),
-                ::toString(currentTime_));
-  }
+  void sleepFor(std::stop_token st, const std::chrono::milliseconds& duration) const override;
 
-  time_t getTimeSinceEpoch() const override { return std::chrono::system_clock::to_time_t(currentTime_); }
+  time_t getTimeSinceEpoch() const override;
 
-  void registerSimulationEndCallback(std::function<void()> callback) {
-    if (currentTime_ >= simulationEnd_) {
-      SPDLOG_INFO("Simulation end reached, invoking callback immediately.");
-      callback();
-    } else {
-      endCallback_ = std::move(callback);
-    }
-  }
+  void registerSimulationEndCallback(std::function<void()> callback);
 
  private:
   mutable TimePoint currentTime_;
