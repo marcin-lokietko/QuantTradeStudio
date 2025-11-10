@@ -134,6 +134,7 @@ export class BacktestDialog {
     return (
       this.transactionFeePercent !== '' &&
       !isNaN(Number(this.transactionFeePercent)) &&
+      Number(this.transactionFeePercent) >= 0 &&
       this.simulationStartUnixTime < this.simulationEndUnixTime &&
       this.initialOwnedAssets.length > 0
     );
