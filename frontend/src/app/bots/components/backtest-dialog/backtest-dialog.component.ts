@@ -89,6 +89,7 @@ export class BacktestDialog {
     this.availableInitialAssets = this.data.availableInitialAssets;
     this.title = `Backtest bot: ${this.botParams.botName}`;
 
+    // TODO support klines paging
     // const oneMonthAgo = new Date();
     // oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
     // this.simulationStartDate = oneMonthAgo;

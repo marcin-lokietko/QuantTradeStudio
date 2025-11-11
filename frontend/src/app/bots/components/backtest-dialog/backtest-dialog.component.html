@@ -95,17 +95,17 @@
       <p>Simulation Start (UTC): {{ simulationStartUnixTime | date: 'dd/MM/yyyy HH:mm' }}</p>
       <p>Simulation End (UTC): {{ simulationEndUnixTime | date: 'dd/MM/yyyy HH:mm' }}</p>
     </div>
-  </mat-dialog-content>
 
-  <div class="backtest-results" *ngIf="backtestResults">
-    <h3>Results:</h3>
-    <p data-testid="backtest-results-total-profit-if-held">
-      Total Profit or Loss (if held): {{ backtestResults.totalProfitOrLossInAbsoluteIfHeld | number: '1.2-2' }}
-    </p>
-    <p data-testid="backtest-results-total-profit-with-trades">
-      Total Profit or Loss (with trades): {{ backtestResults.totalProfitOrLossInAbsolute | number: '1.2-2' }}
-    </p>
-  </div>
+    <div class="backtest-results" *ngIf="backtestResults">
+      <h3>Results:</h3>
+      <p data-testid="backtest-results-total-profit-if-held">
+        Total Profit or Loss (if held): {{ backtestResults.totalProfitOrLossInAbsoluteIfHeld | number: '1.2-2' }}
+      </p>
+      <p data-testid="backtest-results-total-profit-with-trades">
+        Total Profit or Loss (with trades): {{ backtestResults.totalProfitOrLossInAbsolute | number: '1.2-2' }}
+      </p>
+    </div>
+  </mat-dialog-content>
 
   <div class="action-buttons-wrapper">
     <mat-dialog-actions class="action-buttons">
