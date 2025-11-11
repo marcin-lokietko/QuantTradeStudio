@@ -75,19 +75,19 @@ Scenario: Two rebalances of 2 assets
 # 2nd rebalance:
 # User owns:
 #  1. 54 ETH,     worth 54 000 USDT
-#  2. 1.1 BTC,    worth 110 000 USDT
-#  Total: 164 000 USDT
+#  2. 0.9 BTC,    worth 90 000 USDT
+#  Total: 144 000 USDT
 # With the expected value proportion of ETH/BTC= 6/4, the expected wallet is:
-#  1. 98 400 USDT in ETH   => need to buy 44 400 USDT
-#  2. 65 600 USDT in BTC   => need to sell 44 400 USDT
+#  1. 86 400 USDT in ETH   => need to buy 32 400 USDT
+#  2. 57 600 USDT in BTC   => need to sell 32 400 USDT
     And MarketService mock is reset
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     And MarketService mock expects invocations on POST /order and will return empty response
     And MarketService mock expects invocations on GET /ticker/price and will return "[{"price":"100000","symbol":"BTCUSDT"},{"price":"1000","symbol":"ETHUSDT"}]"
     And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"}]}"
     And MarketService mock expects invocations on GET /openOrders and will return "[{"symbol":"ETHUSDT","orderId":2,"price":"2000","origQty":"2","executedQty":"1","side":"SELL"}]"
-    And MarketService mock expects invocations on GET /account and will return "{"balances":[{"free":"1.1","asset":"BTC"},{"free":"54","asset":"ETH"}]}"
+    And MarketService mock expects invocations on GET /account and will return "{"balances":[{"free":"0.9","asset":"BTC"},{"free":"54","asset":"ETH"}]}"
     And System runs for 10 sec
     And MarketService method DELETE of endpoint /openOrders has been invoked with query params "{"symbol":"ETHUSDT"}"
-    And MarketService method POST of endpoint /order has been invoked with query params "{"symbol":"ETHUSDT","side":"BUY","type":"MARKET","quoteOrderQty":"44400.000000"}"
-    And MarketService method POST of endpoint /order has been invoked with query params "{"symbol":"BTCUSDT","side":"SELL","type":"MARKET","quoteOrderQty":"44400.000000"}"
+    And MarketService method POST of endpoint /order has been invoked with query params "{"symbol":"ETHUSDT","side":"BUY","type":"MARKET","quoteOrderQty":"32400.000000"}"
+    And MarketService method POST of endpoint /order has been invoked with query params "{"symbol":"BTCUSDT","side":"SELL","type":"MARKET","quoteOrderQty":"32400.000000"}"
