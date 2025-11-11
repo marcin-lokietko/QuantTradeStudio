@@ -11,8 +11,7 @@ SystemTimeSimulator::SystemTimeSimulator(TimePoint simulationStart, TimePoint si
               ::toString(simulationEnd));
 }
 
-void SystemTimeSimulator::sleepFor(std::stop_token st, const std::chrono::milliseconds& duration) const {
-  (void)st;
+void SystemTimeSimulator::sleepFor(std::stop_token, const std::chrono::milliseconds& duration) const {
   if (currentTime_ >= simulationEnd_) {
     SPDLOG_INFO("Simulation end reached at {}", ::toString(simulationEnd_));
     if (endCallback_) {

@@ -1,7 +1,9 @@
 #include "BotBacktester/Simulators/MarketServiceSimulator.hpp"
 
+#include <spdlog/spdlog.h>
+
+#include "BotBacktester/Utils.hpp"
 #include "Utils/ToString.hpp"
-#include "spdlog/spdlog.h"
 
 namespace BotBacktester::Simulators {
 
@@ -12,6 +14,10 @@ MarketServiceSimulator::MarketServiceSimulator(
       timeSimulator_(timeSimulator),
       transactionFeePercent_(transactionFeePercent),
       ownedAssets_(std::move(initialOwnedAssets)) {
+  if (doKlinesHaveDifferentSizesOrTimeRanges(klines_)) {
+    throw MarketServiceSimulatorException(
+        "Contract broken - klines provided to MarketServiceSimulator have different sizes or time ranges");
+  }
   updateOwnedAssets();
 }
 
@@ -116,7 +122,6 @@ void MarketServiceSimulator::updateCurrentKlineIndex() const {
 
   const auto& singleKlineSequence = klines_.begin()->second;
 
-  // Assumes that every received kline sequence has the same (openTime, closeTime) ranges
   while (currentKlineIndex_ + 1 < singleKlineSequence.size() &&
          singleKlineSequence[currentKlineIndex_].closeTime < currentTime) {
     ++currentKlineIndex_;

@@ -9,6 +9,16 @@
 
 namespace BotBacktester::Evaluator {
 
+class EvaluatorException : public std::exception {
+ public:
+  explicit EvaluatorException(std::string message) : message_(std::move(message)) {}
+
+  const char* what() const noexcept override { return ("EvaluatorException;" + message_).c_str(); }
+
+ private:
+  std::string message_;
+};
+
 class Evaluator {
  public:
   Evaluator(std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> klines);

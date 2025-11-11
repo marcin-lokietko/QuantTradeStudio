@@ -1,11 +1,18 @@
 #include "BotBacktester/Evaluator/Evaluator.hpp"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
+
+#include "BotBacktester/Utils.hpp"
 
 namespace BotBacktester::Evaluator {
 
 Evaluator::Evaluator(std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> klines)
-    : klines_(std::move(klines)) {}
+    : klines_(std::move(klines)) {
+  if (doKlinesHaveDifferentSizesOrTimeRanges(klines_)) {
+    throw EvaluatorException(
+        "Contract broken - klines provided to MarketServiceSimulator have different sizes or time ranges");
+  }
+}
 
 ApiGateway::BacktestResults Evaluator::evaluate(const BotAssetsHistory& botAssetsHistory) {
   ApiGateway::BacktestResults results;
@@ -48,7 +55,6 @@ ApiGateway::AssetQuantitiesAndValuesHistory Evaluator::getExtendedBotAssetHistor
   }
   fillAssetsValues(extendedHistory.back(), klineStartIdx);
 
-  // Assumed that every kline sequence has the same open and close time
   // Limitation - only one trade can be simulated per single kline
   for (size_t klineIdx = klineStartIdx + 1; klineIdx < klines_.begin()->second.size(); ++klineIdx) {
     const auto& klineOpenTime = klines_.begin()->second[klineIdx].openTime;
