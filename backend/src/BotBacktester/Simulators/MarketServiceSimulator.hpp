@@ -88,9 +88,7 @@ class MarketServiceSimulator : public MarketService::IMarketService {
  private:
   void updateCurrentKlineIndex() const;
 
-  void throwIfKlinesConsistencyBroken(const std::chrono::system_clock::time_point& currentTime) const;
-
-  std::optional<double> getOneUnitValue(const ApiGateway::TradingPairSymbol& symbol) const;
+  std::optional<double> getCurrentValueOfUnit(const ApiGateway::TradingPairSymbol& symbol) const;
 
   void updateOwnedAssets() const;
 

@@ -34,9 +34,9 @@ MarketService::AssetValues MarketServiceSimulator::getOwnedAssetValues(
     }
 
     const ApiGateway::TradingPairSymbol tradingPairSymbol{ownedAssetSymbol, quoteAsset};
-    const auto oneUnitValue = getOneUnitValue(tradingPairSymbol);
-    if (oneUnitValue) {
-      const double totalValue = oneUnitValue.value() * std::stod(ownedAssetQuantity.val_);
+    const auto unitValue = getCurrentValueOfUnit(tradingPairSymbol);
+    if (unitValue) {
+      const double totalValue = unitValue.value() * std::stod(ownedAssetQuantity.val_);
       assetValues.emplace_back(ownedAssetSymbol, quoteAsset, ApiGateway::Value{std::to_string(totalValue)});
     } else {
       SPDLOG_WARN("No price data available for trading pair: {}", toString(tradingPairSymbol));
@@ -52,12 +52,9 @@ ApiGateway::OrderResult MarketServiceSimulator::makeMarketTypeOrderWithQuoteQuan
     const ApiGateway::AssetQuantity& quoteQuantity) const {
   updateCurrentKlineIndex();
 
-  const double price = getOneUnitValue(tradingPairSymbol).value();
-
+  const double unitValue = getCurrentValueOfUnit(tradingPairSymbol).value();
   const double quoteQuantityDouble = std::stod(quoteQuantity.val_);
-
-  // think: unit of price is how much quote I get for a single base, so [quote/base], so:
-  const double baseQuantity = quoteQuantityDouble / price;
+  const double baseQuantity = quoteQuantityDouble / unitValue;
 
   ApiGateway::SingleAssetQuantity& ownedBaseAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.baseAsset);
   ApiGateway::SingleAssetQuantity& ownedQuoteAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.quoteAsset);
@@ -120,32 +117,15 @@ const BotAssetsHistory& MarketServiceSimulator::getOwnedAssetsHistory() const { 
 void MarketServiceSimulator::updateCurrentKlineIndex() const {
   const auto currentTime = std::chrono::system_clock::from_time_t(timeSimulator_.getTimeSinceEpoch());
 
-  const auto& singleKlineSequence = klines_.begin()->second;
+  const auto& firstKlineSequence = klines_.begin()->second;
 
-  while (currentKlineIndex_ + 1 < singleKlineSequence.size() &&
-         singleKlineSequence[currentKlineIndex_].closeTime < currentTime) {
+  while (currentKlineIndex_ + 1 < firstKlineSequence.size() &&
+         firstKlineSequence[currentKlineIndex_].closeTime < currentTime) {
     ++currentKlineIndex_;
   }
-
-  throwIfKlinesConsistencyBroken(currentTime);
 }
 
-void MarketServiceSimulator::throwIfKlinesConsistencyBroken(
-    const std::chrono::system_clock::time_point& currentTime) const {
-  for (const auto& [symbol, klines] : klines_) {
-    if (currentKlineIndex_ >= klines.size()) {
-      throw MarketServiceSimulatorException{std::format(
-          "Klines consistency broken: currentKlineIndex_ exceeds size of klines for symbol={}", toString(symbol))};
-    }
-    if (klines[currentKlineIndex_].openTime > currentTime || klines[currentKlineIndex_].closeTime < currentTime) {
-      throw MarketServiceSimulatorException{std::format(
-          "Klines consistency broken: [openTime, closeTime] for symbol={} at index={} does not contain current time",
-          toString(symbol), currentKlineIndex_)};
-    }
-  }
-}
-
-std::optional<double> MarketServiceSimulator::getOneUnitValue(const ApiGateway::TradingPairSymbol& symbol) const {
+std::optional<double> MarketServiceSimulator::getCurrentValueOfUnit(const ApiGateway::TradingPairSymbol& symbol) const {
   const auto it = klines_.find(symbol);
   if (it == klines_.end()) {
     return std::nullopt;
@@ -161,7 +141,7 @@ void MarketServiceSimulator::updateOwnedAssets() const {
 
 ApiGateway::SingleAssetQuantity& MarketServiceSimulator::getOrCreateOwnedAsset(
     const ApiGateway::AssetSymbol& symbol) const {
-  auto it =
+  const auto it =
       std::find_if(ownedAssets_.begin(), ownedAssets_.end(),
                    [&symbol](const ApiGateway::SingleAssetQuantity& asset) { return asset.assetSymbol == symbol; });
   if (it != ownedAssets_.end()) {
