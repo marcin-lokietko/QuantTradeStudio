@@ -26,14 +26,17 @@ class Evaluator {
   ApiGateway::BacktestResults evaluate(const BotAssetsHistory& botAssetsHistory);
 
  private:
-  ApiGateway::AssetQuantitiesAndValuesHistory getExtendedBotAssetHistory(const BotAssetsHistory& botAssetsHistory);
+  ApiGateway::AssetQuantitiesAndValuesHistory calcBotAssetHistoryWithValues(const BotAssetsHistory& botAssetsHistory);
 
   void pushAssetsSymbolsAndQuantities(ApiGateway::AssetQuantitiesAndValuesHistory& extendedHistory,
                                       const std::chrono::system_clock::time_point& timePoint,
                                       const ApiGateway::AssetQuantities& quantities);
 
-  void pushAssetsSymbolsAndQuantitiesFromPrevious(ApiGateway::AssetQuantitiesAndValuesHistory& extendedHistory,
-                                                  const std::chrono::system_clock::time_point& timePoint);
+  void pushAssetsSymbolsAndQuantitiesFromPreviousHistoryEntry(
+      ApiGateway::AssetQuantitiesAndValuesHistory& extendedHistory,
+      const std::chrono::system_clock::time_point& timePoint);
+
+  size_t getIdxOfFirstKlineAtOrAfterTimePoint(const std::chrono::system_clock::time_point& timePoint);
 
   void fillAssetsValues(ApiGateway::AssetQuantitiesAndValuesHistory::value_type& historyEntry, size_t klineIndex);
 

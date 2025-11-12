@@ -9,14 +9,13 @@ namespace BotBacktester::Evaluator {
 Evaluator::Evaluator(std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> klines)
     : klines_(std::move(klines)) {
   if (doKlinesHaveDifferentSizesOrTimeRanges(klines_)) {
-    throw EvaluatorException(
-        "Contract broken - klines provided to MarketServiceSimulator have different sizes or time ranges");
+    throw EvaluatorException("Contract broken - klines provided to Evaluator have different sizes or time ranges");
   }
 }
 
 ApiGateway::BacktestResults Evaluator::evaluate(const BotAssetsHistory& botAssetsHistory) {
   ApiGateway::BacktestResults results;
-  results.botAssetHistory = getExtendedBotAssetHistory(botAssetsHistory);
+  results.botAssetHistory = calcBotAssetHistoryWithValues(botAssetsHistory);
 
   results.totalProfitOrLossInAbsolute = getAbsoluteTotalProfitOrLoss(results.botAssetHistory.value());
   results.totalProfitOrLossInPercent =
@@ -26,7 +25,7 @@ ApiGateway::BacktestResults Evaluator::evaluate(const BotAssetsHistory& botAsset
   // results.averageLossSizeInAbsolute =
 
   const BotAssetsHistory initialStateHistory{{botAssetsHistory[0].first, botAssetsHistory[0].second}};
-  results.assetHistoryIfHeld = getExtendedBotAssetHistory(initialStateHistory);
+  results.assetHistoryIfHeld = calcBotAssetHistoryWithValues(initialStateHistory);
 
   results.totalProfitOrLossInAbsoluteIfHeld = getAbsoluteTotalProfitOrLoss(results.assetHistoryIfHeld.value());
   results.totalProfitOrLossInPercentIfHeld = getPercentTotalProfitOrLoss(
@@ -37,34 +36,38 @@ ApiGateway::BacktestResults Evaluator::evaluate(const BotAssetsHistory& botAsset
   return results;
 }
 
-ApiGateway::AssetQuantitiesAndValuesHistory Evaluator::getExtendedBotAssetHistory(
+ApiGateway::AssetQuantitiesAndValuesHistory Evaluator::calcBotAssetHistoryWithValues(
     const BotAssetsHistory& botAssetsHistory) {
   ApiGateway::AssetQuantitiesAndValuesHistory extendedHistory;
 
   // BotAssetsHistory should always start with a state before the bot is executed
   pushAssetsSymbolsAndQuantities(extendedHistory, botAssetsHistory[0].first, botAssetsHistory[0].second);
-  size_t nextAssetChangeIdx = 1;
 
-  // Skip to the first kline that starts after botAssetsHistory[0].first
-  size_t klineStartIdx = 0;
-  for (const auto& kline : klines_.begin()->second) {
-    if (kline.openTime >= botAssetsHistory[0].first) {
-      break;
-    }
-    ++klineStartIdx;
-  }
+  // Skip to the first kline that starts after botAssetsHistory[0].first and use it to fill values
+  size_t klineStartIdx = getIdxOfFirstKlineAtOrAfterTimePoint(botAssetsHistory[0].first);
   fillAssetsValues(extendedHistory.back(), klineStartIdx);
 
-  // Limitation - only one trade can be simulated per single kline
-  for (size_t klineIdx = klineStartIdx + 1; klineIdx < klines_.begin()->second.size(); ++klineIdx) {
-    const auto& klineOpenTime = klines_.begin()->second[klineIdx].openTime;
-    const bool isAssetChangeDoneBeforeKline =
-        nextAssetChangeIdx < botAssetsHistory.size() && botAssetsHistory[nextAssetChangeIdx].first < klineOpenTime;
-    if (isAssetChangeDoneBeforeKline) {
+  size_t nextAssetChangeIdx = 1;
+  const auto& firstKlineSequence = klines_.begin()->second;
+
+  for (size_t klineIdx = klineStartIdx + 1; klineIdx < firstKlineSequence.size(); ++klineIdx) {
+    const auto& klineOpenTime = firstKlineSequence[klineIdx].openTime;
+
+    auto isAssetChangeDoneBeforeCurrentKline = [&botAssetsHistory, &klineOpenTime](const size_t nextAssetChangeIdx) {
+      return nextAssetChangeIdx < botAssetsHistory.size() && botAssetsHistory[nextAssetChangeIdx].first < klineOpenTime;
+    };
+    if (isAssetChangeDoneBeforeCurrentKline(nextAssetChangeIdx)) {
+      // Multiple trades can happen between two klines, so we need to find the last one before the kline open time and
+      // save it's state as nest AssetQuantitiesAndValuesHistory entry
+      while (isAssetChangeDoneBeforeCurrentKline(nextAssetChangeIdx + 1)) {
+        ++nextAssetChangeIdx;
+      }
       pushAssetsSymbolsAndQuantities(extendedHistory, klineOpenTime, botAssetsHistory[nextAssetChangeIdx].second);
+
+      // next time start with the next asset change
       ++nextAssetChangeIdx;
     } else {
-      pushAssetsSymbolsAndQuantitiesFromPrevious(extendedHistory, klineOpenTime);
+      pushAssetsSymbolsAndQuantitiesFromPreviousHistoryEntry(extendedHistory, klineOpenTime);
     }
 
     fillAssetsValues(extendedHistory.back(), klineIdx);
@@ -87,8 +90,9 @@ void Evaluator::pushAssetsSymbolsAndQuantities(ApiGateway::AssetQuantitiesAndVal
   extendedHistory.emplace_back(timePoint, assetValues);
 }
 
-void Evaluator::pushAssetsSymbolsAndQuantitiesFromPrevious(ApiGateway::AssetQuantitiesAndValuesHistory& extendedHistory,
-                                                           const std::chrono::system_clock::time_point& timePoint) {
+void Evaluator::pushAssetsSymbolsAndQuantitiesFromPreviousHistoryEntry(
+    ApiGateway::AssetQuantitiesAndValuesHistory& extendedHistory,
+    const std::chrono::system_clock::time_point& timePoint) {
   if (extendedHistory.empty()) return;
 
   const auto& previous = extendedHistory.back();
@@ -102,6 +106,17 @@ void Evaluator::pushAssetsSymbolsAndQuantitiesFromPrevious(ApiGateway::AssetQuan
   }
 
   extendedHistory.emplace_back(timePoint, newValues);
+}
+
+size_t Evaluator::getIdxOfFirstKlineAtOrAfterTimePoint(const std::chrono::system_clock::time_point& timePoint) {
+  size_t klineStartIdx = 0;
+  for (const auto& kline : klines_.begin()->second) {
+    if (kline.openTime >= timePoint) {
+      break;
+    }
+    ++klineStartIdx;
+  }
+  return klineStartIdx;
 }
 
 void Evaluator::fillAssetsValues(ApiGateway::AssetQuantitiesAndValuesHistory::value_type& historyEntry,
