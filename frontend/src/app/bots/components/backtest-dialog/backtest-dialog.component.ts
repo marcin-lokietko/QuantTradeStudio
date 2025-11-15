@@ -89,19 +89,14 @@ export class BacktestDialog {
     this.availableInitialAssets = this.data.availableInitialAssets;
     this.title = `Backtest bot: ${this.botParams.botName}`;
 
-    // TODO support klines paging
-    // const oneMonthAgo = new Date();
-    // oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    // this.simulationStartDate = oneMonthAgo;
-    // this.simulationStartTime = '00:00';
+    const now = new Date();
+    this.simulationEndDate = now;
+    this.simulationEndTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    this.simulationEndDate = yesterday;
-    this.simulationEndTime = '23:59';
-
-    this.simulationStartDate = yesterday;
-    this.simulationStartTime = '20:00';
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1); // handles month/year boundaries internally
+    this.simulationStartDate = oneDayAgo;
+    this.simulationStartTime = this.simulationEndTime;
 
     this.updateUnixTimestamps();
   }

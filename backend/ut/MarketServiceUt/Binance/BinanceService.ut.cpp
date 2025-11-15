@@ -87,10 +87,8 @@ TEST_F(BinanceServiceTest, WhenGetKlinesCalled_ThenHttpGetIsInvoked) {
 
   EXPECT_CALL(HttpMock_, get(klinesUrl, "")).WillOnce(Return(binanceResponse));
 
-  const std::chrono::system_clock::time_point startTime =
-      std::chrono::system_clock::time_point(std::chrono::milliseconds{1622548800000});
-  const std::chrono::system_clock::time_point endTime =
-      std::chrono::system_clock::time_point(std::chrono::milliseconds{1622552399999});
+  const std::chrono::system_clock::time_point startTime{std::chrono::milliseconds{1622548800000}};
+  const std::chrono::system_clock::time_point endTime{std::chrono::milliseconds{1622552399999}};
 
   KlineSequence outputSequence = MakeSut().getKlines(symbol, interval, startTime, endTime);
   EXPECT_EQ(1, outputSequence.size());
@@ -103,6 +101,98 @@ TEST_F(BinanceServiceTest, WhenGetKlinesCalled_ThenHttpGetIsInvoked) {
       .highPrice = ApiGateway::Price{"36000.00"},
   };
   EXPECT_EQ(expectedKline, outputSequence.at(0));
+}
+
+TEST_F(BinanceServiceTest,
+       WhenGetKlinesCalledWithLongTimeRange_ThenHttpGetIsInvoked2TimesAndResultsAreCombinedWithoutDuplicates) {
+  const ApiGateway::TradingPairSymbol symbol{AssetSymbol{"BTC"}, AssetSymbol{"USDT"}};
+  const auto interval = KlineInterval::OneMinute;
+
+  const std::chrono::system_clock::time_point startTime{std::chrono::milliseconds{1622548800000}};
+  const std::chrono::system_clock::time_point endTime = startTime + std::chrono::minutes{1500};
+
+  const uint64_t startTimeMs =
+      std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count();
+  // paging is determined based on end time of last kline in received batch, so it has to make sense in the test:
+  const uint64_t splitTimeMs = startTimeMs + std::chrono::minutes{995}.count() * 60 * 1000;
+  const uint64_t endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(endTime.time_since_epoch()).count();
+
+  // in reality, the first response would have about 1k elements in case of paging, but for the sake of the test this
+  // would be unnecessary
+  const std::string binanceResponse1 = std::format(
+      R"([
+        [1622548800000, "35000.00", "36000.00", "34000.00", "35500.00", "1000.00", 1622548859000, "35500000.00", 100,
+        "500.00", "3550000.00", "0"],
+        [1622548860000, "35001.00", "36001.00", "34001.00", "35501.00", "1000.00", 1622548919000, "35500000.00", 100,
+        "500.00", "3550000.00", "0"],
+        [1622548920000, "35002.00", "36002.00", "34002.00", "35502.00", "1000.00", {}, "35500000.00", 100,
+        "500.00", "3550000.00", "0"]
+    ])",
+      splitTimeMs);
+  const std::string binanceResponse2 = std::format(
+      R"([
+        [1622548920000, "35002.00", "36002.00", "34002.00", "35502.00", "1000.00", {}, "35500000.00", 100,
+        "500.00", "3550000.00", "0"],
+        [1622548980000, "35003.00", "36003.00", "34003.00", "35503.00", "1000.00", {}, "35500000.00", 100,
+        "500.00", "3550000.00", "0"]
+    ])",
+      splitTimeMs, endTimeMs);
+
+  const uint64_t oneKlineDurationMs =
+      std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::minutes{1}).count();
+  const std::string klinesUrl1 =
+      dummyBinanceUrlPrefix.val_ + std::format("/klines?symbol=BTCUSDT&interval=1m&startTime={}&endTime={}&limit=1000",
+                                               startTimeMs - oneKlineDurationMs, splitTimeMs + oneKlineDurationMs);
+  const std::string klinesUrl2 =
+      dummyBinanceUrlPrefix.val_ + std::format("/klines?symbol=BTCUSDT&interval=1m&startTime={}&endTime={}&limit=1000",
+                                               splitTimeMs + 1 - oneKlineDurationMs, endTimeMs + oneKlineDurationMs);
+
+  EXPECT_CALL(HttpMock_, get(klinesUrl1, "")).WillOnce(Return(binanceResponse1));
+  EXPECT_CALL(HttpMock_, get(klinesUrl2, "")).WillOnce(Return(binanceResponse2));
+
+  const KlineSequence outputSequence = MakeSut().getKlines(symbol, interval, startTime, endTime);
+
+  EXPECT_EQ(4, outputSequence.size());
+
+  const Kline expectedKline1{
+      .openTime = startTime,
+      .closeTime = startTime + std::chrono::seconds{59},
+      .openPrice = ApiGateway::Price{"35000.00"},
+      .closePrice = ApiGateway::Price{"35500.00"},
+      .lowPrice = ApiGateway::Price{"34000.00"},
+      .highPrice = ApiGateway::Price{"36000.00"},
+  };
+  EXPECT_EQ(expectedKline1, outputSequence.at(0));
+
+  const Kline expectedKline2{
+      .openTime = startTime + std::chrono::minutes{1},
+      .closeTime = startTime + std::chrono::minutes{1} + std::chrono::seconds{59},
+      .openPrice = ApiGateway::Price{"35001.00"},
+      .closePrice = ApiGateway::Price{"35501.00"},
+      .lowPrice = ApiGateway::Price{"34001.00"},
+      .highPrice = ApiGateway::Price{"36001.00"},
+  };
+  EXPECT_EQ(expectedKline2, outputSequence.at(1));
+
+  const Kline expectedKline3{
+      .openTime = startTime + std::chrono::minutes{2},
+      .closeTime = std::chrono::system_clock::time_point{std::chrono::milliseconds{splitTimeMs}},
+      .openPrice = ApiGateway::Price{"35002.00"},
+      .closePrice = ApiGateway::Price{"35502.00"},
+      .lowPrice = ApiGateway::Price{"34002.00"},
+      .highPrice = ApiGateway::Price{"36002.00"},
+  };
+  EXPECT_EQ(expectedKline3, outputSequence.at(2));
+
+  const Kline expectedKline4{
+      .openTime = startTime + std::chrono::minutes{3},
+      .closeTime = std::chrono::system_clock::time_point{std::chrono::milliseconds{endTimeMs}},
+      .openPrice = ApiGateway::Price{"35003.00"},
+      .closePrice = ApiGateway::Price{"35503.00"},
+      .lowPrice = ApiGateway::Price{"34003.00"},
+      .highPrice = ApiGateway::Price{"36003.00"},
+  };
+  EXPECT_EQ(expectedKline4, outputSequence.at(3));
 }
 
 TEST_F(BinanceServiceTest, WhenGetOwnedAssetsQuantityCalled_ThenHttpGetIsInvoked) {

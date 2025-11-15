@@ -82,6 +82,62 @@ MarketService::KlineSequence BinanceService::getKlines(const ApiGateway::Trading
   SPDLOG_INFO("getKlines called: symbol={} interval={} startTime={} endTime={}", toString(symbol), toString(interval),
               startTime, endTime);
 
+  const auto intervalMs = toMilliseconds(interval);
+  const auto totalRangeMs = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+  const int64_t expectedKlines = totalRangeMs / intervalMs.count() + 1;
+
+  constexpr int64_t maxKlinesPerRequest = 1000;       // Binance limit is 1000 klines per request
+  constexpr int64_t additionalKlinesForRounding = 5;  // See comment in getKlinesInSingleRequest
+  const int64_t maxKlines = maxKlinesPerRequest - additionalKlinesForRounding;
+
+  if (expectedKlines <= maxKlines) {
+    return getKlinesInSingleRequest(symbol, interval, startTime, endTime);
+  }
+
+  MarketService::KlineSequence fullSequence;
+
+  const auto endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(endTime.time_since_epoch()).count();
+  auto currentBatchStart = startTime;
+  while (currentBatchStart < endTime) {
+    const auto currentBatchEndMs =
+        std::chrono::duration_cast<std::chrono::milliseconds>(currentBatchStart.time_since_epoch()).count() +
+        (maxKlines * intervalMs.count());
+    const auto currentBatchEnd =
+        std::chrono::system_clock::time_point(std::chrono::milliseconds(std::min(currentBatchEndMs, endTimeMs)));
+    const auto batchSequence = getKlinesInSingleRequest(symbol, interval, currentBatchStart, currentBatchEnd);
+
+    if (batchSequence.empty()) {
+      SPDLOG_ERROR("getKlines: received empty kline batch from Binance; aborting further requests");
+      return fullSequence;
+    }
+
+    // Remove overlapping kline if present
+    auto batchSequenceBegin = batchSequence.begin();
+    if (fullSequence.size() > 0) {
+      if (fullSequence.back().openTime == batchSequence.front().openTime) {
+        batchSequenceBegin++;
+      }
+    }
+
+    fullSequence.insert(fullSequence.end(), batchSequenceBegin, batchSequence.end());
+
+    currentBatchStart = batchSequence.back().closeTime + std::chrono::milliseconds(1);
+
+    // A small delay between requests to avoid hitting Binance rate limits
+    // TODO: there should be a global rate limiter instead of sleeping here
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+
+  SPDLOG_INFO("getKlines result: total klines fetched={}", fullSequence.size());
+  return fullSequence;
+}
+
+MarketService::KlineSequence BinanceService::getKlinesInSingleRequest(
+    const ApiGateway::TradingPairSymbol& symbol, const KlineInterval interval,
+    const std::chrono::system_clock::time_point startTime, const std::chrono::system_clock::time_point endTime) const {
+  SPDLOG_INFO("getKlinesInSingleRequest called: symbol={} interval={} startTime={} endTime={}", toString(symbol),
+              toString(interval), startTime, endTime);
+
   const auto startTimeMilliseconds =
       std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count();
   const auto endTimeMilliseconds =

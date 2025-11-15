@@ -51,6 +51,11 @@ class BinanceService : public IMarketService, public IHistoricalMarketDataProvid
   std::string getOrderUrl(const std::string& queryString) const;
   MarketService::AssetPricesMap getSymbolToPriceMap(const ApiGateway::AssetSymbol& quoteAsset) const;
 
+  MarketService::KlineSequence getKlinesInSingleRequest(const ApiGateway::TradingPairSymbol& symbol,
+                                                        const KlineInterval interval,
+                                                        const std::chrono::system_clock::time_point startTime,
+                                                        const std::chrono::system_clock::time_point endTime) const;
+
   const IEncryption& encryption_;
   const Http::IHttp& http_;
   const ::Time::ITime& time_;
