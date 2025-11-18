@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <format>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -27,5 +28,14 @@ inline std::string toString(const SingleAssetQuantity& singleAsset) {
 }
 
 using AssetQuantities = std::vector<SingleAssetQuantity>;
+using AssetQuantitiesMap = std::map<ApiGateway::AssetSymbol, ApiGateway::AssetQuantity>;
+
+inline AssetQuantitiesMap asMap(const AssetQuantities& assetQuantities) {
+  AssetQuantitiesMap map;
+  for (const auto& singleQuantity : assetQuantities) {
+    map[singleQuantity.assetSymbol] = singleQuantity.freeQuantity;
+  }
+  return map;
+}
 
 }  // namespace ApiGateway

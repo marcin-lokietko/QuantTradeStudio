@@ -36,12 +36,12 @@ class RebalancerTest : public ::testing::Test {
         .WillRepeatedly(Return());
   }
 
-  void expectGetOpenOrdersCalls(ApiGateway::Orders mockedOrders, const int numCallsUntilRequestTopSimulated) {
+  void expectGetOpenOrdersCalls(ApiGateway::Orders mockedOrders, const int numCallsUntilRequestStopSimulated) {
     auto numCallsSoFar = std::make_shared<int>(0);
 
     EXPECT_CALL(marketServiceMock_, getOpenOrders())
-        .WillRepeatedly([&source = source, mockedOrders, numCallsSoFar, numCallsUntilRequestTopSimulated]() mutable {
-          if (++(*numCallsSoFar) >= numCallsUntilRequestTopSimulated) {
+        .WillRepeatedly([&source = source, mockedOrders, numCallsSoFar, numCallsUntilRequestStopSimulated]() mutable {
+          if (++(*numCallsSoFar) >= numCallsUntilRequestStopSimulated) {
             source.request_stop();
           }
           return mockedOrders;

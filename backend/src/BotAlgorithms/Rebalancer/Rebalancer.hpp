@@ -19,7 +19,6 @@ class Rebalancer {
 
  private:
   void rebalance();
-  void cancelOpenOrders();
   MarketService::AssetValues getRelevantOwnedAssetValues();
   std::optional<double> calcTotalValueOfRelevantOwnedAssets(const MarketService::AssetValues& relevantOwnedAssetValues);
   AssetSharesFloating getActualAssetShares(const MarketService::AssetValues& relevantOwnedAssetValues,

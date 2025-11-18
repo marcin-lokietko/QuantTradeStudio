@@ -7,6 +7,8 @@
 #include <set>
 #include <thread>
 
+#include "BotAlgorithms/Utils.hpp"
+
 namespace BotAlgorithms::Rebalancer {
 
 // small transactions are inefficient due to transaction fees
@@ -36,7 +38,10 @@ void Rebalancer::run(std::stop_token st) {
 void Rebalancer::rebalance() {
   SPDLOG_INFO("Rebalancer executes now");
 
-  cancelOpenOrders();
+  cancelOpenOrders(marketService_, config_.quoteAsset,
+                   config_.baseAssetShares | std::views::transform([](const auto& singleAssetShare) {
+                     return singleAssetShare.assetSymbol;
+                   }));
 
   const auto relevantOwnedAssetValues = getRelevantOwnedAssetValues();
   const auto totalValueOfRelevantOwnedAssets = calcTotalValueOfRelevantOwnedAssets(relevantOwnedAssetValues);
@@ -94,21 +99,6 @@ void Rebalancer::rebalance() {
     const ApiGateway::AssetQuantity quoteQuantity{
         std::to_string(totalValueOfRelevantOwnedAssets.value() * singleAssetToBuy.share.val_)};
     marketService_.makeMarketTypeOrderWithQuoteQuantity(symbol, ApiGateway::OrderSide::Buy, quoteQuantity);
-  }
-}
-
-void Rebalancer::cancelOpenOrders() {
-  const auto openOrders = marketService_.getOpenOrders() |
-                          std::views::transform([](const auto& singleOrder) { return singleOrder.assetPair; });
-  std::set<ApiGateway::TradingPairSymbol> openOrdersSymbols{openOrders.begin(), openOrders.end()};
-
-  for (const auto& singleBaseAssetShare : config_.baseAssetShares) {
-    const ApiGateway::TradingPairSymbol symbol{singleBaseAssetShare.assetSymbol, config_.quoteAsset};
-
-    if (openOrdersSymbols.count(symbol)) {
-      SPDLOG_INFO("Cancelling orders on symbol={}", toString(symbol));
-      marketService_.cancelAllOrdersOnASymbol(symbol);
-    }
   }
 }
 

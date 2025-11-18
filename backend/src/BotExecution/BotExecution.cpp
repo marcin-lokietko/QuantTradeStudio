@@ -34,6 +34,17 @@ ApiGateway::StartBotResult BotExecution::startBot(const ApiGateway::BotConfig& b
           });
 
           startBotResult = ApiGateway::StartBotResult::Success;
+        } else if constexpr (std::is_same_v<T, BotAlgorithms::MovingAverageCrossover::Config>) {
+          SPDLOG_INFO("Received valid configuration for bot: MovingAverageCrossover");
+
+          runningBots_.emplace_back([conf = std::move(config), &marketService_ = marketService_,
+                                     &systemTime = systemTime](std::stop_token st) mutable {
+            BotAlgorithms::MovingAverageCrossover::MovingAverageCrossover bot(std::move(conf), marketService_,
+                                                                              systemTime);
+            bot.run(std::move(st));
+          });
+
+          startBotResult = ApiGateway::StartBotResult::Success;
         }
       },
       extractedConfig);

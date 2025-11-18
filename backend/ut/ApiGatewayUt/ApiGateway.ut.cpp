@@ -53,7 +53,8 @@ TEST_F(ApiGatewayTest, WhenMakeOrderCalled_ThenCallDelegatedToMarketService) {
   const OrderResult expectedResult = OrderResult::Success;
 
   EXPECT_CALL(marketServiceMock_, getPrice(pair)).WillOnce(Return(price));
-  EXPECT_CALL(marketServiceMock_, makeOrder(pair, side, qty, price)).WillOnce(Return(expectedResult));
+  EXPECT_CALL(marketServiceMock_, makeOrder(pair, side, qty, std::make_optional<Price>(price)))
+      .WillOnce(Return(expectedResult));
   EXPECT_EQ(expectedResult, sut_.makeOrder(base, quote, side, qty));
 }
 

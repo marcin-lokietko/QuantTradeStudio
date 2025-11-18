@@ -31,7 +31,7 @@ class MarketServiceSimulator : public MarketService::IMarketService {
     throw MarketServiceSimulatorException("Method not implemented: getServerTime");
   }
 
-  ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) override {
+  ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) const override {
     (void)tradingPairSymbol;
     throw MarketServiceSimulatorException("Method not implemented: getPrice");
   }
@@ -53,7 +53,7 @@ class MarketServiceSimulator : public MarketService::IMarketService {
 
   ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
                                     const ApiGateway::AssetQuantity& quantity,
-                                    const ApiGateway::Price& price) override {
+                                    const std::optional<ApiGateway::Price>& price) const override {
     (void)symbol;
     (void)orderSide;
     (void)quantity;

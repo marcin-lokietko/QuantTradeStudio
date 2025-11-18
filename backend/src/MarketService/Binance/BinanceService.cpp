@@ -29,7 +29,7 @@ Time BinanceService::getServerTime() {
   return Time{http_.get(timeUrl, "")};
 }
 
-ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) {
+ApiGateway::Price BinanceService::getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) const {
   SPDLOG_INFO("getPrice called: tradingPairSymbol={}", toString(tradingPairSymbol));
 
   std::string url = binanceUrlPrefix_.val_ + "/ticker/price?symbol=" + toString(tradingPairSymbol);
@@ -227,15 +227,18 @@ AssetValues BinanceService::getOwnedAssetValues(const ApiGateway::AssetSymbol& q
 ApiGateway::OrderResult BinanceService::makeOrder(const ApiGateway::TradingPairSymbol& symbol,
                                                   const ApiGateway::OrderSide& orderSide,
                                                   const ApiGateway::AssetQuantity& quantity,
-                                                  const ApiGateway::Price& price) {
+                                                  const std::optional<ApiGateway::Price>& price) const {
   SPDLOG_INFO("makeOrder called: symbol={} orderSide={} quantity={} price={}", toString(symbol), toString(orderSide),
               quantity, price);
 
   std::string orderSideString = toString(orderSide);
   std::ranges::transform(orderSideString, orderSideString.begin(), [](unsigned char c) { return std::toupper(c); });
 
-  const std::string queryString = "symbol=" + toString(symbol) + "&side=" + orderSideString +
-                                  "&type=LIMIT&timeInForce=GTC&quantity=" + quantity.val_ + "&price=" + price.val_ +
+  const std::string typeString = price.has_value() ? "&type=LIMIT" : "&type=MARKET";
+  const std::string priceString = price.has_value() ? "&price=" + price->val_ : "";
+
+  const std::string queryString = "symbol=" + toString(symbol) + "&side=" + orderSideString + typeString +
+                                  "&timeInForce=GTC&quantity=" + quantity.val_ + priceString +
                                   "&recvWindow=5000&timestamp=" + std::to_string(time_.getTimeSinceEpoch());
 
   const auto orderUrl = getOrderUrl(queryString);

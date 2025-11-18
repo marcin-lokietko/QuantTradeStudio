@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "AssetSymbol.hpp"
+#include "AssetSymbols.hpp"
 #include "Utils/StrongType.hpp"
 #include "Utils/ToString.hpp"
 
@@ -16,6 +16,7 @@ DEFINE_STRONG_TYPE(BotName, std::string);
 DEFINE_STRONG_TYPE(ExecutionPeriod, uint64_t);
 DEFINE_STRONG_TYPE(SharePercent, uint64_t);
 DEFINE_STRONG_TYPE(IsExecutedImmediately, bool);
+DEFINE_STRONG_TYPE(MovingAverageLength, uint64_t);
 
 struct SingleAssetShare {
   AssetSymbol assetSymbol{};
@@ -32,11 +33,19 @@ inline std::string toString(const SingleAssetShare& singleAssetShare) {
 using AssetShares = std::vector<SingleAssetShare>;
 
 struct BotConfig {
+  // Common
   BotName botName{};
-  std::optional<ExecutionPeriod> executionPeriod{};
-  std::optional<IsExecutedImmediately> isExecutedImmediately{};
   std::optional<AssetSymbol> quoteAsset{};
+  std::optional<ExecutionPeriod> executionPeriod{};
+
+  // Rebalancer specific
+  std::optional<IsExecutedImmediately> isExecutedImmediately{};
   std::optional<AssetShares> baseAssetShares{};
+
+  // Moving Average Crossover specific
+  std::optional<MovingAverageLength> shortTermMovingAverageLength{};
+  std::optional<MovingAverageLength> longTermMovingAverageLength{};
+  std::optional<AssetSymbols> baseAssets{};
 
   bool operator==(const BotConfig& other) const = default;
 };

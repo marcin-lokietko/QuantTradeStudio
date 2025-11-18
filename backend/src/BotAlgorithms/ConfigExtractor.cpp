@@ -14,6 +14,22 @@ ConfigExtractor::ExtractedConfig ConfigExtractor::getConfig(const ApiGateway::Bo
         return config;
       }
     }
+  } else if (botConfig.botName == ApiGateway::BotName{"MovingAverageCrossover"}) {
+    const bool areMandatoryFieldsSet = botConfig.executionPeriod.has_value() &&
+                                       botConfig.shortTermMovingAverageLength.has_value() &&
+                                       botConfig.longTermMovingAverageLength.has_value() &&
+                                       botConfig.quoteAsset.has_value() && botConfig.baseAssets.has_value();
+    if (areMandatoryFieldsSet) {
+      MovingAverageCrossover::Config config{
+          .executionPeriod = botConfig.executionPeriod.value(),
+          .shortTermMovingAverageLength = botConfig.shortTermMovingAverageLength.value(),
+          .longTermMovingAverageLength = botConfig.longTermMovingAverageLength.value(),
+          .quoteAsset = botConfig.quoteAsset.value(),
+          .baseAssets = botConfig.baseAssets.value()};
+      if (isValid(config)) {
+        return config;
+      }
+    }
   }
 
   return {};

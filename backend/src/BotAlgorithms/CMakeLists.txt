@@ -1,5 +1,7 @@
 add_library(BotAlgorithms STATIC
     ConfigExtractor.cpp
+    MovingAverageCrossover/AssetHistory.cpp
+    MovingAverageCrossover/MovingAverageCrossover.cpp
     Rebalancer/Rebalancer.cpp
 )
 

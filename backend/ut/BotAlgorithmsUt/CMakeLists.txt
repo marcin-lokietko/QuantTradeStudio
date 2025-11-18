@@ -1,6 +1,8 @@
 add_library(BotAlgorithmsUt STATIC
     ConfigExtractor.ut.cpp
-    Rebalancer.ut.cpp
+    MovingAverageCrossover/AverageCalculator.ut.cpp
+    MovingAverageCrossover/MovingAverageCrossover.ut.cpp
+    Rebalancer/Rebalancer.ut.cpp
 )
 
 #search for headers in root project directory

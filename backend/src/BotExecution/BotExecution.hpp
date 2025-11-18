@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "BotAlgorithms/ConfigExtractor.hpp"
+#include "BotAlgorithms/MovingAverageCrossover/MovingAverageCrossover.hpp"
 #include "BotAlgorithms/Rebalancer/Rebalancer.hpp"
 #include "IBotExecution.hpp"
 #include "MarketService/IMarketService.hpp"

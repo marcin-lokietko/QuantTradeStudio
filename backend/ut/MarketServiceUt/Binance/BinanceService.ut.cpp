@@ -269,7 +269,7 @@ TEST_F(BinanceServiceTest, WhenGetOwnedAssetValuesCalled_ThenReturnsAssetValuesW
   EXPECT_NEAR(std::stod(result[1].value->val_), 8000.0, 0.001);
 }
 
-TEST_F(BinanceServiceTest, WhenMakeOrderCalled_ThenHttpPostIsInvoked) {
+TEST_F(BinanceServiceTest, WhenMakeOrderCalledWithPrice_ThenHttpPostIsInvokedWithLimitOrder) {
   const std::string queryString =
       "symbol=BTCUSDT&side=BUY&type=LIMIT&timeInForce=GTC&quantity=0.01&price=50000&recvWindow=5000&timestamp="
       "1234567890";
@@ -285,6 +285,24 @@ TEST_F(BinanceServiceTest, WhenMakeOrderCalled_ThenHttpPostIsInvoked) {
 
   ApiGateway::OrderResult result = MakeSut().makeOrder(btcUsdtTradingPair, ApiGateway::OrderSide::Buy,
                                                        ApiGateway::AssetQuantity{"0.01"}, ApiGateway::Price{"50000"});
+  EXPECT_EQ(ApiGateway::OrderResult::Success, result);
+}
+
+TEST_F(BinanceServiceTest, WhenMakeOrderCalledWithoutPrice_ThenHttpPostIsInvokedWithMarketOrder) {
+  const std::string queryString =
+      "symbol=BTCUSDT&side=BUY&type=MARKET&timeInForce=GTC&quantity=0.01&recvWindow=5000&timestamp=1234567890";
+  const std::string orderUrl = dummyBinanceUrlPrefix.val_ + "/order?" + queryString + "&signature=dummy_signature";
+  const std::string binanceResponse = R"({"orderId":123456,"status":"NEW"})";
+
+  EXPECT_CALL(timeMock_, getTimeSinceEpoch).WillOnce(Return(1234567890));
+  EXPECT_CALL(encryptionMock_, generateSignature(queryString)).WillOnce(Return("dummy_signature"));
+  EXPECT_CALL(encryptionMock_, getApiKey()).WillOnce(Return("dummy_api_key"));
+
+  EXPECT_CALL(HttpMock_, post(orderUrl, "X-MBX-APIKEY: dummy_api_key"))
+      .WillOnce(Return(Http::Response{Http::HttpStatusCode{200}, Http::HttpBody{binanceResponse}}));
+
+  ApiGateway::OrderResult result = MakeSut().makeOrder(btcUsdtTradingPair, ApiGateway::OrderSide::Buy,
+                                                       ApiGateway::AssetQuantity{"0.01"}, std::nullopt);
   EXPECT_EQ(ApiGateway::OrderResult::Success, result);
 }
 

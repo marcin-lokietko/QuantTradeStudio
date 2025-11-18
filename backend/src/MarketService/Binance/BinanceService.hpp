@@ -17,7 +17,7 @@ class BinanceService : public IMarketService, public IHistoricalMarketDataProvid
 
   Time getServerTime() override;
 
-  ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) override;
+  ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) const override;
 
   AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const override;
 
@@ -32,7 +32,8 @@ class BinanceService : public IMarketService, public IHistoricalMarketDataProvid
   AssetValues getOwnedAssetValues(const ApiGateway::AssetSymbol& quoteAsset) const override;
 
   ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
-                                    const ApiGateway::AssetQuantity& quantity, const ApiGateway::Price& price) override;
+                                    const ApiGateway::AssetQuantity& quantity,
+                                    const std::optional<ApiGateway::Price>& price) const override;
 
   ApiGateway::OrderResult makeMarketTypeOrderWithQuoteQuantity(
       const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
