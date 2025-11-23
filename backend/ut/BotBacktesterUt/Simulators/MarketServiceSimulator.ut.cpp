@@ -106,6 +106,21 @@ TEST_F(MarketServiceSimulatorTest, WhenNoTradesDone_ThenSutReturnsSingleElementI
   expectSingleOwnedAssetsRecord();
 }
 
+TEST_F(MarketServiceSimulatorTest, WhenGetPricesCalled_ThenPricesCalculatedBasedOnKlines) {
+  const MarketService::AssetPrices expectedPrices0 = {
+      {btcUsdtTradingPair, ApiGateway::Price{"80000.000000"}},
+      {ethUsdtTradingPair, ApiGateway::Price{"2000.000000"}},
+  };
+  EXPECT_EQ(expectedPrices0, sut_.getPrices({btcUsdtTradingPair, ethUsdtTradingPair}));
+
+  timeSimulator_.sleepFor(std::stop_token{}, std::chrono::minutes(1) + std::chrono::seconds(1));
+  const MarketService::AssetPrices expectedPrices1 = {
+      {btcUsdtTradingPair, ApiGateway::Price{"90000.000000"}},
+      {ethUsdtTradingPair, ApiGateway::Price{"3000.000000"}},
+  };
+  EXPECT_EQ(expectedPrices1, sut_.getPrices({btcUsdtTradingPair, ethUsdtTradingPair}));
+}
+
 TEST_F(MarketServiceSimulatorTest, WhenNoTradesDone_ThenSutReturnsAssetsValuesBasedOnKlines) {
   const MarketService::AssetValues expectedValues0 = {
       {AssetSymbol{"USDT"}, AssetSymbol{"USDT"}, ApiGateway::Value{"100000"}},
@@ -134,7 +149,8 @@ TEST_F(MarketServiceSimulatorTest, WhenNoTradesDone_ThenSutReturnsAssetsValuesBa
   EXPECT_EQ(expectedValues2, sut_.getOwnedAssetValues(AssetSymbol{"USDT"}));
 }
 
-TEST_F(MarketServiceSimulatorTest, WhenTradesPerformed_ThenSutReturnsAssetsValuesBasedOnKlinesAndOwnedAmount) {
+TEST_F(MarketServiceSimulatorTest,
+       WhenMarketTypeTradesPerformedWithQuoteQuantity_ThenSutReturnsAssetsValuesBasedOnKlinesAndOwnedAmount) {
   const MarketService::AssetValues expectedValues0 = {
       {AssetSymbol{"USDT"}, AssetSymbol{"USDT"}, ApiGateway::Value{"100000"}},
       {AssetSymbol{"BTC"}, AssetSymbol{"USDT"}, ApiGateway::Value{"80000.000000"}},
@@ -184,7 +200,8 @@ TEST_F(MarketServiceSimulatorTest, WhenTradesPerformed_ThenSutReturnsAssetsValue
   EXPECT_EQ(expectedValues4, sut_.getOwnedAssetValues(AssetSymbol{"USDT"}));
 }
 
-TEST_F(MarketServiceSimulatorTest, WhenTradesPerformed_ThenSutReturnsOwnedAssetsHistoryBasedOnKlinesAndOwnedAmount) {
+TEST_F(MarketServiceSimulatorTest,
+       WhenMarketTypeTradesPerformedWithQuoteQuantity_ThenSutReturnsOwnedAssetsHistoryBasedOnKlinesAndOwnedAmount) {
   // 1st trade
   sut_.makeMarketTypeOrderWithQuoteQuantity(btcUsdtTradingPair, ApiGateway::OrderSide::Sell,
                                             ApiGateway::AssetQuantity{"8000"});
@@ -225,6 +242,37 @@ TEST_F(MarketServiceSimulatorTest, WhenTradesPerformed_ThenSutReturnsOwnedAssets
       {time0, ownedAssetsAfter1stTrade},
       {time0, ownedAssetsAfter2ndTrade},
       {time0 + std::chrono::minutes(1) + std::chrono::seconds(1), ownedAssetsAfter3rdTrade}};
+  EXPECT_EQ(expectedHistory, sut_.getOwnedAssetsHistory());
+}
+
+TEST_F(MarketServiceSimulatorTest,
+       WhenMarketTypeTradesPerformedWithBaseQuantity_ThenSutReturnsOwnedAssetsHistoryBasedOnKlinesAndOwnedAmount) {
+  // 1st trade
+  sut_.makeOrder(btcUsdtTradingPair, ApiGateway::OrderSide::Sell, ApiGateway::AssetQuantity{"0.1"}, std::nullopt);
+
+  timeSimulator_.sleepFor(std::stop_token{}, std::chrono::minutes(1) + std::chrono::seconds(1));
+
+  // 2nd trade
+  sut_.makeOrder(ethUsdtTradingPair, ApiGateway::OrderSide::Buy, ApiGateway::AssetQuantity{"1"}, std::nullopt);
+
+  const ApiGateway::AssetQuantities ownedAssetsAfter1stTrade = {
+      {AssetSymbol{"USDT"}, ApiGateway::AssetQuantity{"107920.000000"},
+       ApiGateway::MarketId::Unknown},  // 0,1 BTC sold at 80000 with 1% fee
+      {AssetSymbol{"BTC"}, ApiGateway::AssetQuantity{"0.900000"}, ApiGateway::MarketId::Unknown},
+      {AssetSymbol{"ETH"}, ApiGateway::AssetQuantity{"10"}, ApiGateway::MarketId::Unknown},
+  };
+
+  // 1 ETH bought at 3000 with 1% fee
+  const ApiGateway::AssetQuantities ownedAssetsAfter2ndTrade = {
+      {AssetSymbol{"USDT"}, ApiGateway::AssetQuantity{"104920.000000"}, ApiGateway::MarketId::Unknown},
+      {AssetSymbol{"BTC"}, ApiGateway::AssetQuantity{"0.900000"}, ApiGateway::MarketId::Unknown},
+      {AssetSymbol{"ETH"}, ApiGateway::AssetQuantity{"10.990000"}, ApiGateway::MarketId::Unknown},
+  };
+
+  const BotAssetsHistory expectedHistory = {
+      {time0, initialOwnedAssets},
+      {time0, ownedAssetsAfter1stTrade},
+      {time0 + std::chrono::minutes(1) + std::chrono::seconds(1), ownedAssetsAfter2ndTrade}};
   EXPECT_EQ(expectedHistory, sut_.getOwnedAssetsHistory());
 }
 

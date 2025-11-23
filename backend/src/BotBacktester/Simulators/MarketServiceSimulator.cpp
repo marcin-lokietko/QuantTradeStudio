@@ -21,6 +21,22 @@ MarketServiceSimulator::MarketServiceSimulator(
   updateOwnedAssets();
 }
 
+MarketService::AssetPrices MarketServiceSimulator::getPrices(
+    const std::vector<ApiGateway::TradingPairSymbol>& symbols) const {
+  updateCurrentKlineIndex();
+
+  MarketService::AssetPrices assetPrices;
+  for (const auto& singleSymbol : symbols) {
+    const auto unitValue = getCurrentValueOfUnit(singleSymbol);
+    if (unitValue) {
+      assetPrices.emplace_back(singleSymbol, ApiGateway::Price{std::to_string(unitValue.value())});
+    } else {
+      SPDLOG_ERROR("No price data available for trading pair: {}", toString(singleSymbol));
+    }
+  }
+  return assetPrices;
+}
+
 MarketService::AssetValues MarketServiceSimulator::getOwnedAssetValues(
     const ApiGateway::AssetSymbol& quoteAsset) const {
   updateCurrentKlineIndex();
@@ -47,6 +63,24 @@ MarketService::AssetValues MarketServiceSimulator::getOwnedAssetValues(
   return assetValues;
 }
 
+ApiGateway::OrderResult MarketServiceSimulator::makeOrder(const ApiGateway::TradingPairSymbol& symbol,
+                                                          const ApiGateway::OrderSide& orderSide,
+                                                          const ApiGateway::AssetQuantity& quantity,
+                                                          const std::optional<ApiGateway::Price>& price) const {
+  if (price.has_value()) {
+    throw MarketServiceSimulatorException("Method not implemented: makeOrder with LIMIT price");
+  }
+
+  updateCurrentKlineIndex();
+
+  const double unitValue = getCurrentValueOfUnit(symbol).value();
+  const double baseQuantityDouble = std::stod(quantity.val_);
+  // value = quote / base  =>  quote = value * base
+  const double quoteQuantityDouble = unitValue * baseQuantityDouble;
+
+  return simulateOrder(symbol, orderSide, quoteQuantityDouble, baseQuantityDouble);
+}
+
 ApiGateway::OrderResult MarketServiceSimulator::makeMarketTypeOrderWithQuoteQuantity(
     const ApiGateway::TradingPairSymbol& tradingPairSymbol, const ApiGateway::OrderSide& orderSide,
     const ApiGateway::AssetQuantity& quoteQuantity) const {
@@ -54,49 +88,17 @@ ApiGateway::OrderResult MarketServiceSimulator::makeMarketTypeOrderWithQuoteQuan
 
   const double unitValue = getCurrentValueOfUnit(tradingPairSymbol).value();
   const double quoteQuantityDouble = std::stod(quoteQuantity.val_);
-  const double baseQuantity = quoteQuantityDouble / unitValue;
+  const double baseQuantityDouble = quoteQuantityDouble / unitValue;
 
-  ApiGateway::SingleAssetQuantity& ownedBaseAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.baseAsset);
-  ApiGateway::SingleAssetQuantity& ownedQuoteAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.quoteAsset);
+  const auto result = simulateOrder(tradingPairSymbol, orderSide, quoteQuantityDouble, baseQuantityDouble);
 
-  if (orderSide == ApiGateway::OrderSide::Buy) {
-    if (std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) < quoteQuantityDouble) {
-      SPDLOG_WARN(
-          "Simulated BUY order cannot be fulfilled due to insufficient funds: tradingPairSymbol={}, "
-          "quoteQuantity={}, free quote quantity={}",
-          toString(tradingPairSymbol), quoteQuantity, ownedQuoteAssetQuantity.freeQuantity);
-      return ApiGateway::OrderResult::Failure;
-    }
-    ownedQuoteAssetQuantity.freeQuantity.val_ =
-        std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) - quoteQuantityDouble);
-
-    // Binance charges the fee in the asset you receive when buying/selling
-    const auto baseQuantityAfterFee = (baseQuantity * (100.0 - transactionFeePercent_.val_)) / 100.0;
-    ownedBaseAssetQuantity.freeQuantity.val_ =
-        std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) + baseQuantityAfterFee);
-  } else if (orderSide == ApiGateway::OrderSide::Sell) {
-    if (std::stod(ownedBaseAssetQuantity.freeQuantity.val_) < baseQuantity) {
-      SPDLOG_WARN(
-          "Simulated SELL order cannot be fulfilled due to insufficient funds: tradingPairSymbol={}, "
-          "baseQuantity={}, free base quantity={}",
-          toString(tradingPairSymbol), baseQuantity, ownedBaseAssetQuantity.freeQuantity);
-      return ApiGateway::OrderResult::Failure;
-    }
-    ownedBaseAssetQuantity.freeQuantity.val_ =
-        std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) - baseQuantity);
-
-    const auto quoteQuantityDoubleAfterFee = (quoteQuantityDouble * (100.0 - transactionFeePercent_.val_)) / 100.0;
-    ownedQuoteAssetQuantity.freeQuantity.val_ =
-        std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) + quoteQuantityDoubleAfterFee);
+  if (result == ApiGateway::OrderResult::Success) {
+    SPDLOG_INFO(
+        "Successfully simulating makeMarketTypeOrderWithQuoteQuantity(tradingPairSymbol={}, orderSide={}, "
+        "quoteQuantity={})",
+        toString(tradingPairSymbol), toString(orderSide), quoteQuantity);
   }
-
-  updateOwnedAssets();
-
-  SPDLOG_INFO(
-      "Successfully simulating makeMarketTypeOrderWithQuoteQuantity(tradingPairSymbol={}, orderSide={}, "
-      "quoteQuantity={})",
-      toString(tradingPairSymbol), toString(orderSide), quoteQuantity);
-  return ApiGateway::OrderResult::Success;
+  return result;
 }
 
 ApiGateway::Orders MarketServiceSimulator::getOpenOrders() const {
@@ -113,6 +115,46 @@ ApiGateway::OrderResult MarketServiceSimulator::cancelAllOrdersOnASymbol(
 }
 
 const BotAssetsHistory& MarketServiceSimulator::getOwnedAssetsHistory() const { return ownedAssetsHistory_; }
+
+ApiGateway::OrderResult MarketServiceSimulator::simulateOrder(const ApiGateway::TradingPairSymbol& tradingPairSymbol,
+                                                              const ApiGateway::OrderSide& orderSide,
+                                                              const double quoteQuantity,
+                                                              const double baseQuantity) const {
+  ApiGateway::SingleAssetQuantity& ownedBaseAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.baseAsset);
+  ApiGateway::SingleAssetQuantity& ownedQuoteAssetQuantity = getOrCreateOwnedAsset(tradingPairSymbol.quoteAsset);
+
+  if (orderSide == ApiGateway::OrderSide::Buy) {
+    if (std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) < quoteQuantity) {
+      SPDLOG_WARN(
+          "Simulated BUY order cannot be fulfilled due to insufficient funds: tradingPairSymbol={}, "
+          "quoteQuantity={}, free quote quantity={}",
+          toString(tradingPairSymbol), quoteQuantity, ownedQuoteAssetQuantity.freeQuantity);
+      return ApiGateway::OrderResult::Failure;
+    }
+    ownedQuoteAssetQuantity.freeQuantity.val_ =
+        std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) - quoteQuantity);
+    // Binance charges the fee in the asset you receive when buying/selling
+    const auto baseQuantityAfterFee = (baseQuantity * (100.0 - transactionFeePercent_.val_)) / 100.0;
+    ownedBaseAssetQuantity.freeQuantity.val_ =
+        std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) + baseQuantityAfterFee);
+  } else if (orderSide == ApiGateway::OrderSide::Sell) {
+    if (std::stod(ownedBaseAssetQuantity.freeQuantity.val_) < baseQuantity) {
+      SPDLOG_WARN(
+          "Simulated SELL order cannot be fulfilled due to insufficient funds: tradingPairSymbol={}, "
+          "baseQuantity={}, free base quantity={}",
+          toString(tradingPairSymbol), baseQuantity, ownedBaseAssetQuantity.freeQuantity);
+      return ApiGateway::OrderResult::Failure;
+    }
+    ownedBaseAssetQuantity.freeQuantity.val_ =
+        std::to_string(std::stod(ownedBaseAssetQuantity.freeQuantity.val_) - baseQuantity);
+    const auto quoteQuantityAfterFee = (quoteQuantity * (100.0 - transactionFeePercent_.val_)) / 100.0;
+    ownedQuoteAssetQuantity.freeQuantity.val_ =
+        std::to_string(std::stod(ownedQuoteAssetQuantity.freeQuantity.val_) + quoteQuantityAfterFee);
+  }
+
+  updateOwnedAssets();
+  return ApiGateway::OrderResult::Success;
+}
 
 void MarketServiceSimulator::updateCurrentKlineIndex() const {
   const auto currentTime = std::chrono::system_clock::from_time_t(timeSimulator_.getTimeSinceEpoch());

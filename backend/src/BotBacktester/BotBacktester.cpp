@@ -4,6 +4,7 @@
 
 #include <variant>
 
+#include "BotAlgorithms/MovingAverageCrossover/MovingAverageCrossover.hpp"
 #include "BotAlgorithms/Rebalancer/Rebalancer.hpp"
 
 namespace BotBacktester {
@@ -55,6 +56,25 @@ ApiGateway::BacktestResults BotBacktester::testBot(const ApiGateway::BotConfig& 
                 BotAlgorithms::Rebalancer::Rebalancer bot(std::move(conf), *marketService, *systemTime);
                 bot.run(std::move(st));
               });
+        } else if constexpr (std::is_same_v<T, BotAlgorithms::MovingAverageCrossover::Config>) {
+          SPDLOG_INFO("Received valid configuration for bot: MovingAverageCrossover");
+
+          auto klineSequenceMap =
+              buildKlineSequenceMap(config, this->backtestConfig_.simulationStart, this->backtestConfig_.simulationEnd);
+
+          this->marketServiceSimulator_ = std::make_unique<Simulators::MarketServiceSimulator>(
+              klineSequenceMap, *this->systemTimeSimulator_, this->backtestConfig_.transactionFeePercent,
+              this->backtestConfig_.initialOwnedAssets);
+
+          this->evaluator_ = std::make_unique<Evaluator::Evaluator>(std::move(klineSequenceMap));
+
+          this->runningBot_ =
+              std::make_unique<std::jthread>([conf = std::move(config), &marketService = this->marketServiceSimulator_,
+                                              &systemTime = this->systemTimeSimulator_](std::stop_token st) mutable {
+                BotAlgorithms::MovingAverageCrossover::MovingAverageCrossover bot(std::move(conf), *marketService,
+                                                                                  *systemTime);
+                bot.run(std::move(st));
+              });
         }
       },
       extractedConfig);
@@ -88,6 +108,22 @@ std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> BotBacktes
 
   for (const auto& singleBaseAssetShare : config.baseAssetShares) {
     const ApiGateway::TradingPairSymbol tradingPairSymbol{singleBaseAssetShare.assetSymbol, config.quoteAsset};
+
+    const auto klines = historicalMarketDataProvider_.getKlines(
+        tradingPairSymbol, MarketService::KlineInterval::OneMinute, simStart, simEnd);
+    klineSequenceMap[tradingPairSymbol] = klines;
+  }
+
+  return klineSequenceMap;
+}
+
+std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> BotBacktester::buildKlineSequenceMap(
+    const BotAlgorithms::MovingAverageCrossover::Config& config, std::chrono::system_clock::time_point simStart,
+    std::chrono::system_clock::time_point simEnd) {
+  std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> klineSequenceMap;
+
+  for (const auto& singleBaseAsset : config.baseAssets) {
+    const ApiGateway::TradingPairSymbol tradingPairSymbol{singleBaseAsset, config.quoteAsset};
 
     const auto klines = historicalMarketDataProvider_.getKlines(
         tradingPairSymbol, MarketService::KlineInterval::OneMinute, simStart, simEnd);

@@ -28,6 +28,10 @@ class BotBacktester : public IBotBacktester {
       const BotAlgorithms::Rebalancer::Config& config, std::chrono::system_clock::time_point simStart,
       std::chrono::system_clock::time_point simEnd);
 
+  std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> buildKlineSequenceMap(
+      const BotAlgorithms::MovingAverageCrossover::Config& config, std::chrono::system_clock::time_point simStart,
+      std::chrono::system_clock::time_point simEnd);
+
   std::unique_ptr<Simulators::SystemTimeSimulator> systemTimeSimulator_;
   const BotAlgorithms::ConfigExtractor configExtractor_{};
   const MarketService::IHistoricalMarketDataProvider& historicalMarketDataProvider_;

@@ -36,10 +36,7 @@ class MarketServiceSimulator : public MarketService::IMarketService {
     throw MarketServiceSimulatorException("Method not implemented: getPrice");
   }
 
-  MarketService::AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& symbols) const {
-    (void)symbols;
-    throw MarketServiceSimulatorException("Method not implemented: getPrices");
-  }
+  MarketService::AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& symbols) const;
 
   ApiGateway::AssetQuantities getOwnedAssetsQuantity() const override {
     throw MarketServiceSimulatorException("Method not implemented: getOwnedAssetsQuantity");
@@ -53,13 +50,7 @@ class MarketServiceSimulator : public MarketService::IMarketService {
 
   ApiGateway::OrderResult makeOrder(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::OrderSide& orderSide,
                                     const ApiGateway::AssetQuantity& quantity,
-                                    const std::optional<ApiGateway::Price>& price) const override {
-    (void)symbol;
-    (void)orderSide;
-    (void)quantity;
-    (void)price;
-    throw MarketServiceSimulatorException("Method not implemented: getOwnedAssetsQuantityAndValue");
-  }
+                                    const std::optional<ApiGateway::Price>& price) const;
 
   ApiGateway::OrderResult makeMarketTypeOrderWithQuoteQuantity(const ApiGateway::TradingPairSymbol& tradingPairSymbol,
                                                                const ApiGateway::OrderSide& orderSide,
@@ -86,6 +77,10 @@ class MarketServiceSimulator : public MarketService::IMarketService {
   const BotAssetsHistory& getOwnedAssetsHistory() const;
 
  private:
+  ApiGateway::OrderResult simulateOrder(const ApiGateway::TradingPairSymbol& tradingPairSymbol,
+                                        const ApiGateway::OrderSide& orderSide, const double quoteQuantity,
+                                        const double baseQuantity) const;
+
   void updateCurrentKlineIndex() const;
 
   std::optional<double> getCurrentValueOfUnit(const ApiGateway::TradingPairSymbol& symbol) const;
