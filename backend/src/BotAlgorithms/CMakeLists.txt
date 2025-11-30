@@ -1,5 +1,6 @@
 add_library(BotAlgorithms STATIC
     ConfigExtractor.cpp
+    DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.cpp
     MovingAverageCrossover/AssetHistory.cpp
     MovingAverageCrossover/MovingAverageCrossover.cpp
     Rebalancer/Rebalancer.cpp

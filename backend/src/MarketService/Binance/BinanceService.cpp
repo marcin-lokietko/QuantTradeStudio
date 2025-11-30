@@ -19,6 +19,42 @@ namespace MarketService::Binance {
 namespace {
 constexpr Http::HttpStatusCode statusCodeOk{200};
 constexpr Http::HttpStatusCode statusCodeRequestRateLimitBroken{429};
+
+inline std::string toString(const ApiGateway::KlineInterval interval) {
+  switch (interval) {
+    case ApiGateway::KlineInterval::OneMinute:
+      return "1m";
+    case ApiGateway::KlineInterval::ThreeMinutes:
+      return "3m";
+    case ApiGateway::KlineInterval::FiveMinutes:
+      return "5m";
+    case ApiGateway::KlineInterval::FifteenMinutes:
+      return "15m";
+    case ApiGateway::KlineInterval::ThirtyMinutes:
+      return "30m";
+    case ApiGateway::KlineInterval::OneHour:
+      return "1h";
+    case ApiGateway::KlineInterval::TwoHours:
+      return "2h";
+    case ApiGateway::KlineInterval::FourHours:
+      return "4h";
+    case ApiGateway::KlineInterval::SixHours:
+      return "6h";
+    case ApiGateway::KlineInterval::EightHours:
+      return "8h";
+    case ApiGateway::KlineInterval::TwelveHours:
+      return "12h";
+    case ApiGateway::KlineInterval::OneDay:
+      return "1d";
+    case ApiGateway::KlineInterval::ThreeDays:
+      return "3d";
+    case ApiGateway::KlineInterval::OneWeek:
+      return "1w";
+    case ApiGateway::KlineInterval::OneMonth:
+      return "1M";
+  }
+  throw std::invalid_argument("Invalid KlineInterval");
+}
 }  // namespace
 
 Time BinanceService::getServerTime() {
@@ -76,7 +112,7 @@ AssetPrices BinanceService::getPrices(const std::vector<ApiGateway::TradingPairS
 }
 
 MarketService::KlineSequence BinanceService::getKlines(const ApiGateway::TradingPairSymbol& symbol,
-                                                       const KlineInterval interval,
+                                                       const ApiGateway::KlineInterval interval,
                                                        const std::chrono::system_clock::time_point startTime,
                                                        const std::chrono::system_clock::time_point endTime) const {
   SPDLOG_INFO("getKlines called: symbol={} interval={} startTime={} endTime={}", toString(symbol), toString(interval),
@@ -133,7 +169,7 @@ MarketService::KlineSequence BinanceService::getKlines(const ApiGateway::Trading
 }
 
 MarketService::KlineSequence BinanceService::getKlinesInSingleRequest(
-    const ApiGateway::TradingPairSymbol& symbol, const KlineInterval interval,
+    const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::KlineInterval interval,
     const std::chrono::system_clock::time_point startTime, const std::chrono::system_clock::time_point endTime) const {
   SPDLOG_INFO("getKlinesInSingleRequest called: symbol={} interval={} startTime={} endTime={}", toString(symbol),
               toString(interval), startTime, endTime);

@@ -30,7 +30,7 @@ class AverageCalculator {
  private:
   std::deque<T> history_;
   T sum_{};
-  size_t historySize_{};
+  const size_t historySize_{};
 };
 
 }  // namespace BotAlgorithms::MovingAverageCrossover

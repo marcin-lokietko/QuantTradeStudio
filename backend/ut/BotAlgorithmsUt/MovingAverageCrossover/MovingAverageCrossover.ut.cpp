@@ -22,8 +22,8 @@ const TradingPairSymbol ethUsdtTradingPair{AssetSymbol{"ETH"}, AssetSymbol{"USDT
 const TradingPairSymbol slnUsdtTradingPair{AssetSymbol{"SLN"}, AssetSymbol{"USDT"}};
 
 const Config config{.executionPeriod = ExecutionPeriod{60},
-                    .shortTermMovingAverageLength = ApiGateway::MovingAverageLength{5},
-                    .longTermMovingAverageLength = ApiGateway::MovingAverageLength{10},
+                    .shortTermMovingAverageLength = ApiGateway::AssetHistoryLength{5},
+                    .longTermMovingAverageLength = ApiGateway::AssetHistoryLength{10},
                     .quoteAsset = AssetSymbol{"USDT"},
                     .baseAssets = {AssetSymbol{"BTC"}, AssetSymbol{"ETH"}}};
 

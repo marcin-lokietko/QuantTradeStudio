@@ -30,6 +30,20 @@ ConfigExtractor::ExtractedConfig ConfigExtractor::getConfig(const ApiGateway::Bo
         return config;
       }
     }
+  } else if (botConfig.botName == ApiGateway::BotName{"DonchianChannelBreakoutStrategy"}) {
+    const bool areMandatoryFieldsSet =
+        botConfig.executionInterval.has_value() && botConfig.entryChannelLength.has_value() &&
+        botConfig.exitChannelLength.has_value() && botConfig.quoteAsset.has_value() && botConfig.baseAssets.has_value();
+    if (areMandatoryFieldsSet) {
+      DonchianChannelBreakoutStrategy::Config config{.executionInterval = botConfig.executionInterval.value(),
+                                                     .entryChannelLength = botConfig.entryChannelLength.value(),
+                                                     .exitChannelLength = botConfig.exitChannelLength.value(),
+                                                     .quoteAsset = botConfig.quoteAsset.value(),
+                                                     .baseAssets = botConfig.baseAssets.value()};
+      if (isValid(config)) {
+        return config;
+      }
+    }
   }
 
   return {};

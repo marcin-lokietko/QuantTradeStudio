@@ -7,8 +7,8 @@ namespace BotAlgorithms::MovingAverageCrossover {
 
 struct Config {
   ApiGateway::ExecutionPeriod executionPeriod{};
-  ApiGateway::MovingAverageLength shortTermMovingAverageLength{};
-  ApiGateway::MovingAverageLength longTermMovingAverageLength{};
+  ApiGateway::AssetHistoryLength shortTermMovingAverageLength{};
+  ApiGateway::AssetHistoryLength longTermMovingAverageLength{};
   ApiGateway::AssetSymbol quoteAsset{};
   ApiGateway::AssetSymbols baseAssets{};
 };

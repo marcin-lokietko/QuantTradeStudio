@@ -8,8 +8,8 @@ namespace BotAlgorithms::MovingAverageCrossover {
 
 class AssetHistory {
  public:
-  AssetHistory(const ApiGateway::MovingAverageLength& shortTermMovingAverageLength,
-               const ApiGateway::MovingAverageLength& longTermMovingAverageLength);
+  AssetHistory(const ApiGateway::AssetHistoryLength& shortTermMovingAverageLength,
+               const ApiGateway::AssetHistoryLength& longTermMovingAverageLength);
 
   bool isMinimalHistoryCollected() const;
 

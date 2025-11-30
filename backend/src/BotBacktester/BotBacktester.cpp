@@ -109,8 +109,8 @@ std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> BotBacktes
   for (const auto& singleBaseAssetShare : config.baseAssetShares) {
     const ApiGateway::TradingPairSymbol tradingPairSymbol{singleBaseAssetShare.assetSymbol, config.quoteAsset};
 
-    const auto klines = historicalMarketDataProvider_.getKlines(
-        tradingPairSymbol, MarketService::KlineInterval::OneMinute, simStart, simEnd);
+    const auto klines = historicalMarketDataProvider_.getKlines(tradingPairSymbol, ApiGateway::KlineInterval::OneMinute,
+                                                                simStart, simEnd);
     klineSequenceMap[tradingPairSymbol] = klines;
   }
 
@@ -125,8 +125,8 @@ std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> BotBacktes
   for (const auto& singleBaseAsset : config.baseAssets) {
     const ApiGateway::TradingPairSymbol tradingPairSymbol{singleBaseAsset, config.quoteAsset};
 
-    const auto klines = historicalMarketDataProvider_.getKlines(
-        tradingPairSymbol, MarketService::KlineInterval::OneMinute, simStart, simEnd);
+    const auto klines = historicalMarketDataProvider_.getKlines(tradingPairSymbol, ApiGateway::KlineInterval::OneMinute,
+                                                                simStart, simEnd);
     klineSequenceMap[tradingPairSymbol] = klines;
   }
 

@@ -21,7 +21,7 @@ class BinanceService : public IMarketService, public IHistoricalMarketDataProvid
 
   AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& tradingPairSymbols) const override;
 
-  KlineSequence getKlines(const ApiGateway::TradingPairSymbol& symbol, const KlineInterval klineInterval,
+  KlineSequence getKlines(const ApiGateway::TradingPairSymbol& symbol, const ApiGateway::KlineInterval klineInterval,
                           const std::chrono::system_clock::time_point startTime,
                           const std::chrono::system_clock::time_point endTime) const override;
 
@@ -53,7 +53,7 @@ class BinanceService : public IMarketService, public IHistoricalMarketDataProvid
   MarketService::AssetPricesMap getSymbolToPriceMap(const ApiGateway::AssetSymbol& quoteAsset) const;
 
   MarketService::KlineSequence getKlinesInSingleRequest(const ApiGateway::TradingPairSymbol& symbol,
-                                                        const KlineInterval interval,
+                                                        const ApiGateway::KlineInterval interval,
                                                         const std::chrono::system_clock::time_point startTime,
                                                         const std::chrono::system_clock::time_point endTime) const;
 

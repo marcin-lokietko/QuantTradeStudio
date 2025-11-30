@@ -1,5 +1,7 @@
 add_library(BotAlgorithmsUt STATIC
     ConfigExtractor.ut.cpp
+    DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.ut.cpp
+    DonchianChannelBreakoutStrategy/ExtremumTracker.ut.cpp
     MovingAverageCrossover/AverageCalculator.ut.cpp
     MovingAverageCrossover/MovingAverageCrossover.ut.cpp
     Rebalancer/Rebalancer.ut.cpp

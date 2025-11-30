@@ -18,8 +18,8 @@ void cancelOpenOrders(const MarketService::IMarketService& marketService, ApiGat
                           std::views::transform([](const auto& singleOrder) { return singleOrder.assetPair; });
   std::set<ApiGateway::TradingPairSymbol> openOrdersSymbols{openOrders.begin(), openOrders.end()};
 
-  for (const auto& singleBaseAsset : baseAssets) {
-    const ApiGateway::TradingPairSymbol symbol{singleBaseAsset, quoteAsset};
+  for (auto&& singleBaseAsset : baseAssets) {
+    const ApiGateway::TradingPairSymbol symbol{std::move(singleBaseAsset), quoteAsset};
 
     if (openOrdersSymbols.count(symbol)) {
       SPDLOG_INFO("Cancelling orders on symbol={}", toString(symbol));

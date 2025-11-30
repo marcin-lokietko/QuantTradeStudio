@@ -1,10 +1,9 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 
-#include "KlineInterval.hpp"
-
-namespace MarketService {
+namespace ApiGateway {
 
 enum class KlineInterval
 {
@@ -24,42 +23,6 @@ enum class KlineInterval
   OneWeek,
   OneMonth
 };
-
-inline std::string toString(const KlineInterval interval) {
-  switch (interval) {
-    case KlineInterval::OneMinute:
-      return "1m";
-    case KlineInterval::ThreeMinutes:
-      return "3m";
-    case KlineInterval::FiveMinutes:
-      return "5m";
-    case KlineInterval::FifteenMinutes:
-      return "15m";
-    case KlineInterval::ThirtyMinutes:
-      return "30m";
-    case KlineInterval::OneHour:
-      return "1h";
-    case KlineInterval::TwoHours:
-      return "2h";
-    case KlineInterval::FourHours:
-      return "4h";
-    case KlineInterval::SixHours:
-      return "6h";
-    case KlineInterval::EightHours:
-      return "8h";
-    case KlineInterval::TwelveHours:
-      return "12h";
-    case KlineInterval::OneDay:
-      return "1d";
-    case KlineInterval::ThreeDays:
-      return "3d";
-    case KlineInterval::OneWeek:
-      return "1w";
-    case KlineInterval::OneMonth:
-      return "1M";
-  }
-  throw std::invalid_argument("Invalid KlineInterval");
-}
 
 inline std::chrono::milliseconds toMilliseconds(const KlineInterval interval) {
   using namespace std::chrono;
@@ -97,4 +60,4 @@ inline std::chrono::milliseconds toMilliseconds(const KlineInterval interval) {
   }
   throw std::invalid_argument("Invalid KlineInterval");
 }
-}  // namespace MarketService
+}  // namespace ApiGateway

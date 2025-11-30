@@ -75,7 +75,7 @@ TEST_F(BinanceServiceTest, WhenGetPricesCalled_ThenHttpGetIsInvoked) {
 
 TEST_F(BinanceServiceTest, WhenGetKlinesCalled_ThenHttpGetIsInvoked) {
   const ApiGateway::TradingPairSymbol symbol{AssetSymbol{"BTC"}, AssetSymbol{"USDT"}};
-  const auto interval = KlineInterval::OneHour;
+  const auto interval = ApiGateway::KlineInterval::OneHour;
   const std::string klinesUrl =
       dummyBinanceUrlPrefix.val_ +
       "/klines?symbol=BTCUSDT&interval=1h&startTime=1622545200000&endTime=1622555999999&limit=1000";
@@ -106,7 +106,7 @@ TEST_F(BinanceServiceTest, WhenGetKlinesCalled_ThenHttpGetIsInvoked) {
 TEST_F(BinanceServiceTest,
        WhenGetKlinesCalledWithLongTimeRange_ThenHttpGetIsInvoked2TimesAndResultsAreCombinedWithoutDuplicates) {
   const ApiGateway::TradingPairSymbol symbol{AssetSymbol{"BTC"}, AssetSymbol{"USDT"}};
-  const auto interval = KlineInterval::OneMinute;
+  const auto interval = ApiGateway::KlineInterval::OneMinute;
 
   const std::chrono::system_clock::time_point startTime{std::chrono::milliseconds{1622548800000}};
   const std::chrono::system_clock::time_point endTime = startTime + std::chrono::minutes{1500};

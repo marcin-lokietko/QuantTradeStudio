@@ -33,8 +33,8 @@ TEST(ConfigExtractorTest, movingAverageCrossoverConfigIsExtracted) {
 
   inputConfig.botName = ApiGateway::BotName{"MovingAverageCrossover"};
   inputConfig.executionPeriod = ApiGateway::ExecutionPeriod{2000};
-  inputConfig.shortTermMovingAverageLength = ApiGateway::MovingAverageLength{5};
-  inputConfig.longTermMovingAverageLength = ApiGateway::MovingAverageLength{20};
+  inputConfig.shortTermMovingAverageLength = ApiGateway::AssetHistoryLength{5};
+  inputConfig.longTermMovingAverageLength = ApiGateway::AssetHistoryLength{20};
   inputConfig.quoteAsset = ApiGateway::AssetSymbol{"USD"};
   inputConfig.baseAssets = ApiGateway::AssetSymbols{ApiGateway::AssetSymbol{"BTC"}, ApiGateway::AssetSymbol{"ETH"}};
 

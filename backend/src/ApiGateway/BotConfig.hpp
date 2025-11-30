@@ -6,7 +6,9 @@
 #include <string>
 #include <vector>
 
+#include "AssetHistoryLength.hpp"
 #include "AssetSymbols.hpp"
+#include "KlineInterval.hpp"
 #include "Utils/StrongType.hpp"
 #include "Utils/ToString.hpp"
 
@@ -16,7 +18,6 @@ DEFINE_STRONG_TYPE(BotName, std::string);
 DEFINE_STRONG_TYPE(ExecutionPeriod, uint64_t);
 DEFINE_STRONG_TYPE(SharePercent, uint64_t);
 DEFINE_STRONG_TYPE(IsExecutedImmediately, bool);
-DEFINE_STRONG_TYPE(MovingAverageLength, uint64_t);
 
 struct SingleAssetShare {
   AssetSymbol assetSymbol{};
@@ -43,9 +44,14 @@ struct BotConfig {
   std::optional<AssetShares> baseAssetShares{};
 
   // Moving Average Crossover specific
-  std::optional<MovingAverageLength> shortTermMovingAverageLength{};
-  std::optional<MovingAverageLength> longTermMovingAverageLength{};
+  std::optional<AssetHistoryLength> shortTermMovingAverageLength{};
+  std::optional<AssetHistoryLength> longTermMovingAverageLength{};
   std::optional<AssetSymbols> baseAssets{};
+
+  // Donchian Channel Breakout Strategy specific
+  std::optional<ApiGateway::KlineInterval> executionInterval{ApiGateway::KlineInterval::OneMinute};
+  std::optional<ApiGateway::AssetHistoryLength> entryChannelLength{};
+  std::optional<ApiGateway::AssetHistoryLength> exitChannelLength{};
 
   bool operator==(const BotConfig& other) const = default;
 };
