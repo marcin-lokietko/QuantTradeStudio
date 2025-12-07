@@ -70,10 +70,10 @@ int main(int argc, char* argv[]) {
   const MarketService::Binance::Encryption encryption{config->keysCatalogPath};
   const Http::Http http{};
   const Time::SystemTime time{};
-  MarketService::Binance::BinanceService marketService{encryption, http, time, config->binanceUrlPrefix};
-  BotExecution::BotExecution botExecution{marketService};
-  BotBacktester::BotBacktester botBacktester{marketService};
-  ApiGateway::ApiGateway apiGateway{marketService, botExecution, botBacktester};
+  MarketService::Binance::BinanceService binanceService{encryption, http, time, config->binanceUrlPrefix};
+  BotExecution::BotExecution botExecution{binanceService, binanceService};
+  BotBacktester::BotBacktester botBacktester{binanceService};
+  ApiGateway::ApiGateway apiGateway{binanceService, botExecution, botBacktester};
   GuiService::HttpGuiService::HttpGuiService guiService(apiGateway);
 
   guiService.start();

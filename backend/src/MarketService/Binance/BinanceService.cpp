@@ -1,11 +1,10 @@
-#include "BinanceService.hpp"
-
 #include <spdlog/spdlog.h>
 
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <ranges>
 
+#include "BinanceService.hpp"
 #include "MarketService/Binance/Conversion/AssetPrices.hpp"
 #include "MarketService/Binance/Conversion/AssetQuantities.hpp"
 #include "MarketService/Binance/Conversion/KlineSequence.hpp"
@@ -22,6 +21,8 @@ constexpr Http::HttpStatusCode statusCodeRequestRateLimitBroken{429};
 
 inline std::string toString(const ApiGateway::KlineInterval interval) {
   switch (interval) {
+    case ApiGateway::KlineInterval::Invalid:
+      throw std::invalid_argument("Invalid KlineInterval");
     case ApiGateway::KlineInterval::OneMinute:
       return "1m";
     case ApiGateway::KlineInterval::ThreeMinutes:

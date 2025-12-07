@@ -7,6 +7,7 @@ namespace ApiGateway {
 
 enum class KlineInterval
 {
+  Invalid,
   OneMinute,
   ThreeMinutes,
   FiveMinutes,
@@ -24,9 +25,49 @@ enum class KlineInterval
   OneMonth
 };
 
+inline std::string toReadableString(const KlineInterval interval) {
+  switch (interval) {
+    case KlineInterval::Invalid:
+      return "Invalid";
+    case KlineInterval::OneMinute:
+      return "OneMinute";
+    case KlineInterval::ThreeMinutes:
+      return "ThreeMinutes";
+    case KlineInterval::FiveMinutes:
+      return "FiveMinutes";
+    case KlineInterval::FifteenMinutes:
+      return "FifteenMinutes";
+    case KlineInterval::ThirtyMinutes:
+      return "ThirtyMinutes";
+    case KlineInterval::OneHour:
+      return "OneHour";
+    case KlineInterval::TwoHours:
+      return "TwoHours";
+    case KlineInterval::FourHours:
+      return "FourHours";
+    case KlineInterval::SixHours:
+      return "SixHours";
+    case KlineInterval::EightHours:
+      return "EightHours";
+    case KlineInterval::TwelveHours:
+      return "TwelveHours";
+    case KlineInterval::OneDay:
+      return "OneDay";
+    case KlineInterval::ThreeDays:
+      return "ThreeDays";
+    case KlineInterval::OneWeek:
+      return "OneWeek";
+    case KlineInterval::OneMonth:
+      return "OneMonth";
+  }
+  return "Invalid";
+}
+
 inline std::chrono::milliseconds toMilliseconds(const KlineInterval interval) {
   using namespace std::chrono;
   switch (interval) {
+    case KlineInterval::Invalid:
+      throw std::invalid_argument("Invalid KlineInterval");
     case KlineInterval::OneMinute:
       return minutes(1);
     case KlineInterval::ThreeMinutes:

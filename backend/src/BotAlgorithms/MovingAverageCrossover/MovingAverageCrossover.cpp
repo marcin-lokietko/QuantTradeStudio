@@ -1,5 +1,3 @@
-#include "MovingAverageCrossover.hpp"
-
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -11,6 +9,7 @@
 
 #include "ApiGateway/TradingPairSymbol.hpp"
 #include "BotAlgorithms/Utils.hpp"
+#include "MovingAverageCrossover.hpp"
 
 namespace BotAlgorithms::MovingAverageCrossover {
 
@@ -42,6 +41,8 @@ void MovingAverageCrossover::performIteration() {
   addHistoryForAllAssets();
   if (isMinimalHistoryCollectedForAllAssets()) {
     placeOrdersBasedOnCrossoverSignals();
+  } else {
+    SPDLOG_INFO("Minimal history not yet collected for all assets, skipping checking the buy/sell signals");
   }
 }
 
@@ -53,6 +54,7 @@ void MovingAverageCrossover::addHistoryForAllAssets() {
       std::vector<ApiGateway::TradingPairSymbol>(assetPairsView.begin(), assetPairsView.end()));
 
   for (const auto& [tradingPairSymbol, price] : prices) {
+    SPDLOG_INFO("Adding price {} to price history of {}", toString(price), toString(tradingPairSymbol));
     const auto& assetSymbol = tradingPairSymbol.baseAsset;
     auto& assetHistory = assetHistories_.at(assetSymbol);
     assetHistory.addValue(price);
@@ -76,6 +78,8 @@ void MovingAverageCrossover::placeOrdersBasedOnCrossoverSignals() {
   };
 
   for (auto& [assetSymbol, assetHistory] : assetHistories_) {
+    SPDLOG_INFO("Checking the buy/sell signals for {}", toString(assetSymbol));
+
     const ApiGateway::TradingPairSymbol tradingPairSymbol{assetSymbol, config_.quoteAsset};
 
     if (assetHistory.isBuySignalled()) {
@@ -94,6 +98,8 @@ void MovingAverageCrossover::placeOrdersBasedOnCrossoverSignals() {
         marketService_.makeOrder(tradingPairSymbol, ApiGateway::OrderSide::Sell, ownedAssetsAmounts->at(assetSymbol),
                                  std::nullopt);
       }
+    } else {
+      SPDLOG_INFO("No buy/sell signal detected for {}", assetSymbol);
     }
   }
 }

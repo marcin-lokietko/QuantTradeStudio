@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "ApiGateway/KlineInterval.hpp"
 #include "AssetHistoryLength.hpp"
 #include "AssetSymbols.hpp"
 #include "KlineInterval.hpp"
@@ -49,17 +50,23 @@ struct BotConfig {
   std::optional<AssetSymbols> baseAssets{};
 
   // Donchian Channel Breakout Strategy specific
-  std::optional<ApiGateway::KlineInterval> executionInterval{ApiGateway::KlineInterval::OneMinute};
-  std::optional<ApiGateway::AssetHistoryLength> entryChannelLength{};
-  std::optional<ApiGateway::AssetHistoryLength> exitChannelLength{};
+  std::optional<KlineInterval> executionInterval{KlineInterval::OneMinute};
+  std::optional<AssetHistoryLength> entryChannelLength{};
+  std::optional<AssetHistoryLength> exitChannelLength{};
 
   bool operator==(const BotConfig& other) const = default;
 };
 
 inline std::string toString(const BotConfig& botConfig) {
-  return std::format("{{botName={}, executionPeriod={}, isExecutedImmediately={}, quoteAsset={}, baseAssetShares={}}}",
-                     botConfig.botName.val_, ::toString(botConfig.executionPeriod),
-                     ::toString(botConfig.isExecutedImmediately), ::toString(botConfig.quoteAsset),
-                     ::toString(botConfig.baseAssetShares));
+  return std::format(
+      "{{botName={}, quoteAsset={}, executionPeriod={}, isExecutedImmediately={}, baseAssetShares={}, "
+      "shortTermMovingAverageLength={}, longTermMovingAverageLength={}, baseAssets={}, executionInterval={}, "
+      "entryChannelLength={}, exitChannelLength={}}}",
+      botConfig.botName.val_, ::toString(botConfig.quoteAsset), ::toString(botConfig.executionPeriod),
+      ::toString(botConfig.isExecutedImmediately), ::toString(botConfig.baseAssetShares),
+      ::toString(botConfig.shortTermMovingAverageLength), ::toString(botConfig.longTermMovingAverageLength),
+      ::toString(botConfig.baseAssets),
+      botConfig.executionInterval ? toReadableString(*botConfig.executionInterval) : "nullopt",
+      ::toString(botConfig.entryChannelLength), ::toString(botConfig.exitChannelLength));
 }
 }  // namespace ApiGateway

@@ -166,7 +166,7 @@ void HttpGuiService::start() {
       res.code = 500;
     }
 
-    SPDLOG_INFO("/startBot endpoint response: {}", res.body);
+    SPDLOG_INFO("/startBot endpoint response: {}; status code: {}", res.body, res.code);
     return res;
   });
 
