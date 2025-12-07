@@ -11,6 +11,8 @@ class FixedResponse:
     def get_response(self, request_query_dict, request_body):
         return self.response_body, self.status_code
 
+    def __repr__(self):
+        return f"FixedResponse(status={self.status_code}, body={self.response_body})"
 
 class ResponseDependingOnRequest:
     def __init__(self):
@@ -20,9 +22,26 @@ class ResponseDependingOnRequest:
         self.mocked_response_list.append({
             "request_query_dict": request_query_dict,
             "request_body_dict": request_body_dict,
-            "response_body": response_body,
-            "response_status_code": response_status_code
+            "responses": [
+                {
+                    "response_body": response_body,
+                    "response_status_code": response_status_code
+                },
+            ],
+            "current_response_index": 0
         })
+
+    def add_subsequent_response_for_request(self, request_query_dict, request_body_dict, response_body, response_status_code):
+        # Find the existing mocked response for the EXACT given request (query + body)
+        for mocked_response in self.mocked_response_list:
+            if mocked_response["request_query_dict"] == request_query_dict and \
+               mocked_response["request_body_dict"] == request_body_dict:
+                mocked_response["responses"].append({
+                    "response_body": response_body,
+                    "response_status_code": response_status_code
+                })
+                return
+        raise ValueError("No existing mocked response found for the given request to add subsequent response")
 
     def get_response(self, actual_request_query_dict, actual_request_body_dict):
         print(f"Looking for mocked response for request query: {actual_request_query_dict}; request body: {actual_request_body_dict}")
@@ -37,10 +56,30 @@ class ResponseDependingOnRequest:
                              for mocked_key, mocked_value in mocked_response["request_body_dict"].items())
 
             if query_match and body_match:
-                print(f"Found mocked response: {mocked_response['response_body']}, {mocked_response['response_status_code']}")
-                return mocked_response["response_body"], mocked_response["response_status_code"]
+                response_index = mocked_response["current_response_index"]
+                # stay on the last response if exceeded
+                if response_index >= len(mocked_response["responses"]):
+                    response_index = len(mocked_response["responses"]) - 1
+
+                body = mocked_response["responses"][response_index]["response_body"]
+                status = mocked_response["responses"][response_index]["response_status_code"]
+                mocked_response["current_response_index"] += 1
+
+                print(f"Found mocked response: body={body} status={status} (response index: {response_index})")
+                return body, status
 
         return "Fatal: request is not expected by test scenario", 404
+
+    def __repr__(self):
+        summary = []
+        for r in self.mocked_response_list:
+            responses_summary = ''
+            for resp in r['responses']:
+                responses_summary += f"[status={resp['response_status_code']}, body={resp['response_body']}], "
+            responses_summary = responses_summary.rstrip(', ')
+            summary.append(f"Query: {r['request_query_dict']}, Body: {r['request_body_dict']} -> Responses: {responses_summary}")
+
+        return f"ResponseDependingOnRequest({', '.join(summary)})"
 
 
 class MarketServiceMock:

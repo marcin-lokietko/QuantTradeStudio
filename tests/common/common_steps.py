@@ -17,18 +17,46 @@ def step_impl(context, method, endpoint, response_body_as_string):
 def step_impl(context, method, endpoint, request_to_response_file_path):
     response = ResponseDependingOnRequest()
 
+    def is_line_empty(lines, index):
+        return index >= len(lines) or not lines[index] or lines[index].isspace()
+
     with open("/algo-trader/tests/mockedResponses/" + request_to_response_file_path, 'r') as file:
-        lines = [line.strip() for line in file if line.strip()]
+        lines = [line.strip() for line in file]
 
-        for i in range(0, len(lines), 4):
-            if i + 3 >= len(lines):
-                raise ValueError("Incomplete request-response mapping in the file. Each mapping must have 4 lines.")
+        i = 0
+        while i < len(lines):
+            # skip empty lines
+            if is_line_empty(lines, i):
+                i += 1
+                continue
+            try:
+                query_dict_str = lines[i]
 
-            query_dict_str = lines[i]
-            request_body_str = lines[i + 1]
-            response_body_str = lines[i + 2]
-            status_code_str = lines[i + 3]
-            response.add_response_for_request(json.loads(query_dict_str), json.loads(request_body_str), json.loads(response_body_str), int(status_code_str))
+                i += 1
+                request_body_str = lines[i]
+
+                i += 1
+                status_and_response = lines[i].split(' ', 1)
+                status_code_str = status_and_response[0]
+                response_body_str = status_and_response[1]
+
+                response.add_response_for_request(json.loads(query_dict_str), json.loads(request_body_str), json.loads(response_body_str), int(status_code_str))
+
+                i += 1
+
+                # if present - add responses for subsequent calls
+                while not is_line_empty(lines, i):
+                    print(f"Adding subsequent response: {lines[i]}")
+                    status_and_response = lines[i].split(' ', 1)
+                    status_code_str = status_and_response[0]
+                    response_body_str = status_and_response[1]
+
+                    response.add_subsequent_response_for_request(json.loads(query_dict_str), json.loads(request_body_str), json.loads(response_body_str), int(status_code_str))
+
+                    i += 1
+            except IndexError:
+                raise ValueError("Incomplete request-response mapping in the file. Each mapping must have 3 or more lines.")
+
 
     context.market_service_mock.set_endpoint(endpoint, method, response)
 

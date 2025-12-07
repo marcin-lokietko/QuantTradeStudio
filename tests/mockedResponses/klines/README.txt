@@ -17,4 +17,4 @@ https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-e
   ]
 ]
 
-times are defined as milliseconds since Unix poch; see: https://www.unixtimestamp.com/
+times are defined as milliseconds since Unix epoch; see: https://www.unixtimestamp.com/
