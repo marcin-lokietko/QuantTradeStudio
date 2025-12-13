@@ -9,6 +9,11 @@ if [ -t 1 ]; then
   DOCKER_FLAGS="-it"
 fi
 
+PORT_MAPPING=""
+if [ -n "$3" ] && [ "$3" != "0" ]; then
+  PORT_MAPPING="-p $3:$3"
+fi
+
 docker run \
     -u $(id -u):$(id -g) \
     -v ${BACKEND_DIR}:/algo-trader/backend \
@@ -18,7 +23,7 @@ docker run \
     -v ${LOGS_DIR}:/algo-trader/logs \
     -v ${KEYS_DIR}:/algo-trader/keys \
     -v ${CONFIG_DIR}:/algo-trader/config \
-    -p $3:$3 \
+    $PORT_MAPPING \
     $DOCKER_FLAGS \
     algo-trader-$1 \
     bash -c "$2"

@@ -1,3 +1,5 @@
+#include "MovingAverageCrossover.hpp"
+
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -9,7 +11,6 @@
 
 #include "ApiGateway/TradingPairSymbol.hpp"
 #include "BotAlgorithms/Utils.hpp"
-#include "MovingAverageCrossover.hpp"
 
 namespace BotAlgorithms::MovingAverageCrossover {
 

@@ -1,3 +1,5 @@
+#include "BotExecution.hpp"
+
 #include <spdlog/spdlog.h>
 
 #include <memory>
@@ -6,7 +8,6 @@
 #include "BotAlgorithms/DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.hpp"
 #include "BotAlgorithms/MovingAverageCrossover/MovingAverageCrossover.hpp"
 #include "BotAlgorithms/Rebalancer/Rebalancer.hpp"
-#include "BotExecution.hpp"
 #include "Utils/Time/SystemTime.hpp"
 
 namespace BotExecution {
