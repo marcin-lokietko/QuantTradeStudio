@@ -1,7 +1,8 @@
+#include "BotAlgorithms/DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.hpp"
+
 #include <ranges>
 
 #include "ApiGateway/KlineInterval.hpp"
-#include "BotAlgorithms/DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.hpp"
 #include "GeneratedMocks/HistoricalMarketDataProviderMock.hpp"
 #include "GeneratedMocks/MarketServiceMock.hpp"
 #include "GeneratedMocks/TimeMock.hpp"
