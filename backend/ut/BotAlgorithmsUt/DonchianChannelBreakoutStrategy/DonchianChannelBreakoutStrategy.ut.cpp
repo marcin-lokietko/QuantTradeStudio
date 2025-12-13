@@ -1,8 +1,7 @@
-#include "BotAlgorithms/DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.hpp"
-
 #include <ranges>
 
 #include "ApiGateway/KlineInterval.hpp"
+#include "BotAlgorithms/DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.hpp"
 #include "GeneratedMocks/HistoricalMarketDataProviderMock.hpp"
 #include "GeneratedMocks/MarketServiceMock.hpp"
 #include "GeneratedMocks/TimeMock.hpp"
@@ -99,7 +98,7 @@ class DonchianChannelBreakoutStrategyTest : public ::testing::Test {
 };
 
 TEST_F(DonchianChannelBreakoutStrategyTest, WhenKlinesCannotBeFetched_ThenBotDoesNotTrade) {
-  expectSleep(toMilliseconds(config.executionInterval), 2);
+  expectSleep(toMilliseconds(config.executionInterval), 1);
 
   mockEmptyKlinesHistory(btcUsdtTradingPair);
   mockEmptyKlinesHistory(ethUsdtTradingPair);
@@ -108,7 +107,7 @@ TEST_F(DonchianChannelBreakoutStrategyTest, WhenKlinesCannotBeFetched_ThenBotDoe
 }
 
 TEST_F(DonchianChannelBreakoutStrategyTest, WhenCurrentClosePriceDoesNotBreakoutFromChannels_ThenBotDoesNotTrade) {
-  expectSleep(toMilliseconds(config.executionInterval), 2);
+  expectSleep(toMilliseconds(config.executionInterval), 1);
 
   auto btcUsdtKlines = tenElementsKlinesSequence;
   btcUsdtKlines.push_back({.closePrice = ApiGateway::Price{"10000"}});
@@ -123,7 +122,7 @@ TEST_F(DonchianChannelBreakoutStrategyTest, WhenCurrentClosePriceDoesNotBreakout
 }
 
 TEST_F(DonchianChannelBreakoutStrategyTest, WhenCurrentClosePriceIsLowerThanExitChannelMinimum_ThenBotSells) {
-  expectSleep(toMilliseconds(config.executionInterval), 2);
+  expectSleep(toMilliseconds(config.executionInterval), 1);
 
   auto btcUsdtKlines = tenElementsKlinesSequence;
   btcUsdtKlines.push_back({.closePrice = ApiGateway::Price{"9400"}});
@@ -157,7 +156,7 @@ TEST_F(DonchianChannelBreakoutStrategyTest, WhenCurrentClosePriceIsLowerThanExit
 }
 
 TEST_F(DonchianChannelBreakoutStrategyTest, WhenCurrentClosePriceIsHigherThanEntryChannelMaximum_ThenBotBuys) {
-  expectSleep(toMilliseconds(config.executionInterval), 2);
+  expectSleep(toMilliseconds(config.executionInterval), 1);
 
   auto ethUsdtKlines = tenElementsKlinesSequence;
   ethUsdtKlines.push_back({.closePrice = ApiGateway::Price{"12000"}});

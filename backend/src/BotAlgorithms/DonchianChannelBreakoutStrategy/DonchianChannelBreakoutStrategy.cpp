@@ -24,10 +24,10 @@ void DonchianChannelBreakoutStrategy::run(std::stop_token st) {
   SPDLOG_INFO("DonchianChannelBreakoutStrategy started execution");
   const auto executionPeriod = toMilliseconds(config_.executionInterval);
   while (!st.stop_requested()) {
-    SPDLOG_INFO("DonchianChannelBreakoutStrategy sleeping for {}", executionPeriod.count());
-    time_.sleepFor(st, executionPeriod);
+    performIteration();
     if (!st.stop_requested()) {
-      performIteration();
+      SPDLOG_INFO("DonchianChannelBreakoutStrategy sleeping for {}", executionPeriod.count());
+      time_.sleepFor(st, executionPeriod);
     }
   }
   SPDLOG_INFO("DonchianChannelBreakoutStrategy stopped execution");
