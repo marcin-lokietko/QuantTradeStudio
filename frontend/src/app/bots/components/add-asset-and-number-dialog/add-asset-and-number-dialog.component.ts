@@ -37,7 +37,9 @@ export class AddAssetAndNumberDialog {
   public inputFieldLabel = '';
   public assets: string[] = [];
   public selectedAsset = '';
-  public assetShare: number | undefined = undefined;
+
+  public showNumberInput = false;
+  public selectedNumber: number | undefined = undefined;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -49,12 +51,13 @@ export class AddAssetAndNumberDialog {
     this.title = this.data.title;
     this.assets = this.data.assets;
     this.inputFieldLabel = this.data.inputFieldLabel;
+    this.showNumberInput = this.data.showNumberInput ?? true;
   }
 
   closeWithResult() {
     this.dialogRef.close({
       assetSymbol: this.selectedAsset,
-      assetShare: this.assetShare,
+      number: this.selectedNumber,
     });
   }
 

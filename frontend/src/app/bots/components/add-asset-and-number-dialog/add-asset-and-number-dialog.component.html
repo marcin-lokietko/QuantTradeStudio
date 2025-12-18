@@ -9,9 +9,9 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="fill" *ngIf="showNumberInput">
     <mat-label>{{ inputFieldLabel }}</mat-label>
-    <input matInput [(ngModel)]="assetShare" data-testid="add-asset-and-number-dialog-asset-share" placeholder="0" />
+    <input matInput [(ngModel)]="selectedNumber" data-testid="add-asset-and-number-dialog-asset-share" placeholder="0" />
   </mat-form-field>
   <div class="action-buttons-wrapper">
     <mat-dialog-actions class="action-buttons">

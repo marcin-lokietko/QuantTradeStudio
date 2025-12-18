@@ -16,6 +16,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NotificationService } from '@app/services/notification.service';
 import { DataService, RequestResult } from '@app/services/data.service';
+import { BotName } from '@app/bots/bot-name-enum';
 
 describe('BacktestDialog', () => {
   let component: BacktestDialog;
@@ -24,7 +25,7 @@ describe('BacktestDialog', () => {
 
   const mockDialogData = {
     botParams: {
-      botName: 'Rebalancer',
+      botName: BotName.Rebalancer,
       quoteAsset: 'USDT',
     },
     availableInitialAssets: ['BTC', 'ETH'],

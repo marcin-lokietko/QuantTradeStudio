@@ -168,7 +168,7 @@ export class BacktestDialog {
     dialogRef.afterClosed().subscribe((result) => {
       console.log('Dialog closed with result:', result);
       if (result) {
-        this.initialOwnedAssets.push({ assetSymbol: result.assetSymbol, freeQuantity: result.assetShare });
+        this.initialOwnedAssets.push({ assetSymbol: result.assetSymbol, freeQuantity: result.number });
         this.updateAssetConfigTable();
       }
     });

@@ -1,0 +1,35 @@
+.rebalancer-config {
+  height: 100vh;
+  width: 70vw;
+  background-color: #34383a;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2vh 2vw;
+
+  ::ng-deep .mdc-label {
+    color: white !important;
+  }
+
+  .add-base-asset-button-wrapper {
+    display: flex;
+    justify-content: center;
+
+    ::ng-deep .add-base-asset-button {
+      width: 20vw;
+      margin-top: 0.5vh;
+      margin-bottom: 3vh;
+    }
+  }
+
+  .launch-button-wrapper {
+    display: flex;
+    justify-content: center;
+
+    ::ng-deep .launch-button {
+      width: 20vw;
+      margin-top: 0.5vh;
+      margin-bottom: 3vh;
+    }
+  }
+}

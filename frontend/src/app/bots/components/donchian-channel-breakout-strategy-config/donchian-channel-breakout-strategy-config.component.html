@@ -1,0 +1,69 @@
+<div class="rebalancer-config">
+  {{ configTitle }}
+
+  <mat-form-field appearance="fill">
+    <mat-label>{{ executionIntervalsInputFieldLabel }}</mat-label>
+    <mat-select data-testid="bots-launch-page-execution-interval" [(ngModel)]="selectedExecutionInterval">
+      <mat-option
+        *ngFor="let interval of availableExecutionIntervals"
+        [attr.data-testid]="'bots-launch-page-execution-interval-' + interval"
+        [value]="interval"
+      >
+        {{ getExecutionIntervalDisplayName(interval) }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>{{ exitChannelLengthLabel }}</mat-label>
+    <input data-testid="bots-launch-page-exit-channel-length" matInput [(ngModel)]="exitChannelLength" placeholder="0" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>{{ entryChannelLengthLabel }}</mat-label>
+    <input data-testid="bots-launch-page-entry-channel-length" matInput [(ngModel)]="entryChannelLength" placeholder="0" />
+  </mat-form-field>
+
+  <mat-spinner *ngIf="areAvailableQuoteAssetsLoading" class="spinner" color="accent" diameter="20"></mat-spinner>
+  <mat-form-field *ngIf="!areAvailableQuoteAssetsLoading" appearance="fill">
+    <mat-label>Quote asset</mat-label>
+    <mat-select data-testid="bots-launch-page-quote-asset" [(ngModel)]="selectedQuoteAsset" (selectionChange)="onQuoteAssetChange()">
+      <mat-option *ngFor="let asset of availableQuoteAssets" [attr.data-testid]="'bots-launch-page-quote-asset-' + asset" [value]="asset">
+        {{ asset }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div *ngIf="isQuoteAssetSelected" class="base-assets">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+      <ng-container matColumnDef="assetSymbol">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Base asset symbol</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-button [matMenuTriggerFor]="menu">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button (click)="deleteSelectedBaseAssetConfig(element)" mat-menu-item>Delete</button>
+          </mat-menu>
+          {{ element }}
+        </td>
+      </ng-container>
+
+      <!-- first row -->
+      <tr mat-header-row *matHeaderRowDef="displayedSelectedBaseAssetsTableColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedSelectedBaseAssetsTableColumns"></tr>
+    </table>
+    <mat-spinner *ngIf="areAvailableBaseAssetsLoading" class="spinner" color="accent" diameter="20"></mat-spinner>
+    <div *ngIf="!areAvailableBaseAssetsLoading" class="add-base-asset-button-wrapper">
+      <button class="add-base-asset-button" data-testid="bots-launch-page-add-base-asset-button" mat-button (click)="addBaseAsset()">
+        Add base asset
+      </button>
+    </div>
+    {{ configSummary }}
+  </div>
+
+  <div class="launch-button-wrapper">
+    <button *ngIf="isConfigValid" class="launch-button" data-testid="bots-launch-page-launch-bot-button" mat-button (click)="startBot()">
+      Launch bot
+    </button>
+  </div>
+</div>
