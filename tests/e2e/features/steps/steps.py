@@ -120,10 +120,35 @@ def step_impl(context, execution_period, quote_asset, base_assets, base_assets_s
     base_assets = base_assets.split(',')
     base_assets_shares = base_assets_shares.split(',')
     for single_base_asset, single_base_asset_share in zip(base_assets, base_assets_shares):
-        context.bots_launch_page.add_base_asset(
+        context.bots_launch_page.add_base_asset_share(
             single_base_asset.strip().replace('"', '').replace("'", ""),
             single_base_asset_share.strip().replace('"', '').replace("'", "")
         )
+
+def _set_base_assets(context, base_assets):
+    base_assets = base_assets.split(',')
+    for single_base_asset in base_assets:
+        context.bots_launch_page.add_base_asset(
+            single_base_asset.strip().replace('"', '').replace("'", "")
+        )
+
+@step('Moving Average Crossover bot configuration is filled with execution period "{execution_period}", short average length "{short_average_length}", long average length "{long_average_length}", quote asset "{quote_asset}", base assets [{base_assets}]')
+def step_impl(context, execution_period, short_average_length, long_average_length, quote_asset, base_assets):
+    context.bots_launch_page.set_execution_period(execution_period)
+    context.bots_launch_page.set_short_term_moving_average_length(short_average_length)
+    context.bots_launch_page.set_long_term_moving_average_length(long_average_length)
+    context.bots_launch_page.set_quote_asset(quote_asset)
+
+    _set_base_assets(context, base_assets)
+
+@step(u'Moving Donchian Channel Breakout Strategy bot configuration is filled with execution interval "{execution_interval}", exit channel length "{exit_channel_length}", entry channel length "{entry_channel_length}", quote asset "{quote_asset}", base assets [{base_assets}]')
+def step_impl(context, execution_interval, exit_channel_length, entry_channel_length, quote_asset, base_assets):
+    context.bots_launch_page.set_execution_interval(execution_interval)
+    context.bots_launch_page.set_exit_channel_length(exit_channel_length)
+    context.bots_launch_page.set_entry_channel_length(entry_channel_length)
+    context.bots_launch_page.set_quote_asset(quote_asset)
+
+    _set_base_assets(context, base_assets)
 
 @step('Bot launch button is clicked')
 def step_impl(context):

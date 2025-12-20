@@ -127,7 +127,7 @@ class MarketServiceMock:
                 if is_query_ok and is_body_ok:
                     return
 
-        raise AssertionError(f"Endpoint call assertion failed for: {method} {endpoint} expected_query={expected_query}, expected_body={expected_body}. Actual received requests: {self._received_requests}")
+        raise AssertionError(f"\nEndpoint call assertion failed for: {method} {endpoint} expected_query={expected_query}, expected_body={expected_body}.\nActual received requests: {self._received_requests}")
 
     #"0.0.0.0" binds to all available network interfaces - needed for Docker bridge network
     def run(self, host="0.0.0.0", port=5001):

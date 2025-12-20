@@ -16,7 +16,7 @@ Scenario Outline: Ordering a trade when short and long averages cross over
     And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"}]}"
     And MarketService mock expects invocations on GET /account and will return "{"balances":[{"free":"1","asset":"BTC"},{"free":"50","asset":"ETH"},{"free":"10000","asset":"USDT"}]}"
     And Backend is available
-    When Request POST /startBot is sent with body "{"botName":"MovingAverageCrossover","executionPeriod":1,"shortTermMovingAverageLength":3,"longTermMovingAverageLength":6,"quoteAsset":"USDT","baseAssets":["ETH","BTC"]}"
+    When Request POST /startBot is sent with body "{"botName":"MovingAverageCrossover","executionPeriod":1,"shortTermMovingAverageLength":3,"longTermMovingAverageLength":6,"quoteAsset":"USDT","baseAssets":["BTC", "ETH"]}"
     Then Response for POST /startBot was received with status code "200" and no body
     And System runs for 7.5 sec
     And MarketService method DELETE of endpoint /openOrders has been invoked with query params "{"symbol":"BTCUSDT"}"
