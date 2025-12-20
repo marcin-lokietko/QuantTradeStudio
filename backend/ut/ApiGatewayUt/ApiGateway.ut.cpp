@@ -105,11 +105,11 @@ TEST_F(ApiGatewayTest, WhenGetAvailableBaseAssetsCalledWithoutQuoteAsset_ThenAll
   EXPECT_TRUE(std::ranges::is_permutation(result, std::vector{AssetSymbol{"BTC"}, AssetSymbol{"ETH"}}));
 }
 
-TEST_F(ApiGatewayTest, WhenGetQuoteAssetsSuitableForRebalancingCalled_ThenAssetsWithAtLeastTwoPairsAreReturned) {
+TEST_F(ApiGatewayTest, WhenGetQuoteAssetsSuitableForBotsCalled_ThenAssetsWithAtLeastTwoPairsAreReturned) {
   MarketService::TradingPairs tradingPairs = {btcEurTradingPair, btcUsdtTradingPair, ethUsdtTradingPair,
                                               btcPlnTradingPair, ethPlnTradingPair,  ltcPlnTradingPair};
   EXPECT_CALL(marketServiceMock_, getAllTradingPairs()).WillOnce(Return(tradingPairs));
-  auto result = sut_.getQuoteAssetsSuitableForRebalancing();
+  auto result = sut_.getQuoteAssetsSuitableForBots();
 
   ASSERT_EQ(2, result.size());
   EXPECT_TRUE(std::ranges::is_permutation(result, std::vector{AssetSymbol{"USDT"}, AssetSymbol{"PLN"}}));

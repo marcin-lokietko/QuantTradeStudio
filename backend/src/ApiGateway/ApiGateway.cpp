@@ -83,25 +83,25 @@ AssetSymbols ApiGateway::getAvailableBaseAssets(const std::optional<AssetSymbol>
   return assetSymbols;
 }
 
-AssetSymbols ApiGateway::getQuoteAssetsSuitableForRebalancing() const {
-  SPDLOG_INFO("getQuoteAssetsSuitableForRebalancing called");
-  MarketService::TradingPairs tradingPairs = marketService_.getAllTradingPairs();
+AssetSymbols ApiGateway::getQuoteAssetsSuitableForBots() const {
+  SPDLOG_INFO("getQuoteAssetsSuitableForBots called");
+  const MarketService::TradingPairs tradingPairs = marketService_.getAllTradingPairs();
 
   std::map<AssetSymbol, uint64_t> quoteAssetToNumOccurrences;
   for (const auto& singleTradingPair : tradingPairs) {
     ++quoteAssetToNumOccurrences[singleTradingPair.quoteAsset];
   }
 
-  constexpr auto minOccurrencesForRebalancing = 2;
+  constexpr auto minOccurrences = 2;
   AssetSymbols quoteAssetSymbols;
   for (const auto& [quoteAsset, numOccurrences] : quoteAssetToNumOccurrences) {
-    if (numOccurrences >= minOccurrencesForRebalancing) {
+    if (numOccurrences >= minOccurrences) {
       quoteAssetSymbols.push_back(quoteAsset);
     }
   }
 
-  AssetSymbols suitableBaseAssets{quoteAssetSymbols.begin(), quoteAssetSymbols.end()};
-  SPDLOG_INFO("getQuoteAssetsSuitableForRebalancing result: suitableBaseAssets={}", ::toString(suitableBaseAssets));
+  const AssetSymbols suitableBaseAssets{quoteAssetSymbols.begin(), quoteAssetSymbols.end()};
+  SPDLOG_INFO("getQuoteAssetsSuitableForBots result: suitableBaseAssets={}", ::toString(suitableBaseAssets));
   return suitableBaseAssets;
 }
 

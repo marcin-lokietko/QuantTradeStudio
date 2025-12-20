@@ -20,12 +20,12 @@ Scenario Outline: Invoking /availableQuoteAssets returns assets
       | {"symbols":[{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"},{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCEUR","baseAsset":"BTC","quoteAsset":"EUR"},{"symbol":"ETHEUR","baseAsset":"ETH","quoteAsset":"EUR"}]} | [{"price":"80000","symbol":"BTCUSDT"},{"price":"2000","symbol":"ETHUSDT"},{"price":"70000","symbol":"BTCEUR"},{"price":"1500","symbol":"ETHEUR"}] | baseAsset=ETH   | [{"baseAssetUnitPrice":"2000","quoteAsset":"USDT"},{"baseAssetUnitPrice":"1500","quoteAsset":"EUR"}] |
 
 
-Scenario Outline: Invoking /quoteAssetsSuitableForRebalancing returns assets
+Scenario Outline: Invoking /quoteAssetsSuitableForBots returns assets
     Given MarketService mock is running
     And MarketService mock expects invocations on GET /exchangeInfo and will return "<mocked_exchange_info>"
     And Backend is available
-    When Request GET /quoteAssetsSuitableForRebalancing is sent with query "<sent_query>"
-    Then Response for GET /quoteAssetsSuitableForRebalancing was received with status code "200" and body "<received_quote_assets>"
+    When Request GET /quoteAssetsSuitableForBots is sent with query "<sent_query>"
+    Then Response for GET /quoteAssetsSuitableForBots was received with status code "200" and body "<received_quote_assets>"
     Examples:
       | mocked_exchange_info                                                                                                                                                                         | received_quote_assets    |
       | {"symbols":[{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"},{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"}]}                                                          | [{"assetSymbol":"USDT"}] |

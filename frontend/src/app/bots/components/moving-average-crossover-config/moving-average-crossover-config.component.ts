@@ -88,7 +88,7 @@ export class MovingAverageCrossoverConfigComponent {
 
   public fetchAvailableQuoteAssets(): void {
     this.areAvailableQuoteAssetsLoading = true;
-    this.dataService.getQuoteAssetsSuitableForRebalancing().then((data) => {
+    this.dataService.getQuoteAssetsSuitableForBots().then((data) => {
       if (data) {
         this.availableQuoteAssets = data;
         this.areAvailableQuoteAssetsLoading = false;

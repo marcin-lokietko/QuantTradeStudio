@@ -26,7 +26,7 @@ describe('DonchianChannelBreakoutStrategyConfigComponent', () => {
   beforeEach(async () => {
     mockDataService = jasmine.createSpyObj('DataService', [
       'getOpenOrders',
-      'getQuoteAssetsSuitableForRebalancing',
+      'getQuoteAssetsSuitableForBots',
       'getAvailableBaseAssets',
       'startBot',
     ]);
@@ -67,7 +67,7 @@ describe('DonchianChannelBreakoutStrategyConfigComponent', () => {
     fixture = TestBed.createComponent(DonchianChannelBreakoutStrategyConfigComponent);
     component = fixture.componentInstance;
 
-    mockDataService.getQuoteAssetsSuitableForRebalancing.and.returnValue(Promise.resolve(['USDT', 'EUR']));
+    mockDataService.getQuoteAssetsSuitableForBots.and.returnValue(Promise.resolve(['USDT', 'EUR']));
     mockDataService.getAvailableBaseAssets.and.returnValue(Promise.resolve(['BTC', 'ETH']));
 
     await triggerComponentInitAndStabilization();
@@ -81,7 +81,7 @@ describe('DonchianChannelBreakoutStrategyConfigComponent', () => {
 
   afterEach(() => {
     mockDataService.getOpenOrders.calls.reset();
-    mockDataService.getQuoteAssetsSuitableForRebalancing.calls.reset();
+    mockDataService.getQuoteAssetsSuitableForBots.calls.reset();
     mockDataService.getAvailableBaseAssets.calls.reset();
     mockDataService.startBot.calls.reset();
     mockNotificationService.show.calls.reset();
@@ -95,7 +95,7 @@ describe('DonchianChannelBreakoutStrategyConfigComponent', () => {
 
   it('should fetch quote assets', async () => {
     expect(component).toBeTruthy();
-    expect(mockDataService.getQuoteAssetsSuitableForRebalancing).toHaveBeenCalled();
+    expect(mockDataService.getQuoteAssetsSuitableForBots).toHaveBeenCalled();
   });
 
   it('should fetch available base assets on quote asset change', () => {

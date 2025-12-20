@@ -110,13 +110,13 @@ void HttpGuiService::start() {
     return res;
   });
 
-  CROW_ROUTE(app, "/quoteAssetsSuitableForRebalancing")
+  CROW_ROUTE(app, "/quoteAssetsSuitableForBots")
   ([&apiGateway_ = apiGateway_]() {
-    SPDLOG_INFO("/quoteAssetsSuitableForRebalancing endpoint called");
+    SPDLOG_INFO("/quoteAssetsSuitableForBots endpoint called");
 
-    auto res = buildEmptyResponse(Conversion::toJson(apiGateway_.getQuoteAssetsSuitableForRebalancing()).dump());
+    auto res = buildEmptyResponse(Conversion::toJson(apiGateway_.getQuoteAssetsSuitableForBots()).dump());
 
-    SPDLOG_INFO("/quoteAssetsSuitableForRebalancing endpoint response: {}", res.body);
+    SPDLOG_INFO("/quoteAssetsSuitableForBots endpoint response: {}", res.body);
     return res;
   });
 

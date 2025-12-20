@@ -29,7 +29,7 @@ class IApiGateway {
 
   virtual AssetSymbols getAvailableBaseAssets(const std::optional<AssetSymbol>& quoteAsset = std::nullopt) const = 0;
 
-  virtual AssetSymbols getQuoteAssetsSuitableForRebalancing() const = 0;
+  virtual AssetSymbols getQuoteAssetsSuitableForBots() const = 0;
 
   virtual StartBotResult startBot(const BotConfig& botConfig) const = 0;
 

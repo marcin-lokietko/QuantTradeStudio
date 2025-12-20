@@ -152,24 +152,24 @@ describe('DataService', () => {
     });
   });
 
-  describe('getQuoteAssetsSuitableForRebalancing', () => {
+  describe('getQuoteAssetsSuitableForBots', () => {
     it('should return asset symbols on success', async () => {
       const mockResponse = [{ assetSymbol: 'USDT' }, { assetSymbol: 'EUR' }];
       spyOn(window, 'fetch').and.resolveTo(new Response(JSON.stringify(mockResponse), { status: 200 }));
 
-      const result = await service.getQuoteAssetsSuitableForRebalancing();
+      const result = await service.getQuoteAssetsSuitableForBots();
       expect(result).toEqual(['USDT', 'EUR']);
     });
 
     it('should return undefined on fetch error', async () => {
       spyOn(window, 'fetch').and.rejectWith(new Error('Network error'));
-      const result = await service.getQuoteAssetsSuitableForRebalancing();
+      const result = await service.getQuoteAssetsSuitableForBots();
       expect(result).toBeUndefined();
     });
 
     it('should return undefined on non-OK response', async () => {
       spyOn(window, 'fetch').and.resolveTo(new Response('', { status: 500 }));
-      const result = await service.getQuoteAssetsSuitableForRebalancing();
+      const result = await service.getQuoteAssetsSuitableForBots();
       expect(result).toBeUndefined();
     });
   });

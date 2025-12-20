@@ -204,21 +204,21 @@ export class DataService {
     }
   }
 
-  async getQuoteAssetsSuitableForRebalancing(): Promise<string[] | undefined> {
-    console.log('DataService.getQuoteAssetsSuitableForRebalancing');
+  async getQuoteAssetsSuitableForBots(): Promise<string[] | undefined> {
+    console.log('DataService.getQuoteAssetsSuitableForBots');
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/quoteAssetsSuitableForRebalancing');
+      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/quoteAssetsSuitableForBots');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('GET /quoteAssetsSuitableForRebalancing response:', JSON.stringify(data));
+      console.log('GET /quoteAssetsSuitableForBots response:', JSON.stringify(data));
 
       return data.map((elem: any) => {
         return elem.assetSymbol;
       });
     } catch (error) {
-      console.error('GET /quoteAssetsSuitableForRebalancing error:', error);
+      console.error('GET /quoteAssetsSuitableForBots error:', error);
       return undefined;
     }
   }
