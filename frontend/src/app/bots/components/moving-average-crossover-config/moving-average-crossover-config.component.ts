@@ -109,7 +109,7 @@ export class MovingAverageCrossoverConfigComponent {
     });
   }
 
-  public deleteSelectedBaseAssetConfig(elementToRemove: string) {
+  public deleteSelectedBaseAsset(elementToRemove: string) {
     this.selectedBaseAssets = this.selectedBaseAssets.filter((elem: string) => {
       return elem !== elementToRemove;
     });

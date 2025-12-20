@@ -13,11 +13,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { NotificationService } from '@app/services/notification.service';
 import { FormsModule } from '@angular/forms';
-import { RebalancerConfigComponent } from './rebalancer-config.component';
+import { DonchianChannelBreakoutStrategyConfigComponent } from './donchian-channel-breakout-strategy-config.component';
 
-describe('RebalancerConfigComponent', () => {
-  let component: RebalancerConfigComponent;
-  let fixture: ComponentFixture<RebalancerConfigComponent>;
+describe('DonchianChannelBreakoutStrategyConfigComponent', () => {
+  let component: DonchianChannelBreakoutStrategyConfigComponent;
+  let fixture: ComponentFixture<DonchianChannelBreakoutStrategyConfigComponent>;
 
   let mockDataService: jasmine.SpyObj<DataService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
@@ -35,7 +35,7 @@ describe('RebalancerConfigComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [
-        RebalancerConfigComponent,
+        DonchianChannelBreakoutStrategyConfigComponent,
         FormsModule,
         MatButtonModule,
         MatCheckboxModule,
@@ -57,14 +57,14 @@ describe('RebalancerConfigComponent', () => {
       // configuration (through the imported Material modules). Because of this the Angular can create a real MatDialog, ignoring the mock.
       // To prevent this we override the component to provide the mock MatDialog directly to the component.
       // This forces Angular to inject the mock into the component, even though it could technically create a real instance.
-      .overrideComponent(RebalancerConfigComponent, {
+      .overrideComponent(DonchianChannelBreakoutStrategyConfigComponent, {
         set: {
           providers: [{ provide: MatDialog, useValue: mockDialog }],
         },
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(RebalancerConfigComponent);
+    fixture = TestBed.createComponent(DonchianChannelBreakoutStrategyConfigComponent);
     component = fixture.componentInstance;
 
     mockDataService.getQuoteAssetsSuitableForRebalancing.and.returnValue(Promise.resolve(['USDT', 'EUR']));
@@ -104,68 +104,60 @@ describe('RebalancerConfigComponent', () => {
     expect(mockDataService.getAvailableBaseAssets).toHaveBeenCalledWith('USDT');
   });
 
-  it('should delete a base asset config', () => {
-    component.selectedBaseAssetsConfig = [
-      { assetSymbol: 'BTC', expectedShare: 60 },
-      { assetSymbol: 'ETH', expectedShare: 40 },
-    ];
+  it('should delete base asset config', () => {
+    component.selectedBaseAssets = ['BTC', 'ETH'];
 
-    expect(component.selectedBaseAssetsConfig.length).toBe(2);
-    component.deleteSelectedBaseAssetConfig(component.selectedBaseAssetsConfig[0]);
-    expect(component.selectedBaseAssetsConfig.length).toBe(1);
-    expect(component.selectedBaseAssetsConfig[0].assetSymbol).toBe('ETH');
+    expect(component.selectedBaseAssets.length).toBe(2);
+    component.deleteSelectedBaseAsset(component.selectedBaseAssets[0]);
+    expect(component.selectedBaseAssets.length).toBe(1);
+    expect(component.selectedBaseAssets[0]).toBe('ETH');
   });
 
-  it('should add a base asset config after dialog closes with result', () => {
+  it('should add base asset config after dialog closes with result', () => {
     console.log('mockDialog:', mockDialog);
     console.log('component dialog:', (component as any).dialog);
     component.availableBaseAssets = ['BTC', 'ETH'];
-    expect(component.selectedBaseAssetsConfig.length).toBe(0);
+    expect(component.selectedBaseAssets.length).toBe(0);
 
     const afterClosedSpy = jasmine.createSpyObj('afterClosed', ['subscribe']);
-    afterClosedSpy.subscribe.and.callFake((fn: (result: any) => void) => fn({ assetSymbol: 'BTC', assetShare: 70 }));
+    afterClosedSpy.subscribe.and.callFake((fn: (result: any) => void) => fn({ assetSymbol: 'BTC' }));
     mockDialog.open.and.returnValue({ afterClosed: () => afterClosedSpy } as any);
 
     component.addBaseAsset();
 
-    expect(component.selectedBaseAssetsConfig.length).toBe(1);
-    expect(component.selectedBaseAssetsConfig[0]).toEqual({ assetSymbol: 'BTC', expectedShare: 70 });
+    expect(component.selectedBaseAssets.length).toBe(1);
+    expect(component.selectedBaseAssets[0]).toEqual('BTC');
   });
 
   it('should validate config and show summary', () => {
     expect(component.isConfigValid).toBeFalse();
-    expect(component.baseAssetConfigSummary).toContain('Execution period is needed');
+    expect(component.configSummary).toContain('Execution interval is needed');
 
-    component.executionPeriodInput = '60';
-    component.selectedBaseAssetsConfig = [{ assetSymbol: 'BTC', expectedShare: 100 }];
-    expect(component.baseAssetConfigSummary).toContain('At least two base assets');
+    component.selectedExecutionInterval = 'ThirtyMinutes';
+    expect(component.configSummary).toContain('Both channel lengths are needed ');
+    expect(component.isConfigValid).toBeFalse();
+    component.exitChannelLength = '4';
+    expect(component.configSummary).toContain('Both channel lengths are needed ');
     expect(component.isConfigValid).toBeFalse();
 
-    component.selectedBaseAssetsConfig = [
-      { assetSymbol: 'BTC', expectedShare: 60 },
-      { assetSymbol: 'ETH', expectedShare: 30 },
-    ];
+    component.entryChannelLength = '2';
+    expect(component.configSummary).toContain('At least one base asset is needed');
     expect(component.isConfigValid).toBeFalse();
-    expect(component.baseAssetConfigSummary).toContain('The total share must be equal to 100 percent.');
 
-    component.selectedBaseAssetsConfig = [
-      { assetSymbol: 'BTC', expectedShare: 60 },
-      { assetSymbol: 'ETH', expectedShare: 40 },
-    ];
+    component.selectedBaseAssets = ['BTC'];
     component.selectedQuoteAsset = 'USDT';
-    expect(component.baseAssetConfigSummary).toContain('The bot can be launched.');
+    expect(component.configSummary).toContain('The bot can be launched.');
     expect(component.isConfigValid).toBeTrue();
   });
 
-  describe('when Rebalancer bot configuration is correct', async () => {
+  describe('when bot configuration is correct', async () => {
     beforeEach(async () => {
-      component.executionPeriodInput = '60';
-      component.isExecutedImmediately = true;
+      component.selectedExecutionInterval = 'ThirtyMinutes';
+      component.entryChannelLength = '4';
+      component.exitChannelLength = '2';
       component.selectedQuoteAsset = 'USDT';
-      component.selectedBaseAssetsConfig = [
-        { assetSymbol: 'BTC', expectedShare: 60 },
-        { assetSymbol: 'ETH', expectedShare: 40 },
-      ];
+      component.selectedBaseAssets = ['BTC', 'ETH'];
+
       await triggerComponentInitAndStabilization();
     });
 

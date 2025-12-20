@@ -116,14 +116,14 @@ describe('RebalancerConfigComponent', () => {
     expect(component.selectedBaseAssetsConfig[0].assetSymbol).toBe('ETH');
   });
 
-  it('should add a base asset config after dialog closes with result', () => {
+  it('should add base asset config after dialog closes with result', () => {
     console.log('mockDialog:', mockDialog);
     console.log('component dialog:', (component as any).dialog);
     component.availableBaseAssets = ['BTC', 'ETH'];
     expect(component.selectedBaseAssetsConfig.length).toBe(0);
 
     const afterClosedSpy = jasmine.createSpyObj('afterClosed', ['subscribe']);
-    afterClosedSpy.subscribe.and.callFake((fn: (result: any) => void) => fn({ assetSymbol: 'BTC', assetShare: 70 }));
+    afterClosedSpy.subscribe.and.callFake((fn: (result: any) => void) => fn({ assetSymbol: 'BTC', number: 70 }));
     mockDialog.open.and.returnValue({ afterClosed: () => afterClosedSpy } as any);
 
     component.addBaseAsset();
@@ -157,7 +157,7 @@ describe('RebalancerConfigComponent', () => {
     expect(component.isConfigValid).toBeTrue();
   });
 
-  describe('when Rebalancer bot configuration is correct', async () => {
+  describe('when bot configuration is correct', async () => {
     beforeEach(async () => {
       component.executionPeriodInput = '60';
       component.isExecutedImmediately = true;

@@ -126,7 +126,7 @@ export class DonchianChannelBreakoutStrategyConfigComponent {
     });
   }
 
-  public deleteSelectedBaseAssetConfig(elementToRemove: string) {
+  public deleteSelectedBaseAsset(elementToRemove: string) {
     this.selectedBaseAssets = this.selectedBaseAssets.filter((elem: string) => {
       return elem !== elementToRemove;
     });

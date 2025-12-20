@@ -68,11 +68,11 @@ describe('AddAssetAndNumberDialog', () => {
 
   it('should call dialogRef.close with result on closeWithResult()', () => {
     component.selectedAsset = 'BTC';
-    component.assetShare = 60;
+    component.selectedNumber = 60;
     component.closeWithResult();
     expect(mockDialogRef.close).toHaveBeenCalledWith({
       assetSymbol: 'BTC',
-      assetShare: 60,
+      number: 60,
     });
   });
 
