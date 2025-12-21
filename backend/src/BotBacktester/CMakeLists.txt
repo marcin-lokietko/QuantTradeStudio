@@ -2,6 +2,7 @@ add_library(BotBacktester STATIC
     BotBacktester.cpp
     Evaluator/Evaluator.cpp
     Utils.cpp
+    Simulators/HistoricalMarketDataProviderSimulator.cpp
     Simulators/MarketServiceSimulator.cpp
     Simulators/SystemTimeSimulator.cpp
 )

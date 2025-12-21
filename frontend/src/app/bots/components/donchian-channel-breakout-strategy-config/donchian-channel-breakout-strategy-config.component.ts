@@ -17,6 +17,7 @@ import { AddAssetAndNumberDialog } from '@app/bots/components/add-asset-and-numb
 import { DataService, RequestResult } from '@app/services/data.service';
 import { NotificationService } from '@app/services/notification.service';
 import { NotificationSeverity } from '@app/shared/components/notification/notification-severity-enum';
+import { BacktestDialog } from '../backtest-dialog/backtest-dialog.component';
 
 @Component({
   selector: 'app-donchian-channel-breakout-strategy-config',
@@ -235,6 +236,22 @@ export class DonchianChannelBreakoutStrategyConfigComponent {
       default:
         return executionInterval;
     }
+  }
+
+  public openBacktestDialog(): void {
+    const botParams = this.buildBotParams();
+
+    const dialogRef = this.dialog.open(BacktestDialog, {
+      width: '60vw',
+      data: {
+        botParams,
+        availableInitialAssets: [...this.selectedBaseAssets, this.selectedQuoteAsset],
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('Dialog closed with result:', result);
+    });
   }
 
   private buildBotParams() {

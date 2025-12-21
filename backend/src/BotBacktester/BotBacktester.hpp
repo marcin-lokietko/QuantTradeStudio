@@ -29,12 +29,17 @@ class BotBacktester : public IBotBacktester {
       std::chrono::system_clock::time_point simEnd);
 
   std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> buildKlineSequenceMap(
-      const BotAlgorithms::MovingAverageCrossover::Config& config, std::chrono::system_clock::time_point simStart,
-      std::chrono::system_clock::time_point simEnd);
+      const ApiGateway::AssetSymbols& baseAssets, const ApiGateway::AssetSymbol& quoteAsset,
+      std::chrono::system_clock::time_point simStart, std::chrono::system_clock::time_point simEnd);
+
+  std::chrono::system_clock::time_point getDonchianChannelBreakoutStrategySimulationStart(
+      const BotAlgorithms::DonchianChannelBreakoutStrategy::Config& config,
+      std::chrono::system_clock::time_point backtesterStart);
 
   std::unique_ptr<Simulators::SystemTimeSimulator> systemTimeSimulator_;
   const BotAlgorithms::ConfigExtractor configExtractor_{};
   const MarketService::IHistoricalMarketDataProvider& historicalMarketDataProvider_;
+  std::unique_ptr<MarketService::IHistoricalMarketDataProvider> historicalMarketDataProviderSimulator_;
   std::unique_ptr<Simulators::MarketServiceSimulator> marketServiceSimulator_;
   std::unique_ptr<std::jthread> runningBot_{};
   std::unique_ptr<Evaluator::Evaluator> evaluator_{};

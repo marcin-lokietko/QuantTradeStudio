@@ -57,12 +57,14 @@ const MarketService::KlineSequence tenElementsKlinesSequence{
     {.lowPrice = ApiGateway::Price{"9500"}, .highPrice = ApiGateway::Price{"10100"}},
     kline};
 
+const uint64_t numKlinesNeeded = config.entryChannelLength.val_ + 1;
+
 class DonchianChannelBreakoutStrategyTest : public ::testing::Test {
  public:
   DonchianChannelBreakoutStrategyTest()
       : klinesStartTimePoint_(currentTimeAsTimePoint -
                               std::chrono::duration_cast<std::chrono::system_clock::duration>(
-                                  toMilliseconds(config.executionInterval) * config.entryChannelLength.val_)) {
+                                  toMilliseconds(config.executionInterval) * numKlinesNeeded)) {
     EXPECT_CALL(timeMock_, getTimeSinceEpoch()).WillRepeatedly(Return(currentTimeAsTimeT));
   }
 

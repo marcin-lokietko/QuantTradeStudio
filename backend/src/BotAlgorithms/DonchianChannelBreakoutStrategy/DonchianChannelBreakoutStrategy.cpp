@@ -44,16 +44,18 @@ void DonchianChannelBreakoutStrategy::processKlinesForAllDetectors() {
     const ApiGateway::TradingPairSymbol tradingPairSymbol{assetSymbol, config_.quoteAsset};
 
     const uint64_t maxChannelLength = std::max(config_.entryChannelLength.val_, config_.exitChannelLength.val_);
+    const uint64_t requiredKlines = maxChannelLength + 1;  // +1 to have the current close price
+
     const auto endTime = std::chrono::system_clock::from_time_t(time_.getTimeSinceEpoch());
     const std::chrono::system_clock::time_point startTime =
-        endTime - (toMilliseconds(config_.executionInterval) * maxChannelLength);
+        endTime - (toMilliseconds(config_.executionInterval) * requiredKlines);
 
     const auto klines =
         historicalMarketDataProvider_.getKlines(tradingPairSymbol, config_.executionInterval, startTime, endTime);
 
-    if (klines.size() < maxChannelLength) {
+    if (klines.size() < requiredKlines) {
       SPDLOG_ERROR("Not enough klines to process for asset {}. Required: {}, available: {}", assetSymbol.val_,
-                   maxChannelLength, klines.size());
+                   requiredKlines, klines.size());
     } else {
       detector.processKlines(klines);
     }

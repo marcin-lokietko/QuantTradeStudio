@@ -86,3 +86,20 @@ Scenario: Donchian Channel Breakout Strategy bot is started
     And System runs for 1 sec
     And MarketService method DELETE of endpoint /openOrders has been invoked with query params "{"symbol":"BTCUSDT"}"
     And MarketService method POST of endpoint /order has been invoked with query params "{"symbol":"BTCUSDT", "side":"BUY", "type":"MARKET", "quoteOrderQty":"10000"}"
+
+
+# See tests/backend/features/DonchianChannelBreakoutStrategyBacktesting.feature
+Scenario: Backtest of Donchian Channel Breakout Strategy bot is started
+    Given AlgoTrader is running
+    Given MarketService mock is running
+    And MarketService mock expects invocations on DELETE /openOrders and will return empty response
+    And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"}]}"
+    And MarketService mock expects invocations on GET /klines and will return responses as defined in file "klines/currentClosePriceIsHigherThanEntryChannelMaximum2.json"
+    When Bots page is opened
+    And Bot "DonchianChannelBreakoutStrategy" is selected
+    And Moving Donchian Channel Breakout Strategy bot configuration is filled with execution interval "OneMinute", exit channel length "3", entry channel length "6", quote asset "USDT", base assets ["BTC", "ETH"]
+    And Open bot backtest dialog button is clicked
+    And Backtest configuration is filled with transaction fee percent "1", owned assets ["BTC", "ETH", "USDT"] with amounts ["1", "10", "10000"] respectively, simulation start date "10/17/2025", start time "18:07", simulation end date "10/17/2025", end time "18:08"
+    And Launch backtest button is clicked
+    Then Total profit if held "2,000.00" is shown
+    And Total profit "2,138.55" is shown

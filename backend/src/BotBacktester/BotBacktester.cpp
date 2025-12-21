@@ -4,13 +4,17 @@
 
 #include <variant>
 
+#include "BotAlgorithms/DonchianChannelBreakoutStrategy/DonchianChannelBreakoutStrategy.hpp"
 #include "BotAlgorithms/MovingAverageCrossover/MovingAverageCrossover.hpp"
 #include "BotAlgorithms/Rebalancer/Rebalancer.hpp"
+#include "BotBacktester/Simulators/HistoricalMarketDataProviderSimulator.hpp"
 
 namespace BotBacktester {
 
 ApiGateway::BacktestResults BotBacktester::testBot(const ApiGateway::BotConfig& botConfig,
                                                    const ApiGateway::BacktestConfig& backtestConfig) {
+  SPDLOG_INFO("Starting bot backtest botConfig: {}, backtestConfig {}", toString(botConfig), toString(backtestConfig));
+
   stopAllBots();
   simulationEndPromise_ = std::promise<void>();
   backtestConfig_ = backtestConfig;
@@ -60,7 +64,8 @@ ApiGateway::BacktestResults BotBacktester::testBot(const ApiGateway::BotConfig& 
           SPDLOG_INFO("Received valid configuration for bot: MovingAverageCrossover");
 
           auto klineSequenceMap =
-              buildKlineSequenceMap(config, this->backtestConfig_.simulationStart, this->backtestConfig_.simulationEnd);
+              buildKlineSequenceMap(config.baseAssets, config.quoteAsset, this->backtestConfig_.simulationStart,
+                                    this->backtestConfig_.simulationEnd);
 
           this->marketServiceSimulator_ = std::make_unique<Simulators::MarketServiceSimulator>(
               klineSequenceMap, *this->systemTimeSimulator_, this->backtestConfig_.transactionFeePercent,
@@ -75,6 +80,33 @@ ApiGateway::BacktestResults BotBacktester::testBot(const ApiGateway::BotConfig& 
                                                                                   *systemTime);
                 bot.run(std::move(st));
               });
+        } else if constexpr (std::is_same_v<T, BotAlgorithms::DonchianChannelBreakoutStrategy::Config>) {
+          SPDLOG_INFO("Received valid configuration for bot: DonchianChannelBreakoutStrategy");
+
+          const auto simulationStart =
+              getDonchianChannelBreakoutStrategySimulationStart(config, this->backtestConfig_.simulationStart);
+          auto klineSequenceMap = buildKlineSequenceMap(config.baseAssets, config.quoteAsset, simulationStart,
+                                                        this->backtestConfig_.simulationEnd);
+
+          this->marketServiceSimulator_ = std::make_unique<Simulators::MarketServiceSimulator>(
+              klineSequenceMap, *this->systemTimeSimulator_, this->backtestConfig_.transactionFeePercent,
+              this->backtestConfig_.initialOwnedAssets);
+
+          this->historicalMarketDataProviderSimulator_ =
+              std::make_unique<Simulators::HistoricalMarketDataProviderSimulator>(klineSequenceMap);
+
+          this->evaluator_ = std::make_unique<Evaluator::Evaluator>(std::move(klineSequenceMap));
+
+          this->runningBot_ =
+              std::make_unique<std::jthread>([conf = std::move(config), &marketService = this->marketServiceSimulator_,
+                                              &historyProvider = this->historicalMarketDataProviderSimulator_,
+                                              &systemTime = this->systemTimeSimulator_](std::stop_token st) mutable {
+                BotAlgorithms::DonchianChannelBreakoutStrategy::DonchianChannelBreakoutStrategy bot(
+                    std::move(conf), *marketService, *historyProvider, *systemTime);
+                bot.run(std::move(st));
+              });
+        } else {
+          SPDLOG_ERROR("Unsupported bot configuration type");
         }
       },
       extractedConfig);
@@ -118,13 +150,12 @@ std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> BotBacktes
 }
 
 std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> BotBacktester::buildKlineSequenceMap(
-    const BotAlgorithms::MovingAverageCrossover::Config& config, std::chrono::system_clock::time_point simStart,
-    std::chrono::system_clock::time_point simEnd) {
+    const ApiGateway::AssetSymbols& baseAssets, const ApiGateway::AssetSymbol& quoteAsset,
+    std::chrono::system_clock::time_point simStart, std::chrono::system_clock::time_point simEnd) {
   std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> klineSequenceMap;
 
-  for (const auto& singleBaseAsset : config.baseAssets) {
-    const ApiGateway::TradingPairSymbol tradingPairSymbol{singleBaseAsset, config.quoteAsset};
-
+  for (const auto& singleBaseAsset : baseAssets) {
+    const ApiGateway::TradingPairSymbol tradingPairSymbol{singleBaseAsset, quoteAsset};
     const auto klines = historicalMarketDataProvider_.getKlines(tradingPairSymbol, ApiGateway::KlineInterval::OneMinute,
                                                                 simStart, simEnd);
     klineSequenceMap[tradingPairSymbol] = klines;
@@ -133,4 +164,14 @@ std::map<ApiGateway::TradingPairSymbol, MarketService::KlineSequence> BotBacktes
   return klineSequenceMap;
 }
 
+std::chrono::system_clock::time_point BotBacktester::getDonchianChannelBreakoutStrategySimulationStart(
+    const BotAlgorithms::DonchianChannelBreakoutStrategy::Config& config,
+    std::chrono::system_clock::time_point backtesterStart) {
+  const auto longerChannel = std::max(config.entryChannelLength.val_, config.exitChannelLength.val_);
+  // Last kline is used only to get the current close price
+  const auto totalKlinesNeeded = longerChannel + 1;
+  const auto lookbackDuration = toMilliseconds(config.executionInterval) * totalKlinesNeeded;
+
+  return backtesterStart - lookbackDuration;
+}
 }  // namespace BotBacktester
