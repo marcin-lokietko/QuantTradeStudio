@@ -1,7 +1,5 @@
 #include "BotBacktester/Simulators/MarketServiceSimulator.hpp"
 
-#include <spdlog/spdlog.h>
-
 #include "BotBacktester/Utils.hpp"
 #include "Utils/ToString.hpp"
 
@@ -36,6 +34,8 @@ MarketService::AssetPrices MarketServiceSimulator::getPrices(
   }
   return assetPrices;
 }
+
+ApiGateway::AssetQuantities MarketServiceSimulator::getOwnedAssetsQuantity() const { return ownedAssets_; }
 
 MarketService::AssetValues MarketServiceSimulator::getOwnedAssetValues(
     const ApiGateway::AssetSymbol& quoteAsset) const {

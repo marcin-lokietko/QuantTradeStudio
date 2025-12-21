@@ -2,11 +2,11 @@ Feature: Moving Average Crossover Bot
 
 
 ### Example 1: price/3DayAverageRisesAbove6DayAverage.json - for BTCUSDT:
-# after 6th kline: short term is 80010, long term is 80015     -> short term BELOW long term
-# after 7th kline: short term is 80030, long term is 80023.(3) -> short term ABOVE long term
+# after 6th price check: short term is 80010, long term is 80015     -> short term BELOW long term
+# after 7th price check: short term is 80030, long term is 80023.(3) -> short term ABOVE long term
 ### Example 2: price/3DayAverageFallsBelow6DayAverage.json - for ETHUSDT:
-# after 6th kline: short term is 2020, long term is 2015     -> short term ABOVE long term
-# after 7th kline: short term is 1996.(6), long term is 2005 -> short term BELOW long term
+# after 6th price check: short term is 2020, long term is 2015     -> short term ABOVE long term
+# after 7th price check: short term is 1996.(6), long term is 2005 -> short term BELOW long term
 Scenario Outline: Ordering a trade when short and long averages cross over
     Given MarketService mock is running
     And MarketService mock expects invocations on GET /openOrders and will return "[{"symbol":"BTCUSDT","orderId":2,"price":"80000","origQty":"0.01","executedQty":"0","side":"SELL"}]"

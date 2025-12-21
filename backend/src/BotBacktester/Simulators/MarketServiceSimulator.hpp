@@ -1,5 +1,7 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
+
 #include <chrono>
 
 #include "ApiGateway/BacktestConfig.hpp"
@@ -28,21 +30,22 @@ class MarketServiceSimulator : public MarketService::IMarketService {
                          ApiGateway::AssetQuantities initialOwnedAssets);
 
   MarketService::Time getServerTime() override {
+    SPDLOG_ERROR("Method not implemented: getServerTime");
     throw MarketServiceSimulatorException("Method not implemented: getServerTime");
   }
 
   ApiGateway::Price getPrice(const ApiGateway::TradingPairSymbol& tradingPairSymbol) const override {
     (void)tradingPairSymbol;
+    SPDLOG_ERROR("Method not implemented: getPrice");
     throw MarketServiceSimulatorException("Method not implemented: getPrice");
   }
 
   MarketService::AssetPrices getPrices(const std::vector<ApiGateway::TradingPairSymbol>& symbols) const;
 
-  ApiGateway::AssetQuantities getOwnedAssetsQuantity() const override {
-    throw MarketServiceSimulatorException("Method not implemented: getOwnedAssetsQuantity");
-  }
+  ApiGateway::AssetQuantities getOwnedAssetsQuantity() const override;
 
   ApiGateway::AssetValues getOwnedAssetsQuantityAndValue() const override {
+    SPDLOG_ERROR("Method not implemented: getOwnedAssetsQuantityAndValue");
     throw MarketServiceSimulatorException("Method not implemented: getOwnedAssetsQuantityAndValue");
   }
 
@@ -57,16 +60,19 @@ class MarketServiceSimulator : public MarketService::IMarketService {
                                                                const ApiGateway::AssetQuantity& quoteQuantity) const;
 
   MarketService::TradingPairs getAllTradingPairs() const override {
+    SPDLOG_ERROR("Method not implemented: getAllTradingPairs");
     throw MarketServiceSimulatorException("Method not implemented: getAllTradingPairs");
   }
 
   MarketService::TradingPairs getTradingPairsWithQuoteAsset(const ApiGateway::AssetSymbol& quoteAsset) const override {
     (void)quoteAsset;
+    SPDLOG_ERROR("Method not implemented: getTradingPairsWithQuoteAsset");
     throw MarketServiceSimulatorException("Method not implemented: getTradingPairsWithQuoteAsset");
   }
 
   MarketService::TradingPairs getTradingPairsWithBaseAsset(const ApiGateway::AssetSymbol& baseAsset) const override {
     (void)baseAsset;
+    SPDLOG_ERROR("Method not implemented: getTradingPairsWithBaseAsset");
     throw MarketServiceSimulatorException("Method not implemented: getTradingPairsWithBaseAsset");
   }
 

@@ -72,7 +72,9 @@ void MovingAverageCrossover::placeOrdersBasedOnCrossoverSignals() {
   const auto cancelOrdersAndInitOwnedAssetsAmounts = [&ownedAssetsAmounts, &marketService = marketService_,
                                                       &config = config_]() {
     cancelOpenOrders(marketService, config.quoteAsset, config.baseAssets);
+    SPDLOG_INFO("Cancelled all relevant open orders");
     if (!ownedAssetsAmounts) {
+      SPDLOG_INFO("Fetching owned assets quantities");
       const auto ownedAssetsVector = marketService.getOwnedAssetsQuantity();
       ownedAssetsAmounts = std::make_unique<ApiGateway::AssetQuantitiesMap>(ApiGateway::asMap(ownedAssetsVector));
     }
