@@ -60,3 +60,9 @@ Now you can use gdb debugger while running backend connected to frontend.
 - doc/ArchitectureLog.md - design changes done during the development
 
 # Further development plans
+
+# Disclaimer
+
+This project is provided for educational and demonstration purposes only. It is not financial advice and is not intended for live trading.
+
+The author makes no guarantees of performance, profitability, or accuracy, and accepts no liability for any losses arising from the use of this software. Use at your own risk.
