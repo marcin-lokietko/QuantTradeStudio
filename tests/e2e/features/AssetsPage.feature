@@ -2,14 +2,14 @@ Feature: Assets page
 
 
 Scenario: Owned assets are presented
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     And MarketService mock is running with default configuration
     When Assets page is opened
     Then Assets are presented
 
 
 Scenario Outline: Asset order is placed
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     And MarketService mock is running with default configuration
     When Assets page is opened
     And Assets are presented

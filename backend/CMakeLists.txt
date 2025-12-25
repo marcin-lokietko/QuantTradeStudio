@@ -12,7 +12,7 @@ set(CMAKE_CXX_COMPILER "/bin/g++")
 
 
 #set compilation flags
-set(EXECUTABLE_NAME "AlgoTrader")
+set(EXECUTABLE_NAME "QuantTradeStudio")
 # set(BASIC_COMPILE_FLAGS "-Wall;-Wextra;-Werror;-pthread;-lboost_system;-lrt;-lm;-ldl")
 set(BASIC_COMPILE_FLAGS "-Wall;-Wextra;-Werror;-pthread;-lrt;-lm;-ldl")
 

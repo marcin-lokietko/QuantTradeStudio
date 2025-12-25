@@ -48,7 +48,7 @@ export class DataService {
   async getOwnedAssets(): Promise<Balance[] | undefined> {
     console.log('DataService.getOwnedAssets');
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/assets');
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + '/assets');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -64,7 +64,7 @@ export class DataService {
   async getOpenOrders(): Promise<Order[] | undefined> {
     console.log('DataService.getOpenOrders');
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/openOrders');
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + '/openOrders');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -89,7 +89,7 @@ export class DataService {
     }
 
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + urlWithQuery);
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + urlWithQuery);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -112,7 +112,7 @@ export class DataService {
     });
     const urlWithQuery = `/availableQuoteAssets?${params.toString()}`;
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + urlWithQuery);
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + urlWithQuery);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -136,7 +136,7 @@ export class DataService {
     );
 
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/makeOrder', {
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + '/makeOrder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ export class DataService {
     console.log('DataService.startBot, params:', JSON.stringify(botParams));
 
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/startBot', {
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + '/startBot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ export class DataService {
     console.log('DataService.botConfig, params:', JSON.stringify(botConfig), 'DataService.backtestConfig:', JSON.stringify(backtestConfig));
 
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/testBot', {
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + '/testBot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ export class DataService {
   async getQuoteAssetsSuitableForBots(): Promise<string[] | undefined> {
     console.log('DataService.getQuoteAssetsSuitableForBots');
     try {
-      const response = await fetch(environment.algoTraderBackendUrlPrefix + '/quoteAssetsSuitableForBots');
+      const response = await fetch(environment.quantTradeStudioBackendUrlPrefix + '/quoteAssetsSuitableForBots');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

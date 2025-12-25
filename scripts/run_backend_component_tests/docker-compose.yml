@@ -1,29 +1,29 @@
 services:
   backend:
-    image: algo-trader-backend
+    image: quant-trade-studio-backend
     restart: always
     volumes:
-      - ../../backend:/algo-trader/backend
-      - ../../build:/algo-trader/build
-      - ../../logs:/algo-trader/logs
-      - ../../keys:/algo-trader/keys
-      - ../../config:/algo-trader/config
-      - ../../tests:/algo-trader/tests
+      - ../../backend:/quant-trade-studio/backend
+      - ../../build:/quant-trade-studio/build
+      - ../../logs:/quant-trade-studio/logs
+      - ../../keys:/quant-trade-studio/keys
+      - ../../config:/quant-trade-studio/config
+      - ../../tests:/quant-trade-studio/tests
     ports:
       - "5000:5000"
     user: "${USER_ID}:${GROUP_ID}"
     working_dir: /
     command: bash -c "${BACKEND_CMD}"
   backend-tests:
-    image: algo-trader-backend-component-tests
+    image: quant-trade-studio-backend-component-tests
     volumes:
-      - ../../tests:/algo-trader/tests
-      - ../../scripts:/algo-trader/scripts
+      - ../../tests:/quant-trade-studio/tests
+      - ../../scripts:/quant-trade-studio/scripts
     ports:
       - "5001:5001"
     environment:
-      PYTHONPATH: "/algo-trader"
+      PYTHONPATH: "/quant-trade-studio"
     working_dir: /
-    command: bash -c "cd /algo-trader/tests/backend && behave --no-color ${TEST_ARGUMENTS}"
+    command: bash -c "cd /quant-trade-studio/tests/backend && behave --no-color ${TEST_ARGUMENTS}"
     stdin_open: true
     tty: true

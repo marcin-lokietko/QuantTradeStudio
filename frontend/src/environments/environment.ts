@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  algoTraderBackendUrlPrefix: 'http://localhost:5000',
+  quantTradeStudioBackendUrlPrefix: 'http://localhost:5000',
 };

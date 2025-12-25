@@ -16,14 +16,14 @@ fi
 
 docker run \
     -u $(id -u):$(id -g) \
-    -v ${BACKEND_DIR}:/algo-trader/backend \
-    -v ${FRONTEND_DIR}:/algo-trader/frontend \
-    -v ${SCRIPTS_PATH}:/algo-trader/scripts \
-    -v ${BACKEND_BUILD_MAIN_DIR}:/algo-trader/build \
-    -v ${LOGS_DIR}:/algo-trader/logs \
-    -v ${KEYS_DIR}:/algo-trader/keys \
-    -v ${CONFIG_DIR}:/algo-trader/config \
+    -v ${BACKEND_DIR}:/quant-trade-studio/backend \
+    -v ${FRONTEND_DIR}:/quant-trade-studio/frontend \
+    -v ${SCRIPTS_PATH}:/quant-trade-studio/scripts \
+    -v ${BACKEND_BUILD_MAIN_DIR}:/quant-trade-studio/build \
+    -v ${LOGS_DIR}:/quant-trade-studio/logs \
+    -v ${KEYS_DIR}:/quant-trade-studio/keys \
+    -v ${CONFIG_DIR}:/quant-trade-studio/config \
     $PORT_MAPPING \
     $DOCKER_FLAGS \
-    algo-trader-$1 \
+    quant-trade-studio-$1 \
     bash -c "$2"

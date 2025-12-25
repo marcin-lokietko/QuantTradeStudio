@@ -1,32 +1,32 @@
 networks:
-  algo-trader-network:
+  quant-trade-studio-network:
     driver: bridge
 
 services:
   frontend:
-    image: algo-trader-frontend
+    image: quant-trade-studio-frontend
     networks:
-      - algo-trader-network
+      - quant-trade-studio-network
     restart: always
     volumes:
-      - ../../frontend:/algo-trader/frontend
+      - ../../frontend:/quant-trade-studio/frontend
     ports:
-      - '4200:4200'
-    working_dir: /algo-trader/frontend
+      - "4200:4200"
+    working_dir: /quant-trade-studio/frontend
     command: bash -c "npm install && ng serve --host 0.0.0.0"
   backend:
-    image: algo-trader-backend
+    image: quant-trade-studio-backend
     networks:
-      - algo-trader-network
+      - quant-trade-studio-network
     restart: always
     volumes:
-      - ../../backend:/algo-trader/backend
-      - ../../build:/algo-trader/build
-      - ../../logs:/algo-trader/logs
-      - ../../keys:/algo-trader/keys
-      - ../../config:/algo-trader/config
+      - ../../backend:/quant-trade-studio/backend
+      - ../../build:/quant-trade-studio/build
+      - ../../logs:/quant-trade-studio/logs
+      - ../../keys:/quant-trade-studio/keys
+      - ../../config:/quant-trade-studio/config
     ports:
       - "5000:5000"
     user: "${USER_ID}:${GROUP_ID}"
     working_dir: /
-    command: bash -c "/algo-trader/build/debug/src/AlgoTrader /algo-trader/config/dockerDevelConfig.json"
+    command: bash -c "/quant-trade-studio/build/debug/src/QuantTradeStudio /quant-trade-studio/config/dockerDevelConfig.json"

@@ -9,4 +9,4 @@ if [ -n "$1" ]; then
   FORMATTER_TASK="$1"
 fi
 
-. ${SCRIPTS_PATH}/execute_command_in_docker.sh backend "/algo-trader/scripts/run_formatter.sh ${FORMATTER_TASK}"
+. ${SCRIPTS_PATH}/execute_command_in_docker.sh backend "/quant-trade-studio/scripts/run_formatter.sh ${FORMATTER_TASK}"

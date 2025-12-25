@@ -3,7 +3,7 @@ set -e
 
 . $(dirname $(realpath -s $0))/.common.sh
 
-FILES=$(find /algo-trader/backend/ -type f \( -name "*.cpp" -o -name "*.hpp" \))
+FILES=$(find /quant-trade-studio/backend/ -type f \( -name "*.cpp" -o -name "*.hpp" \))
 
 IS_FORMATTING_NOK=0
 for FILE in $FILES; do

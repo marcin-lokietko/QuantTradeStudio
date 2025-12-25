@@ -3,7 +3,7 @@ import os
 
 
 def before_all(context):
-    context.screens_dir = '/algo-trader/logs/e2e_screens'
+    context.screens_dir = '/quant-trade-studio/logs/e2e_screens'
     if os.path.exists(context.screens_dir):
         shutil.rmtree(context.screens_dir)
     os.makedirs(context.screens_dir)
@@ -36,7 +36,7 @@ def after_step(context, step):
     context.webdriver.save_screenshot(file_path + "/" + file_name_with_extension)
 
 def after_scenario(context, scenario):
-    with open("/algo-trader/logs/e2e_tests/browser_logs.txt", "w") as f:
+    with open("/quant-trade-studio/logs/e2e_tests/browser_logs.txt", "w") as f:
         for entry in context.webdriver.get_log("browser"):
             f.write(f"{entry['level']} - {entry['message']}\n")
 

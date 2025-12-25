@@ -20,7 +20,7 @@ def step_impl(context, method, endpoint, request_to_response_file_path):
     def is_line_empty(lines, index):
         return index >= len(lines) or not lines[index] or lines[index].isspace()
 
-    with open("/algo-trader/tests/mockedResponses/" + request_to_response_file_path, 'r') as file:
+    with open("/quant-trade-studio/tests/mockedResponses/" + request_to_response_file_path, 'r') as file:
         lines = [line.strip() for line in file]
 
         i = 0

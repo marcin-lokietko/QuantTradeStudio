@@ -1,5 +1,5 @@
 {
-  "logsCatalogPath": "/algo-trader/logs/backend_tests",
-  "keysCatalogPath": "/algo-trader/tests/keys",
+  "logsCatalogPath": "/quant-trade-studio/logs/backend_tests",
+  "keysCatalogPath": "/quant-trade-studio/tests/keys",
   "binanceUrlPrefix": "backend-tests:5001"
 }

@@ -36,7 +36,7 @@ def wait_for_frontend(context):
     context.webdriver = webdriver.Remote(command_executor=selenium_server_url, options=options)
     context.webdriver.get(frontend_url)
 
-    assert "Algo Trader" in context.webdriver.title, f'Actual title: {context.webdriver.title}'
+    assert "Quant Trade Studio" in context.webdriver.title, f'Actual title: {context.webdriver.title}'
 
 def setup_pages(context):
     context.base_layout = BaseLayout(context.webdriver)
@@ -46,7 +46,7 @@ def setup_pages(context):
     context.make_order_dialog = MakeOrderDialog(context.webdriver)
     context.backtest_dialog = BacktestDialog(context.webdriver)
 
-@step('AlgoTrader is running')
+@step('QuantTradeStudio is running')
 def step_impl(context):
     message = "Executing e2e test; scenario: " + context.scenario.name
     wait_for_backend(backend_url, timeout=60, message_to_backend=message)

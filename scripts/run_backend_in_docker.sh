@@ -3,4 +3,4 @@ set -e
 
 . $(dirname $(realpath -s $0))/.common.sh
 
-${SCRIPTS_PATH}/execute_command_in_docker.sh backend "/algo-trader/build/debug/src/${MAIN_EXE_NAME} /algo-trader/config/dockerDevelConfig.json" 5000
+${SCRIPTS_PATH}/execute_command_in_docker.sh backend "/quant-trade-studio/build/debug/src/${MAIN_EXE_NAME} /quant-trade-studio/config/dockerDevelConfig.json" 5000

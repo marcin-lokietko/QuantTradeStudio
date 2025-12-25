@@ -1,5 +1,5 @@
 {
-  "logsCatalogPath": "/algo-trader/logs/e2e_tests",
-  "keysCatalogPath": "/algo-trader/tests/keys",
+  "logsCatalogPath": "/quant-trade-studio/logs/e2e_tests",
+  "keysCatalogPath": "/quant-trade-studio/tests/keys",
   "binanceUrlPrefix": "e2e-tests:5001"
 }

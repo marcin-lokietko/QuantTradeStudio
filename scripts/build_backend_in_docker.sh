@@ -11,4 +11,4 @@ if [ -n "$1" ]; then
   BUILD_TYPE="$1"
 fi
 
-. ${SCRIPTS_PATH}/execute_command_in_docker.sh backend "/algo-trader/scripts/build.sh ${BUILD_TYPE}" 0
+. ${SCRIPTS_PATH}/execute_command_in_docker.sh backend "/quant-trade-studio/scripts/build.sh ${BUILD_TYPE}" 0

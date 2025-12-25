@@ -14,7 +14,7 @@ else
   export TEST_ARGUMENTS=""
 fi
 
-export BACKEND_CMD="/algo-trader/build/debug/src/AlgoTrader /algo-trader/tests/backend/configuration.json" 
+export BACKEND_CMD="/quant-trade-studio/build/debug/src/QuantTradeStudio /quant-trade-studio/tests/backend/configuration.json" 
 docker compose --file ${SCRIPTS_PATH}/run_backend_component_tests/docker-compose.yml up -d --build
 TEST_CONTAINER_ID=$(docker ps -aqf "name=run_backend_component_tests-backend-tests-1")
 docker logs --follow ${TEST_CONTAINER_ID} | tee ${LOGS_DIR}/backend_tests/behave_output.log

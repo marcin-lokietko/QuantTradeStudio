@@ -34,8 +34,8 @@ void setupLogger(const Config::LogsCatalogPath& logDir) {
     std::filesystem::create_directory(logDir.val_);
   }
 
-  const std::string filenameLatest = "AlgoTrader_backend_latest.log";
-  const std::string filenameWithTime = "AlgoTrader_backend_" + getDatetimeString() + ".log";
+  const std::string filenameLatest = "QuantTradeStudio_backend_latest.log";
+  const std::string filenameWithTime = "QuantTradeStudio_backend_" + getDatetimeString() + ".log";
 
   const auto fileSinkLatest =
       std::make_shared<spdlog::sinks::basic_file_sink_mt>(logDir.val_.string() + "/" + filenameLatest, true);
@@ -43,7 +43,7 @@ void setupLogger(const Config::LogsCatalogPath& logDir) {
       std::make_shared<spdlog::sinks::basic_file_sink_mt>(logDir.val_.string() + "/" + filenameWithTime, true);
 
   const std::vector<spdlog::sink_ptr> sinks{fileSinkLatest, fileSinkWithTime};
-  const auto logger = std::make_shared<spdlog::logger>("AlgoTrader_backend", sinks.begin(), sinks.end());
+  const auto logger = std::make_shared<spdlog::logger>("QuantTradeStudio_backend", sinks.begin(), sinks.end());
 
   spdlog::set_default_logger(logger);
   spdlog::set_level(spdlog::level::trace);
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 
   setupLogger(config->logsCatalogPath);
 
-  SPDLOG_INFO("########## Config read; starting AlgoTrader");
+  SPDLOG_INFO("########## Config read; starting QuantTradeStudio");
 
   const MarketService::Binance::Encryption encryption{config->keysCatalogPath};
   const Http::Http http{};

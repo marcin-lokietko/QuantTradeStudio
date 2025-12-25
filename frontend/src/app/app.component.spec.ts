@@ -19,8 +19,8 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'algo-trader-gui' title`, () => {
-    expect(app.title).toEqual('algo-trader-gui');
+  it(`should have the 'quant-trade-studio-gui' title`, () => {
+    expect(app.title).toEqual('quant-trade-studio-gui');
   });
 
   it(`menu should allow to navigate to: assets, orders, bots`, () => {

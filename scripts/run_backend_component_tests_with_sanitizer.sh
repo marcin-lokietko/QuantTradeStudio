@@ -8,7 +8,7 @@ mkdir -p ${LOGS_DIR}/sanitizer
 
 # ==7332==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
 export ASAN_OPTIONS="detect_leaks=0:verbosity=1:abort_on_error=0"
-export BACKEND_CMD="/algo-trader/build/sanitizer/src/AlgoTrader /algo-trader/tests/backend/configuration.json > /algo-trader/logs/sanitizer/sanitizer_output.txt 2>&1"
+export BACKEND_CMD="/quant-trade-studio/build/sanitizer/src/QuantTradeStudio /quant-trade-studio/tests/backend/configuration.json > /quant-trade-studio/logs/sanitizer/sanitizer_output.txt 2>&1"
 docker compose --file ${SCRIPTS_PATH}/run_backend_component_tests/docker-compose.yml up -d --build
 TEST_CONTAINER_ID=$(docker ps -aqf "name=run_backend_component_tests-backend-tests-1")
 docker logs --follow ${TEST_CONTAINER_ID}

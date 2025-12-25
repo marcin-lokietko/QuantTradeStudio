@@ -1,7 +1,7 @@
 {
   // Only intended for debugging Angular unit tests while working locally (outside of docker container). In order to do so:
   // 1. Start the Angular test server with `npm run test` - this will start Karma and serve the debug.html endpoint at http://localhost:9876/debug.html
-  // 2. Open "algo-trader/frontend" catalog in VSCode and select the "Debug Angular Unit Tests" configuration from the debug panel
+  // 2. Open "quant-trade-studio/frontend" catalog in VSCode and select the "Debug Angular Unit Tests" configuration from the debug panel
   // 3. Start debugging by clicking the green play button or pressing F5
   // Now you can set breakpoints in your Angular unit tests and debug them directly in VSCode
   "version": "0.2.0",

@@ -1,44 +1,44 @@
 services:
   frontend:
-    image: algo-trader-frontend
+    image: quant-trade-studio-frontend
     restart: always
     volumes:
-      - ../../frontend:/algo-trader/frontend
+      - ../../frontend:/quant-trade-studio/frontend
     ports:
-      - '4200:4200'
-    working_dir: /algo-trader/frontend
+      - "4200:4200"
+    working_dir: /quant-trade-studio/frontend
     command: bash -c "npm install && ng serve --host 0.0.0.0 --configuration=e2e"
   backend:
-    image: algo-trader-backend
+    image: quant-trade-studio-backend
     restart: always
     volumes:
-      - ../../backend:/algo-trader/backend
-      - ../../build:/algo-trader/build
-      - ../../logs:/algo-trader/logs
-      - ../../keys:/algo-trader/keys
-      - ../../config:/algo-trader/config
-      - ../../tests:/algo-trader/tests
+      - ../../backend:/quant-trade-studio/backend
+      - ../../build:/quant-trade-studio/build
+      - ../../logs:/quant-trade-studio/logs
+      - ../../keys:/quant-trade-studio/keys
+      - ../../config:/quant-trade-studio/config
+      - ../../tests:/quant-trade-studio/tests
     ports:
       - "5000:5000"
     user: "${USER_ID}:${GROUP_ID}"
     working_dir: /
-    command: bash -c "/algo-trader/build/debug/src/AlgoTrader /algo-trader/tests/e2e/configuration.json"
+    command: bash -c "/quant-trade-studio/build/debug/src/QuantTradeStudio /quant-trade-studio/tests/e2e/configuration.json"
   selenium:
     image: selenium/standalone-chrome:latest # official Selenium image - includes: Google Chrome (headless), ChromeDriver, Selenium server
     ports:
       - "4444:4444" # localhost:4444/ui/ -> Selenium Grid
     shm_size: 2g # prevents Chrome crashes
   e2e-tests:
-    image: algo-trader-e2e-tests
+    image: quant-trade-studio-e2e-tests
     volumes:
-      - ../../tests:/algo-trader/tests
-      - ../../scripts:/algo-trader/scripts
-      - ../../logs:/algo-trader/logs
+      - ../../tests:/quant-trade-studio/tests
+      - ../../scripts:/quant-trade-studio/scripts
+      - ../../logs:/quant-trade-studio/logs
     ports:
       - "5001:5001"
     environment:
-      PYTHONPATH: "/algo-trader"
+      PYTHONPATH: "/quant-trade-studio"
     working_dir: /
-    command: bash -c "cd /algo-trader/tests/e2e && behave --no-color ${TEST_ARGUMENTS}"
+    command: bash -c "cd /quant-trade-studio/tests/e2e && behave --no-color ${TEST_ARGUMENTS}"
     stdin_open: true
     tty: true

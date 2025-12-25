@@ -8,7 +8,7 @@ mkdir -p ${LOGS_DIR}/profiler
 
 # When the backend is run, then the gmon.out profiler output is created in the working directory of the backend container.
 # The default working directory is root, so we first need to change it to a directory, which is mounted to the host
-export BACKEND_CMD="cd /algo-trader/build/profiler/src && ./AlgoTrader /algo-trader/tests/backend/configuration.json"
+export BACKEND_CMD="cd /quant-trade-studio/build/profiler/src && ./QuantTradeStudio /quant-trade-studio/tests/backend/configuration.json"
 docker compose --file ${SCRIPTS_PATH}/run_backend_component_tests/docker-compose.yml up -d --build
 TEST_CONTAINER_ID=$(docker ps -aqf "name=run_backend_component_tests-backend-tests-1")
 docker logs --follow ${TEST_CONTAINER_ID}
@@ -20,7 +20,7 @@ TEST_EXIT_CODE=$(docker inspect ${TEST_CONTAINER_ID} --format='{{.State.ExitCode
 docker compose --file ${SCRIPTS_PATH}/run_backend_component_tests/docker-compose.yml down
 
 # It's needed to process this file to get readable output.
-gprof ${BUILD_PROFILER_PATH}/src/AlgoTrader ${BUILD_PROFILER_PATH}/src/gmon.out > ${LOGS_DIR}/profiler/gprof_analysis.txt
+gprof ${BUILD_PROFILER_PATH}/src/QuantTradeStudio ${BUILD_PROFILER_PATH}/src/gmon.out > ${LOGS_DIR}/profiler/gprof_analysis.txt
 
 # Exit with the test container's exit code
 if [ "$TEST_EXIT_CODE" -ne 0 ]; then

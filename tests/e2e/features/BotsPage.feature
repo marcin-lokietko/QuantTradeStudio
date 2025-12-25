@@ -3,7 +3,7 @@ Feature: Bots page
 
 # See tests/backend/features/RebalancerBot.feature, scenario "Single rebalancing of 2 assets" for explanation of the expected requests to MarketService
 Scenario: Rebalancer bot is started
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     And MarketService mock is running with default configuration
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     When Bots page is opened
@@ -19,7 +19,7 @@ Scenario: Rebalancer bot is started
 
 # See tests/backend/features/RebalancerBotBacktesting.feature, scenario "Backtesting single rebalancing of 2 assets"
 Scenario: Backtest of Rebalancer bot is started
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     And MarketService mock is running with default configuration
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     And MarketService mock expects invocations on GET /klines and will return responses as defined in file "klines/1.json"
@@ -35,7 +35,7 @@ Scenario: Backtest of Rebalancer bot is started
 
 # See tests/backend/features/MovingAverageCrossoverBot.feature, scenario outline "Ordering a trade when short and long averages cross over" - example 1
 Scenario: Moving Average Crossover bot is started
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     And MarketService mock is running
     And MarketService mock expects invocations on GET /openOrders and will return "[{"symbol":"BTCUSDT","orderId":2,"price":"80000","origQty":"0.01","executedQty":"0","side":"SELL"}]"
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
@@ -54,7 +54,7 @@ Scenario: Moving Average Crossover bot is started
 
 # See tests/backend/features/MovingAverageCrossoverBotbacktesting.feature, scenario "Backtesting of ordering a trade when short and long averages cross over"
 Scenario: Backtest of Moving Average Crossover bot is started
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     Given MarketService mock is running
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"}]}"
@@ -71,7 +71,7 @@ Scenario: Backtest of Moving Average Crossover bot is started
 
 # See tests/backend/features/DonchianChannelBreakoutStrategy.feature, scenario outline "Ordering a trade when current close price is more extreme than exit/entry channel extremum" - example 1
 Scenario: Donchian Channel Breakout Strategy bot is started
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     And MarketService mock is running
     And MarketService mock expects invocations on GET /openOrders and will return "[{"symbol":"BTCUSDT","orderId":2,"price":"80000","origQty":"0.01","executedQty":"0","side":"SELL"}]"
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
@@ -90,7 +90,7 @@ Scenario: Donchian Channel Breakout Strategy bot is started
 
 # See tests/backend/features/DonchianChannelBreakoutStrategyBacktesting.feature
 Scenario: Backtest of Donchian Channel Breakout Strategy bot is started
-    Given AlgoTrader is running
+    Given QuantTradeStudio is running
     Given MarketService mock is running
     And MarketService mock expects invocations on DELETE /openOrders and will return empty response
     And MarketService mock expects invocations on GET /exchangeInfo and will return "{"symbols":[{"symbol":"ETHUSDT","baseAsset":"ETH","quoteAsset":"USDT"},{"symbol":"BTCUSDT","baseAsset":"BTC","quoteAsset":"USDT"}]}"

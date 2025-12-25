@@ -1,5 +1,5 @@
 {
-  "logsCatalogPath": "/workspaces/algo-trader/logs",
-  "keysCatalogPath": "/workspaces/algo-trader/keys",
+  "logsCatalogPath": "/workspaces/quant-trade-studio/logs",
+  "keysCatalogPath": "/workspaces/quant-trade-studio/keys",
   "binanceUrlPrefix": "https://testnet.binance.vision/api/v3"
 }
