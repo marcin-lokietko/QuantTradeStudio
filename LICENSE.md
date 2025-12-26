@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2025 Marcin Łokietko
+Copyright (c) 2025 Marcin Łokietko (https://github.com/marcin-lokietko)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the “Software”), to deal
